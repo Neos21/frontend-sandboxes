@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Iframe Communication : Parent</title>
+    <style>
+
+*, ::before, ::after {
+  box-sizing: border-box;
+}
+
+html {
+  margin: 0;
+  padding: 0;
+  overflow: auto scroll;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+}
+
+.width-100  { width : 100%; }
+.height-100 { height: 100%; }
+
+h1 {
+  font-size: 1.2rem;
+}
+
+table {
+  border-collapse: collapse;
+}
+
+th {
+  border: 1px solid #999;
+  padding: .1rem .3rem;
+  text-align: center;
+}
+
+td {
+  border: 1px solid #999;
+  padding: .1rem .3rem;
+  text-align: right;
+}
+
+button {
+  cursor: pointer;
+}
+
+#iframe {
+  border: 0;
+  width: 100%;
+  height: 350px;
+}
+#iframe.vertical            { resize: vertical  ; }
+#iframe.horizontal          { resize: horizontal; }
+#iframe.vertical.horizontal { resize: both      ; }
+
+#container {
+  margin: 0 15px;
+  background: #f0f0f0;
+}
+
+    </style>
+    <script>
+
+document.addEventListener('DOMContentLoaded', () => {
+  const iframe           = document.getElementById('iframe');
+  const htmlClientWidth  = document.getElementById('html-client-width' );
+  const htmlOffsetWidth  = document.getElementById('html-offset-width' );
+  const htmlScrollWidth  = document.getElementById('html-scroll-width' );
+  const htmlClientHeight = document.getElementById('html-client-height');
+  const htmlOffsetHeight = document.getElementById('html-offset-height');
+  const htmlScrollHeight = document.getElementById('html-scroll-height');
+  const bodyClientWidth  = document.getElementById('body-client-width' );
+  const bodyOffsetWidth  = document.getElementById('body-offset-width' );
+  const bodyScrollWidth  = document.getElementById('body-scroll-width' );
+  const bodyClientHeight = document.getElementById('body-client-height');
+  const bodyOffsetHeight = document.getElementById('body-offset-height');
+  const bodyScrollHeight = document.getElementById('body-scroll-height');
+  const iframeHtmlClientWidth  = document.getElementById('iframe-html-client-width' );
+  const iframeHtmlOffsetWidth  = document.getElementById('iframe-html-offset-width' );
+  const iframeHtmlScrollWidth  = document.getElementById('iframe-html-scroll-width' );
+  const iframeHtmlClientHeight = document.getElementById('iframe-html-client-height');
+  const iframeHtmlOffsetHeight = document.getElementById('iframe-html-offset-height');
+  const iframeHtmlScrollHeight = document.getElementById('iframe-html-scroll-height');
+  const iframeBodyClientWidth  = document.getElementById('iframe-body-client-width' );
+  const iframeBodyOffsetWidth  = document.getElementById('iframe-body-offset-width' );
+  const iframeBodyScrollWidth  = document.getElementById('iframe-body-scroll-width' );
+  const iframeBodyClientHeight = document.getElementById('iframe-body-client-height');
+  const iframeBodyOffsetHeight = document.getElementById('iframe-body-offset-height');
+  const iframeBodyScrollHeight = document.getElementById('iframe-body-scroll-height');
+  
+  const forceEval = (evalStr) => {
+    try { return eval(evalStr); }
+    catch(_error) { return '(Error)'; }
+  };
+  
+  window.getSize = () => {
+    // document.querySelector('html') = document.documentElement
+    htmlClientWidth .innerText = document.documentElement.clientWidth ;
+    htmlOffsetWidth .innerText = document.documentElement.offsetWidth ;
+    htmlScrollWidth .innerText = document.documentElement.scrollWidth ;
+    htmlClientHeight.innerText = document.documentElement.clientHeight;
+    htmlOffsetHeight.innerText = document.documentElement.offsetHeight;
+    htmlScrollHeight.innerText = document.documentElement.scrollHeight;
+    // document.querySelector('body') = document.body
+    bodyClientWidth .innerText = document.body.clientWidth ;
+    bodyOffsetWidth .innerText = document.body.offsetWidth ;
+    bodyScrollWidth .innerText = document.body.scrollWidth ;
+    bodyClientHeight.innerText = document.body.clientHeight;
+    bodyOffsetHeight.innerText = document.body.offsetHeight;
+    bodyScrollHeight.innerText = document.body.scrollHeight;
+    // Iframe
+    iframeHtmlClientWidth .innerText = forceEval(`iframe.contentWindow.document.documentElement.clientWidth` );
+    iframeHtmlOffsetWidth .innerText = forceEval(`iframe.contentWindow.document.documentElement.offsetWidth` );
+    iframeHtmlScrollWidth .innerText = forceEval(`iframe.contentWindow.document.documentElement.scrollWidth` );
+    iframeHtmlClientHeight.innerText = forceEval(`iframe.contentWindow.document.documentElement.clientHeight`);
+    iframeHtmlOffsetHeight.innerText = forceEval(`iframe.contentWindow.document.documentElement.offsetHeight`);
+    iframeHtmlScrollHeight.innerText = forceEval(`iframe.contentWindow.document.documentElement.scrollHeight`);
+    iframeBodyClientWidth .innerText = forceEval(`iframe.contentWindow.document.body.clientWidth` );
+    iframeBodyOffsetWidth .innerText = forceEval(`iframe.contentWindow.document.body.offsetWidth` );
+    iframeBodyScrollWidth .innerText = forceEval(`iframe.contentWindow.document.body.scrollWidth` );
+    iframeBodyClientHeight.innerText = forceEval(`iframe.contentWindow.document.body.clientHeight`);
+    iframeBodyOffsetHeight.innerText = forceEval(`iframe.contentWindow.document.body.offsetHeight`);
+    iframeBodyScrollHeight.innerText = forceEval(`iframe.contentWindow.document.body.scrollHeight`);
+  };
+  
+  window.addEventListener('load', () => {
+    getSize();
+    
+    try {
+      const childPageHeight = iframe.contentWindow.document.documentElement.scrollHeight;
+      iframe.style.height = `${childPageHeight}px`;
+      console.log('Parent : Initial Height', childPageHeight);
+    } catch(error) {
+      console.warn('Parent : Initial Height Error', error);
+    }
+    
+    try {
+      iframe.contentWindow.postMessage('Hello From Parent!', '*');
+      console.log('Parent : Post Message');
+    } catch(error) {
+      console.warn('Parent : Post Message Error', error);
+    }
+  });
+  window.addEventListener('resize', getSize);
+  new MutationObserver(getSize).observe(iframe, { attributes: true });
+  getSize();
+  
+  window.addEventListener('message', (event) => {
+    console.log('Parent : Message Received', event.data || event);
+  });
+  
+  const togglePageSize = (element, direction) => {
+    document.querySelector(element).classList.toggle(`${direction}-100`);
+    document.getElementById(`toggle-${element}-${direction}-status`).innerText = document.querySelector(element).classList.contains(`${direction}-100`) ? '100%' : 'auto';
+    getSize();
+    try { iframe.contentWindow.getSize(); } catch(_error) { }
+  };
+  document.getElementById('toggle-html-width' ).addEventListener('click', () => togglePageSize('html', 'width' ));
+  document.getElementById('toggle-html-height').addEventListener('click', () => togglePageSize('html', 'height'));
+  document.getElementById('toggle-body-width' ).addEventListener('click', () => togglePageSize('body', 'width' ));
+  document.getElementById('toggle-body-height').addEventListener('click', () => togglePageSize('body', 'height'));
+  
+  document.getElementById('reset-size').addEventListener('click', () => {
+    iframe.removeAttribute('style');
+    iframe.classList.remove('vertical'  );
+    iframe.classList.remove('horizontal');
+    document.getElementById('toggle-vertical-status'  ).innerText = 'Off';
+    document.getElementById('toggle-horizontal-status').innerText = 'Off';
+    getSize();
+    try { iframe.contentWindow.getSize(); } catch(_error) { }
+  });
+  const toggleResize = (direction) => {
+    iframe.classList.toggle(direction);
+    document.getElementById(`toggle-${direction}-status`).innerText = iframe.classList.contains(direction) ? 'On ' : 'Off';
+    getSize();
+    try { iframe.contentWindow.getSize(); } catch(_error) { }
+  };
+  document.getElementById('toggle-vertical'  ).addEventListener('click', () => toggleResize('vertical'  ));
+  document.getElementById('toggle-horizontal').addEventListener('click', () => toggleResize('horizontal'));
+});
+
+    </script>
+  </head>
+  <body>
+
+<div id="container">
+  <h1>Iframe Communication : Parent</h1>
+  <p>Author : <a href="https://neos21.net/">Neo</a></p>
+  <table>
+    <thead>
+      <tr>
+        <th rowspan="2">Element</th>
+        <th colspan="3">Width </th>
+        <th colspan="3">Height</th>
+      </tr>
+      <tr>
+        <th>Client</th>
+        <th>Offset</th>
+        <th>Scroll</th>
+        <th>Client</th>
+        <th>Offset</th>
+        <th>Scroll</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <th>HTML</th>
+        <td id="html-client-width" ></td>
+        <td id="html-offset-width" ></td>
+        <td id="html-scroll-width" ></td>
+        <td id="html-client-height"></td>
+        <td id="html-offset-height"></td>
+        <td id="html-scroll-height"></td>
+      </tr>
+      <tr>
+        <th>Body</th>
+        <td id="body-client-width" ></td>
+        <td id="body-offset-width" ></td>
+        <td id="body-scroll-width" ></td>
+        <td id="body-client-height"></td>
+        <td id="body-offset-height"></td>
+        <td id="body-scroll-height"></td>
+      </tr>
+      <tr>
+        <th>Iframe HTML</th>
+        <td id="iframe-html-client-width" ></td>
+        <td id="iframe-html-offset-width" ></td>
+        <td id="iframe-html-scroll-width" ></td>
+        <td id="iframe-html-client-height"></td>
+        <td id="iframe-html-offset-height"></td>
+        <td id="iframe-html-scroll-height"></td>
+      </tr>
+      <tr>
+        <th>Iframe Body</th>
+        <td id="iframe-body-client-width" ></td>
+        <td id="iframe-body-offset-width" ></td>
+        <td id="iframe-body-scroll-width" ></td>
+        <td id="iframe-body-client-height"></td>
+        <td id="iframe-body-offset-height"></td>
+        <td id="iframe-body-scroll-height"></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  <p>
+    <button type="button" id="toggle-html-width" >Toggle HTML Width  (<span id="toggle-html-width-status" >auto</span>)</button>
+    <button type="button" id="toggle-html-height">Toggle HTML Height (<span id="toggle-html-height-status">auto</span>)</button>
+    <button type="button" id="toggle-body-width" >Toggle Body Width  (<span id="toggle-body-width-status" >auto</span>)</button>
+    <button type="button" id="toggle-body-height">Toggle Body Height (<span id="toggle-body-height-status">auto</span>)</button>
+  </p>
+  
+  <p>
+    Begin Iframe
+    <button type="button" id="reset-size">Reset Size</button>
+    <button type="button" id="toggle-vertical"  >Toggle Vertical (<span id="toggle-vertical-status">Off</span>)</button>
+    <button type="button" id="toggle-horizontal">Toggle Horizontal (<span id="toggle-horizontal-status">Off</span>)</button>
+  </p>
+  <iframe id="iframe" src="./child.html"></iframe>
+</div>
+
+  </body>
+</html>
