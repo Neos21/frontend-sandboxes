@@ -51,7 +51,7 @@ button {
 #iframe {
   border: 0;
   width: 100%;
-  height: 350px;
+  height: 390px;
 }
 #iframe.vertical            { resize: vertical  ; }
 #iframe.horizontal          { resize: horizontal; }
@@ -125,6 +125,8 @@ document.addEventListener('DOMContentLoaded', () => {
     iframeBodyClientHeight.innerText = forceEval(`iframe.contentWindow.document.body.clientHeight`);
     iframeBodyOffsetHeight.innerText = forceEval(`iframe.contentWindow.document.body.offsetHeight`);
     iframeBodyScrollHeight.innerText = forceEval(`iframe.contentWindow.document.body.scrollHeight`);
+    
+    document.getElementById('iframe-height').innerText = window.getComputedStyle(iframe).height;
   };
   
   window.addEventListener('load', () => {
@@ -181,6 +183,14 @@ document.addEventListener('DOMContentLoaded', () => {
   };
   document.getElementById('toggle-vertical'  ).addEventListener('click', () => toggleResize('vertical'  ));
   document.getElementById('toggle-horizontal').addEventListener('click', () => toggleResize('horizontal'));
+  
+  document.getElementById('auto-fit').addEventListener('click', () => {
+    try {
+      iframe.style.height = `${iframe.contentWindow.document.documentElement.offsetHeight}px`;
+    } catch(error) { console.warn('Auto Fit : Failed', error); }
+    getSize();
+    try { iframe.contentWindow.getSize(); } catch(_error) { }
+  });
 });
 
     </script>
@@ -189,7 +199,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
 <div id="container">
   <h1>Iframe Communication : Parent</h1>
-  <p>Author : <a href="https://neos21.net/">Neo</a></p>
   <table>
     <thead>
       <tr>
@@ -254,12 +263,15 @@ document.addEventListener('DOMContentLoaded', () => {
   </p>
   
   <p>
-    Begin Iframe
     <button type="button" id="reset-size">Reset Size</button>
     <button type="button" id="toggle-vertical"  >Toggle Vertical (<span id="toggle-vertical-status">Off</span>)</button>
     <button type="button" id="toggle-horizontal">Toggle Horizontal (<span id="toggle-horizontal-status">Off</span>)</button>
+    <button type="button" id="auto-fit"         >Auto Fit</button>
+    <span id="iframe-height">-</span>
   </p>
   <iframe id="iframe" src="./child.html"></iframe>
+  
+  <p>Author : <a href="https://neos21.net/">Neo</a></p>
 </div>
 
   </body>

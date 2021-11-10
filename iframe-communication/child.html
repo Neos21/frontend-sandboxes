@@ -24,6 +24,7 @@ body {
 
 .width-100  { width : 100%; }
 .height-100 { height: 100%; }
+.padding-1  { padding: 1px 0; }
 
 h1 {
   font-size: 1.2rem;
@@ -145,6 +146,13 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('toggle-html-height').addEventListener('click', () => togglePageSize('html', 'height'));
   document.getElementById('toggle-body-width' ).addEventListener('click', () => togglePageSize('body', 'width' ));
   document.getElementById('toggle-body-height').addEventListener('click', () => togglePageSize('body', 'height'));
+  
+  document.getElementById('toggle-padding').addEventListener('click', () => {
+    document.querySelector('body').classList.toggle('padding-1');
+    document.getElementById('toggle-padding-status').innerText = document.querySelector('body').classList.contains('padding-1') ? '1px' : '0px';
+    getSize();
+    try { window.parent.getSize(); } catch(_error) { }
+  });
 });
 
     </script>
@@ -213,6 +221,7 @@ document.addEventListener('DOMContentLoaded', () => {
   <button type="button" id="toggle-html-height">Toggle HTML Height (<span id="toggle-html-height-status">auto</span>)</button>
   <button type="button" id="toggle-body-width" >Toggle Body Width  (<span id="toggle-body-width-status" >auto</span>)</button>
   <button type="button" id="toggle-body-height">Toggle Body Height (<span id="toggle-body-height-status">auto</span>)</button>
+  <button type="button" id="toggle-padding">Toggle Padding (<span id="toggle-padding-status">0px</span>)</button>
 </p>
 
 <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>

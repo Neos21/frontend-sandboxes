@@ -3,6 +3,13 @@
 __[Enter The Website](https://neos21.github.io/frontend-sandboxes/)__
 
 
+## Develop
+
+```bash
+$ npx sirv-cli -D .
+```
+
+
 ## Links
 
 - [Neo's World](https://neos21.net/)
