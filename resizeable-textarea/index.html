@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Resizeable Textarea</title>
+    <style>
+
+*, ::before, ::after { box-sizing: border-box; }
+html { font-family: sans-serif; }
+
+textarea {
+  width: 200px;
+  height: 100px;
+}
+
+#horizontal { resize: horizontal; }
+#vertical { resize: vertical; }
+#both { resize: both; }
+#both2 {
+  resize: both;
+  max-width: 500px;
+  max-height: 200px;
+  min-width: 100px;
+  min-height: 50px;
+}
+#none { resize: none; }
+
+    </style>
+  </head>
+  <body>
+
+<p><textarea id="default"   >Default (No CSS)</textarea></p>
+<p><textarea id="horizontal">resize: horizontal;</textarea></p>
+<p><textarea id="vertical"  >resize: vertical;</textarea></p>
+<p><textarea id="both"      >resize: both;</textarea></p>
+<p><textarea id="both2"     >resize: both; and max/min width/height</textarea></p>
+<p><textarea id="none"      >resize: none;</textarea></p>
+
+  </body>
+</html>

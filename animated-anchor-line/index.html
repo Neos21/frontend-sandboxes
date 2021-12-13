@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>リンクホバー時に下線を引かせる CSS アニメーション</title>
+    <style>
+
+*, ::before, ::after { box-sizing: border-box; }
+html { font-family: sans-serif; }
+
+.line {
+  text-decoration: none;  /* 元々の下線を消す */
+  display: inline-block;  /* リンクを文字列中に置くため */
+}
+
+/* 疑似要素を作る */
+.line::before {
+  display: block;
+  content: "";
+  position: relative;
+  top: 1.25em;         /* 下線になるよう適当に位置調整 */
+  left: 0;             /* テキストの左端に位置させる */
+  width: 0;            /* アニメーションさせるため 0 にしておく */
+  height: 1px;
+  background: #00f;  /* 下線の色になる */
+  transition: .3s;     /* アニメーションの時間 */
+}
+
+.line:hover::before {
+  width: 100%;  /* ホバー時にテキストの右端まで下線を伸ばす */
+}
+
+    </style>
+  </head>
+  <body>
+
+<h1>リンクホバー時に下線を引かせる CSS アニメーション</h1>
+<p>This is <a href="#">Normal Link</a>.</p>
+<p>This is <a href="#" class="line">Line Animation Link</a>.</p>
+
+  </body>
+</html>

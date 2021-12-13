@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Animated Linear Gradient</title>
+    <style>
+
+*, ::before, ::after { box-sizing: border-box; }
+html { font-family: sans-serif; }
+
+#logo a {
+  display: block;
+  width: 100%;
+  height: 200px;
+  line-height: 200px;
+  font-size: 250%;
+  letter-spacing: 5px;
+  text-align: center;
+  text-decoration: none;
+  color: #fff;
+  background: linear-gradient(to right, #0af, #f0a);
+  background-size: 300% 300%;
+}
+
+#logo a:hover {
+  animation: AnimatedLinearGradient 2s ease infinite;
+}
+
+@keyframes AnimatedLinearGradient {
+    0% { background-position:   0% 50%; }
+   50% { background-position: 100% 50%; }
+  100% { background-position:   0% 50%; }
+}
+
+    </style>
+  </head>
+  <body>
+
+<div id="logo">
+  <a href="#">Site Title</a>
+</div>
+
+  </body>
+</html>

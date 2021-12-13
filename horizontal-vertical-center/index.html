@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>幅・高さが不明な要素を上下左右中央配置する</title>
+    <style>
+
+*, ::before, ::after { box-sizing: border-box; }
+html { font-family: sans-serif; }
+
+/* .wrapper の height: 100% を生かすためには html と body にも height: 100% が必要 */
+html,
+body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.wrapper {
+  position: relative;
+  height: 100%;
+}
+
+.box {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  /* 
+   * NOTE : left を指定せず transform: translateY(-50%); といった設定をすれば、左揃えで上下中央配置になる
+   *        また、上の設定のあと right: 0; を指定すれば右揃えになる
+   */
+}
+
+/* 以下はサンプル用のスタイル設定 */
+.wrapper:nth-child(odd ) { outline: 5px solid #09f; outline-offset: -5px; color: #ddd; background: #222; }
+.wrapper:nth-child(even) { outline: 5px solid #0f9; outline-offset: -5px; color: #222; background: #ddd; }
+.box                     { outline: 2px solid #f09; outline-offset: -2px; padding: 0 1rem; }
+
+    </style>
+  </head>
+  <body>
+
+<div class="wrapper">
+  <div class="box">
+    <h1>Horizontal &amp; Vertical Center</h1>
+    <p>このボックスは .wrapper の中で上下左右中央に配置されます。</p>
+  </div>
+</div>
+
+<div class="wrapper">
+  <div class="box">
+    <h1>.box の幅・高さは分からなくても OK</h1>
+    <p>中身の要素が色々変わって幅や高さが分からなくても Anything OK! (特ホウ王国のリサ・ステッグマイヤー風)</p>
+    <p>上の .box との幅・高さの違いを比較してみてください。</p>
+    <p>CSS3、素晴らしいですね!!!</p>
+  </div>
+</div>
+
+  </body>
+</html>

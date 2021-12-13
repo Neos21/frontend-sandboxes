@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>IE で input[type=&quot;text&quot;] と input[type=&quot;password&quot;] に同じ size 属性を指定すると幅が異なる件</title>
+    <style>
+
+#iedefault  input[type="text"]     { font-family: "MS UI Gothic"; }
+#iedefault  input[type="password"] { font-family: "Tahoma"; }
+#msuigothic input                  { font-family: "MS UI Gothic"; }
+#mspgothic  input                  { font-family: "ＭＳ Ｐゴシック", "MS PGothic"; }
+#tahoma     input                  { font-family: "Tahoma"; }
+
+dl  { width: 200px; float: left; }
+dt  { font-weight: bold; }
+dd  { margin-left: 20px; margin-bottom: .5rem; }
+div { margin-left: 220px; }
+h1  { font-size: 1.1rem; }
+
+    </style>
+  </head>
+  <body>
+
+<dl>
+  <dt>Default</dt>
+  <dd id="default">
+    <input value="Hoge ふが" size="20" type="text"><br>
+    <input value="Hoge ふが" size="20" type="password">
+  </dd>
+  <dt>IE Default (simulate)</dt>
+  <dd id="iedefault">
+    <input value="Hoge ふが" size="20" type="text"><br>
+    <input value="Hoge ふが" size="20" type="password">
+  </dd>
+  <dt>MS UI Gothic</dt>
+  <dd id="msuigothic">
+    <input value="Hoge ふが" size="20" type="text"><br>
+    <input value="Hoge ふが" size="20" type="password">
+  </dd>
+  <dt>MS PGothic</dt>
+  <dd id="mspgothic">
+    <input value="Hoge ふが" size="20" type="text"><br>
+    <input value="Hoge ふが" size="20" type="password">
+  </dd>
+  <dt>Tahoma</dt>
+  <dd id="tahoma">
+    <input value="Hoge ふが" size="20" type="text"><br>
+    <input value="Hoge ふが" size="20" type="password">
+  </dd>
+</dl>
+
+<div>
+  <h1>IE で input[type=&quot;text&quot;] と input[type=&quot;password&quot;] に同じ size 属性を指定すると幅が異なる件</h1>
+  <p>原因は IE のデフォルトスタイルシートで</p>
+  <ul>
+    <li>input[type=&quot;text&quot;] には MS UI Gothic</li>
+    <li>input[type=&quot;password&quot;] には Tahoma</li>
+  </ul>
+  <p>がそれぞれ指定されているため。</p>
+  <p>回避するには input[type=&quot;text&quot;] と input[type=&quot;password&quot;] の両方に同じ font-family を設定する。</p>
+  <p>個人的にはパスワードの「●」の文字が良い感じなので Tahoma に設定するのがオススメ。</p>
+  <p>もちろん、size 属性を使わず、font-family に依存しない単位で幅を指定していればそもそも問題なし。</p>
+</div>
+
+  </body>
+</html>

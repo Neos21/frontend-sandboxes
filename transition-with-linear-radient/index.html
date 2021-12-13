@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Transition With Linear Gradient</title>
+    <style>
+
+*, ::before, ::after { box-sizing: border-box; }
+html { font-family: sans-serif; }
+
+#logo1 a {
+  display: block;
+  width: 100%;
+  height: 200px;
+  line-height: 200px;
+  font-size: 250%;
+  letter-spacing: 5px;
+  text-align: center;
+  text-decoration: none;
+  background: linear-gradient(to right, hsla(200, 100%, 45%, .9), hsla(160, 100%, 45%, .9));
+  transition: .2s;
+  color: #fff;
+  background-color: #fff;
+}
+
+#logo1 a:hover {
+  color: #ddd;
+  background-color: #000;
+}
+
+#logo2 {
+  background: linear-gradient(to left, hsla(200, 100%, 45%, .9), hsla(160, 100%, 45%, .9));
+}
+
+#logo2 a {
+  display: block;
+  width: 100%;
+  height: 200px;
+  line-height: 200px;
+  font-size: 250%;
+  letter-spacing: 5px;
+  text-align: center;
+  text-decoration: none;
+  background: linear-gradient(to right, hsla(200, 100%, 45%, .9), hsla(160, 100%, 45%, .9));
+  transition: .5s;
+  color: #fff;
+  background-color: #fff;
+  opacity: 1;
+}
+
+#logo2 a:hover {
+  opacity: 0;  /* NOTE : 文字列も消えちゃう ;( */
+}
+
+hr {
+  visibility: hidden;
+}
+
+    </style>
+  </head>
+  <body>
+
+<div id="logo1">
+  <a href="#">Site Title</a>
+</div>
+
+<hr>
+
+<div id="logo2">
+  <a href="#"><span>Site Title</span></a>
+</div>
+
+  </body>
+</html>
