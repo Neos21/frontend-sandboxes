@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>pointer-events: none; To Image Link</title>
+    <style>
+
+*, ::before, ::after { box-sizing: border-box; }
+html { font-family: sans-serif; }
+
+/* 画像を右クリックで保存されないように pointer-events を仕込む */
+img {
+  pointer-events: none;
+}
+
+/* display: block; でも OK */
+#good-link {
+  display: inline-block;
+}
+
+    </style>
+  </head>
+  <body>
+
+<h1>img 要素に pointer-events: none; を指定すると、それを囲んでいる a 要素のリンクが効かなくなる件と、その回避方法</h1>
+
+<p>
+  <a id="bad-link"    href="https://dummyimage.com/300x200/f09/fff.png&text=Bad"    target="_blank"><img id="bad-img"    src="https://dummyimage.com/300x200/f09/fff.png&text=Bad"                                 ></a>
+  <a id="good-link"   href="https://dummyimage.com/300x200/09f/fff.png&text=Good"   target="_blank"><img id="good-img"   src="https://dummyimage.com/300x200/09f/fff.png&text=Good"                                ></a>
+  <a id="normal-link" href="https://dummyimage.com/300x200/0f3/fff.png&text=Normal" target="_blank"><img id="normal-img" src="https://dummyimage.com/300x200/0f3/fff.png&text=Normal" style="pointer-events: auto;"></a>
+</p>
+
+<ul>
+  <li>画像をむやみに右クリックで保存されないようにするため、img 要素に pointer-events: none; を指定する。<br>これにより、画像の上で右クリックをしても、「名前を付けて画像を保存」といったコンテキストメニューが表示されなくなる。</li>
+  <li>すると、今度は img 要素を囲んでいる a 要素のリンクも効かなくなってしまう。<br>「Bad」はこの状態。</li>
+  <li>a 要素はリンクとして効かせつつ、img 要素は右クリックしても「名前を付けて画像を保存」を表示させないようにするには、<strong>img 要素を囲んでいる a 要素に display: inline-block;</strong> を付与すると回避できる。<br>「Good」はこの状態。</li>
+  <li>a 要素に指定する display プロパティは block でも良いが、inline だと効果がなかった。</li>
+  <li>「Normal」は参考までに、pointer-events 指定をデフォルトの auto にした場合の、普通のリンク付き画像。コンテキストメニューやリンクの動作を比較してみて欲しい。</li>
+</ul>
+
+  </body>
+</html>

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>text-decoration-skip-ink</title>
+    <style>
+
+*, ::before, ::after { box-sizing: border-box; }
+html { font-family: sans-serif; }
+
+a {
+  text-decoration: underline;
+}
+
+#none {
+  text-decoration-skip-ink: none;
+}
+
+#auto {
+  text-decoration-skip-ink: auto;
+}
+
+dl {
+  display: inline-grid;
+  grid-template-columns: auto auto;
+  white-space: nowrap;
+}
+
+dd {
+  margin-left: 1rem;
+}
+
+    </style>
+  </head>
+  <body>
+
+<h1>text-decoration-skip-ink</h1>
+<dl>
+  <dt>Browser Default</dt>
+  <dd><a href="#">http://example-quote-everything-bra-bra.com/</a></dd>
+  <dt>text-decoration-skip-ink: none</dt>
+  <dd><a href="#" id="none">http://example-quote-everything-bra-bra.com/</a></dd>
+  <dt>text-decoration-skip-ink: auto</dt>
+  <dd><a href="#" id="auto">http://example-quote-everything-bra-bra.com/</a></dd>
+</dl>
+<p>Chrome 64 から <code>text-decoration-skip-ink: auto</code> が初期値になり、下線が文字に被らなくなった。なかなか見慣れなくて気持ち悪いので <code>text-decoration-skip-ink: none</code> に戻すのが自然かと。</p>
+
+  </body>
+</html>

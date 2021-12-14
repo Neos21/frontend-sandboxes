@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Formatting JSON String</title>
+    <style>
+
+*, ::before, ::after { box-sizing: border-box; }
+html { font-family: sans-serif; }
+
+    </style>
+    <script>
+
+document.addEventListener('DOMContentLoaded', () => {
+  const plain = JSON.stringify({
+    testKey: `This is "Test" & 'Example' Value`,
+    json: `Stringify
+	Breakin' Line`
+  }, null, '\t');
+  document.getElementById('plain').innerHTML = plain;
+  console.log(plain);
+  
+  const formatted = plain.replace(/\\n/g, '\\n')
+                         .replace(/\\'/g, `\\'`)
+                         .replace(/\\"/g, '\\"')
+                         .replace(/\\&/g, '\\&')
+                         .replace(/\\r/g, '\\r')
+                         .replace(/\\t/g, '\\t')
+                         .replace(/\\b/g, '\\b')
+                         .replace(/\\f/g, '\\f');
+  document.getElementById('formatted').innerHTML = formatted;
+  console.log(formatted);
+});
+
+    </script>
+  </head>
+  <body>
+
+<pre id="plain"></pre>
+<pre id="formatted"></pre>
+
+<!-- https://stackoverflow.com/questions/4253367/how-to-escape-a-json-string-containing-newline-characters-using-javascript -->
+
+  </body>
+</html>

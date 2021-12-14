@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>CSS Variables vs SCSS Variables</title>
+    <script src="https://cdn.jsdelivr.net/npm/@neos21/in-browser-sass@1.0.10/dist/in-browser-sass.bundle.min.js"></script>
+    <style type="text/scss">
+
+*, ::before, ::after { box-sizing: border-box; }
+html { font-family: sans-serif; }
+
+:root {
+  --css-base-colour: #f00;
+  --css-code-colour: #08f;
+}
+
+$scss-base-colour    : var(--css-base-colour);
+$scss-headline-colour: #090;
+
+body {
+  color: $scss-base-colour;
+}
+
+h1 {
+  color: $scss-headline-colour;
+}
+
+code {
+  color: var(--css-code-colour);
+}
+
+    </style>
+  </head>
+  <body>
+
+<h1>CSS Variables vs SCSS Variables</h1>
+<p><code>h1</code> 要素の緑色 … 純粋な SCSS 変数の定義</p>
+<p><code>code</code> 要素の青色 … 純粋な CSS 変数の定義</p>
+<p><code>body</code> 要素の赤色 (<code>p</code> 要素に継承) … CSS 変数を SCSS 変数の定義値に利用している</p>
+
+  </body>
+</html>

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Anti-Aliasing by transform: rotate();</title>
+    <style>
+
+*, ::before, ::after { box-sizing: border-box; }
+html { font-family: sans-serif; }
+
+html > body > p > button {  /* フォント指定を優先させるため細かく指定してみたりする */
+  border: 1px solid #999;
+  border-radius: 4px;
+  padding: 8px;
+  font-size: 100%;
+  font-family: 'MS PGothic', sans-serif !important;
+  background: #e6e6e6;
+  cursor: pointer;
+}
+
+#anti-alias {
+  /* Anti-Aliasing! */
+  transform: rotate(.001deg);
+}
+
+/* 以下ボタンに適当なスタイル付け */
+
+button:hover {
+  background: #f6f6f6;
+}
+
+button:active {
+  color: #fff;
+  background: #38f;
+  border-color: #27c;
+}
+
+    </style>
+  </head>
+  <body>
+
+<h1>transform: rotate(0.001deg); でアンチエイリアスがかけられる</h1>
+
+<p>
+  <button id="normal">▼ Normal Button ボタン</button>
+  <button id="anti-alias">▼ Anti-Aliasing Button ボタン</button>
+</p>
+
+<ul>
+  <li>ClearType でないフォントを使用していると、テキストにジャギーが発生することがある。</li>
+  <li>上の2つのボタンには、ビットマップフォントである「MS P ゴシック」を適用しており、Windows 環境で見ると「▼ Normal Button」の三角形や文字がギザギザしているように見えると思う。</li>
+  <li>一方、「▼ Anti-Aliasing Button」の方は、使用しているフォントは同じ「MS P ゴシック」だが、<strong>transform: rotate(0.001deg); を指定することでハードウェア・アクセラレーションを有効にし、テキストにアンチエイリアスをかけさせた。</strong></li>
+  <li>0.001deg と、ほぼ視認できない程度に回転させている。360deg でも効くブラウザもあるようだが、当方ではダメだった。お好みで 0.0028deg など、もう少し数字を増やすとアンチエイリアスの程度を少しだけイジれる。</li>
+</ul>
+
+  </body>
+</html>

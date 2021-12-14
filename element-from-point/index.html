@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Element From Point</title>
+    <style>
+
+*, ::before, ::after { box-sizing: border-box; }
+html { font-family: sans-serif; }
+
+html,
+body {
+  margin: 0;
+  padding: 0;  /* 基本は margin だけで十分だけど… */
+  width: 100%;
+  height: 100%;
+}
+
+/* 以下本質に関係ないサンプル用の要素のスタイリング */
+
+.example1 {
+  position: absolute;
+  top: 100px;
+  left: 50px;
+  width: 150px;
+  height: 150px;
+  border: 1px solid #f00;
+  background: #fff;
+}
+
+.example2 {
+  position: absolute;
+  top: 150px;
+  left: 100px;
+  width: 150px;
+  height: 150px;
+  border: 1px solid #00f;
+  background: rgba(255, 255, 255, .6);
+}
+
+#wrapper {
+  margin-top: 350px;
+  margin-left: 1em;
+}
+
+    </style>
+    <script>
+
+document.addEventListener('DOMContentLoaded', (loadEvent) => {
+  // ポインタ要素を生成しておく
+  const pointer = document.createElement('div');
+  // position: fixed を使うと完全にフローして画面外にはみ出てもスクロールバーが表示されたりしなくなる
+  pointer.setAttribute('style', 'display: inline-block; position: fixed; top: -1000px; border: 1px solid #ccc; border-radius: 4px; padding: 10px; background: #fff; opacity: .7;');
+  // スクロールバーは html 要素が出すので body 要素配下にいるポインタ要素はスクロールバーの下に隠れる
+  document.body.appendChild(pointer);
+  
+  // 直前にポイントした要素を控えておく
+  let previousElement;
+  
+  // 引数の要素の CSS セレクタ表現を作る
+  const getQuerySelector = (elem) => {
+    const tagName = elem.tagName.toLowerCase();
+    let querySelector = tagName;
+    if(elem.id.trim()) {
+      querySelector += '#' + elem.id.trim();
+    }
+    if(elem.className.trim()) {
+      querySelector += '.' + Array.apply(null, elem.classList).join('.');
+    }
+    return querySelector;
+  };
+  
+  // ポインタの位置にある要素を取得し CSS セレクタ表現を表示する
+  const getElementFromPoint = (event) => {
+    // ポインタの位置を設定する
+    pointer.style.top = (event.y + 10) + 'px';
+    pointer.style.left = (event.x + 5) + 'px';
+    
+    // 指定の座標位置にある要素を取得する
+    const elementFromPoint = document.elementFromPoint(event.x, event.y);
+    // 要素がないか直前の要素と同じなら中止
+    if(!elementFromPoint || elementFromPoint === previousElement) {
+      return;
+    }
+    // 直前の要素として控えておく
+    previousElement = elementFromPoint;
+    
+    // 当該要素の CSS セレクタ表現を作る
+    let parentElement = elementFromPoint;
+    let tagName = elementFromPoint.tagName.toLowerCase();
+    let querySelector = getQuerySelector(elementFromPoint);
+    // 親要素に遡って CSS セレクタ表現を作る
+    while(tagName !== 'html') {
+      parentElement = parentElement.parentElement;
+      tagName = parentElement.tagName.toLowerCase();
+      querySelector = getQuerySelector(parentElement) + ' > ' + querySelector;
+    }
+    
+    // ポインタ要素に表示する
+    pointer.textContent = querySelector;
+  }
+  
+  document.addEventListener('mousemove', getElementFromPoint);  // マウス操作中
+  document.addEventListener('click'    , getElementFromPoint);  // マウスボタン押下時
+});
+
+    </script>
+  </head>
+  <body>
+
+<h1>Element From Point</h1>
+
+<div class="example1">サンプル1</div>
+<div class="example2"><mark>サンプル2</mark></div>
+
+<div id="wrapper">
+  <p class="example3" id="example3">サンプル<strong>3。</strong></p>
+</div>
+
+  </body>
+</html>

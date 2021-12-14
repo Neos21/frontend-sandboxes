@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Status Bar URI Display</title>
+  </head>
+  <body>
+
+<h1>ブラウザのステータスバーに URL が表示されないようにできるか</h1>
+
+<p><a href="https://neos21.net/">通常の外部サイトへのリンク</a></p>
+<p><a href="#">ハッシュ # のみのリンク</a></p>
+<p><a href="https://neos21.net/" onmouseover="window.status='Dummy Text';" onmouseout="window.status='';">マウスホバー時に window.status を書き換えてみる</a></p>
+<p><a href="" onclick="location.href='https://neos21.net/';return false;">href 属性値は空、クリック時に location.href で外部サイトに移動させる</a></p>
+<p><a href="#" onclick="location.href='https://neos21.net/';return false;">href 属性値はハッシュ #、クリック時に location.href で外部サイトに移動させる</a></p>
+<p><a href=".:" onclick="location.href='https://neos21.net/';return false;">href 属性値はドットとコロン .:、クリック時に location.href で外部サイトに移動させる</a></p>
+<p><span onclick="location.href='https://neos21.net/';return false;" style="color:blue;text-decoration:underline;cursor:pointer;">span 要素をスタイルでリンクに偽装、クリック時に location.href で外部サイトに移動させる</span></p>
+<hr>
+<p><a href="javascript:window.open(location.href, 'mywindow', 'width=800,height=400,menubar=no,toolbar=no,location=no,status=no,resizable=yes,scrollbars=yes');">このページをステータスバーなしのサブウィンドウで開く</a><br>
+※「window.open」ステータスバーを表示させないウィンドウで閲覧した場合にどのように URL 表示されるか検証する用</p>
+
+<p>Author : <a href="https://neos21.net/">Neo</a></p>
+
+  </body>
+</html>

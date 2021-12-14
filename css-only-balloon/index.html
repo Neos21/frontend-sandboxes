@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>CSS Only Balloon</title>
+    <style>
+
+*, ::before, ::after { box-sizing: border-box; }
+html { font-family: sans-serif; }
+
+.balloon {
+  position: relative;
+  padding: 0 1rem;
+  border-radius: 5px;
+  border: 1px solid #999;     /* border-color     => ::before */
+  background-color: #e0e0e0;  /* background-color => ::after  */
+}
+
+.balloon::before,
+.balloon::after {
+  content: "";
+  display: block;
+  position: absolute;
+  left: 2rem;
+  width: 0;
+  height: 0;
+  border: 10px solid transparent;
+}
+
+.balloon::before {
+  top: -21px;
+  border-bottom-color: #999;  /* border-color */
+}
+
+.balloon::after {
+  top: -20px;
+  border-bottom-color: #e0e0e0;  /* background-color */
+}
+
+/* For Demo */
+.balloon:hover::before { border-color: #ccf; border-bottom-color: #00f; }
+.balloon:hover::after  {                    border-bottom-color: #f00; }
+
+    </style>
+  </head>
+  <body>
+
+<h1>CSS Only Balloon</h1>
+
+<div class="balloon">
+  <p>hogehoge</p>
+  <p>fugafuga</p>
+</div>
+
+  </body>
+</html>

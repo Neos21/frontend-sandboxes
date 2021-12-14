@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Responsive Font Size : SCSS Mixin</title>
+    <script src="https://cdn.jsdelivr.net/npm/@neos21/in-browser-sass@1.0.10/dist/in-browser-sass.bundle.min.js"></script>
+    <style type="text/scss">
+
+*, ::before, ::after { box-sizing: border-box; }
+html { font-family: sans-serif; }
+
+/// 引数に単位が付いている場合は単位を除去して数値のみ返却する
+/// 
+/// @param $num {number} 数値のみ返却してほしい値
+/// @return {number} 引数を数値のみに変換した値
+@function strip-unit($num) {
+  @if type-of($num) == 'number' and not unitless($num) {
+    @return $num / ($num * 0 + 1);
+  }
+  
+  @return $num;
+}
+
+/// 単位がない数値に px を付ける
+/// 
+/// @param $num {number} 単位のみの値
+/// @return {number} 引数を px 単位に変換した値
+@function to-px($num) {
+  @return $num * 1px;
+}
+
+/// レスポンシブルにフォントサイズを変更する
+/// 
+/// @param {number} $min-font-size 最小フォントサイズ (px)
+/// @param {number} $max-font-size 最大フォントサイズ (px)
+/// @param {number} $min-breakpoint 最小ビューポート幅 (px)
+/// @param {number} $max-breakpoint 最大ビューポート幅 (px)
+/// @param {number} $root-font-size ルートのフォントサイズ・未指定時は 16 (px)
+@mixin responsive-font-size($min-font-size, $max-font-size, $min-breakpoint, $max-breakpoint, $root-font-size: 16px) {
+  $min-font-size-num : strip-unit($min-font-size);
+  $max-font-size-num : strip-unit($max-font-size);
+  $min-breakpoint-num: strip-unit($min-breakpoint);
+  $max-breakpoint-num: strip-unit($max-breakpoint);
+  $root-font-size-num: strip-unit($root-font-size);
+  
+  // Min Font Size
+  font-size: to-px($min-font-size-num);
+  
+  // Responsive Font Size
+  @media (min-width: to-px($min-breakpoint-num)) {
+    $min-font-size-rem        : ($min-font-size-num / $root-font-size-num * 1rem);
+    $min-breakpoint-percent-px: ($min-breakpoint-num / 100 * 1px);
+    $font-size-difference     : ($max-font-size-num - $min-font-size-num);
+    $breakpoint-difference    : ($max-breakpoint-num - $min-breakpoint-num);
+    $differences              : (100 * $font-size-difference / $breakpoint-difference);
+    
+    font-size: calc( #{$min-font-size-rem} + ( 1vw - #{$min-breakpoint-percent-px} ) * #{$differences} );
+  }
+  
+  // Max Font Size
+  @media (min-width: to-px($max-breakpoint-num)) {
+    font-size: to-px($max-font-size-num);
+  }
+}
+
+// 16px @ 768px から 24px @ 1024px に変更する (ルートのフォントサイズは未指定で 16px として扱わせる)
+html {
+  @include responsive-font-size(16px, 24px, 768px, 1024px);
+}
+
+    </style>
+    <script>
+
+/** フォントサイズとビューポート幅を出力する */
+function detectSizes() {
+  const test = document.getElementById('test');
+  const size = document.getElementById('size');
+  const vw   = document.getElementById('vw');
+  
+  size.innerHTML = window.getComputedStyle(test).fontSize;
+  vw.innerHTML   = window.innerWidth + 'px';
+}
+
+document.addEventListener('DOMContentLoaded', detectSizes);
+window.addEventListener('resize', detectSizes);
+
+    </script>
+  </head>
+  <body>
+
+<h1>Responsive Font Size : SCSS Mixin</h1>
+<div style="font-size: 16px">Test 16px (Min)</div>
+<div id="test">Test <span id="size"></span></div>
+<div style="font-size: 24px">Test 24px (Max)</div>
+<div id="vw" style="position: absolute; top: 0; right: 0;"></div>
+
+  </body>
+</html>

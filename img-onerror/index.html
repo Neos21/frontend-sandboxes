@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>読み込みに失敗した画像を処理する</title>
+    <style>
+
+*, ::before, ::after { box-sizing: border-box; }
+html { font-family: sans-serif; }
+
+h1 { font-size: 120%; }
+h2 { font-size: 100%; }
+
+img {
+  width: 50px;
+  height: 50px;
+}
+
+    </style>
+    <script>
+
+// window.onload 前に処理を入れておく
+document.addEventListener('DOMContentLoaded', () => {
+  // ココでは #images 配下にしているが、全 img 要素を指定して良い
+  const imgElems = document.querySelectorAll('#images img');
+  for(const imgElem of imgElems) {
+    imgElem.addEventListener('error', (event) => {
+      imgElem.style.border = '5px dashed red';
+      document.querySelector('#results').innerHTML += `<li>${imgElem.src}</li>`;
+    });
+  }
+});
+
+    </script>
+  </head>
+  <body>
+
+<h1>読み込みに失敗した画像を処理する</h1>
+
+<h2>onerror 属性を直接付与する：色付けして可視化してみる</h2>
+<p><img src="not-found.jpg" onerror="this.style.border = '5px solid red';"></p>
+
+<h2>その要素を消してみる</h2>
+<p><img src="not-found.jpg" onerror="this.parentNode.removeChild(this);"> ←ココに img 要素がありました</p>
+
+<h2>JavaScript で一括処理する</h2>
+<p id="images"><img src="not-found1.jpg"><img src="not-found2.jpg"><img src="not-found3.jpg"> ↓読み込めなかった画像 URL を表示</p>
+<ul id="results"></ul>
+
+<h2>参考</h2>
+<ul>
+  <li><a href="https://qiita.com/tonchin193/items/6144f53297abf499a7bf">JavaScript で死んでる画像をうまいことする</a></li>
+</ul>
+
+  </body>
+</html>

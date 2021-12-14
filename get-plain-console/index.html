@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Get Plain Console</title>
+    <style>
+
+*, ::before, ::after { box-sizing: border-box; }
+html { font-family: sans-serif; }
+
+    </style>
+    <script>
+
+document.addEventListener('DOMContentLoaded', () => {
+  // console.log() を独自に書き換えて汚染する
+  console = {
+    log: (text) => {
+      document.getElementById('console').innerHTML += `${text}<br>`;
+    }
+  };
+  // 汚染された console.log() を使用する
+  console.log('Dirty Console');
+  
+  // インラインフレームを生成し、そこからプレーンな console を取り出す
+  const iframe = document.body.appendChild(document.createElement('iframe'));
+  iframe.style.display = 'none';
+  window.console = iframe.contentWindow.console;
+  // プレーンな console.log() を使用する
+  console.log('Plain Console');
+});
+
+    </script>
+  </head>
+  <body>
+
+<h1>Get Plain Console</h1>
+
+<div id="console"></div>
+
+<!-- https://qiita.com/nori4k/items/be008fe228871663d809 -->
+
+  </body>
+</html>

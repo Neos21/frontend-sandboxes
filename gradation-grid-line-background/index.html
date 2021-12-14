@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Gradation Grid Line Background</title>
+    <style>
+
+*, ::before, ::after { box-sizing: border-box; }
+html { font-family: sans-serif; }
+
+.grid {
+  height: 280px;
+  background:
+    /* vignette */
+    linear-gradient(transparent 55%, #000509 99%),
+    linear-gradient(90deg, #000509 1%, transparent 20%, transparent 80%, #000509 99%),
+    /* grid */
+    linear-gradient(       transparent 95%, #34faff),
+    linear-gradient(90deg, transparent 95%, #34faff),
+    /* light */
+    radial-gradient(ellipse farthest-side at 50% 0%, #1cd2ef, #149acf 22%, transparent 34%),
+    /* line */
+    radial-gradient(ellipse farthest-side at 50% 20%, transparent 22%, #2b99c6 32%, transparent 32%),
+    /* base */
+    radial-gradient(ellipse farthest-side at 50% 10%, #19679e 40%, #0a5c95 50%, #04253d 85%, transparent),
+    #000509;
+  background-size:
+    /* vignette */
+    auto,
+    auto,
+    /* grid */
+    20px 20px,
+    20px 20px,
+    /* light */
+    1800px 280px,
+    /* line */
+    6000px 420px,
+    /* base */
+    2000px 280px,
+    auto;
+  background-position: center center;
+  /* text style */
+  color: #fff;
+  font-size: 2rem;
+  font-family: Arial, sans-serif;
+  text-transform: uppercase;
+  text-align: center;
+  text-shadow: 0 0 15px #fff;
+  letter-spacing: .8rem;
+  /* centering text */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+    </style>
+  </head>
+  <body>
+
+<h1>Gradation Grid Line Background</h1>
+
+<div class="grid">
+  Gradation Grid Line Background
+</div>
+
+  </body>
+</html>

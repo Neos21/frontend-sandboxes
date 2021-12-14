@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Good Text-Shadow</title>
+    <style>
+
+*, ::before, ::after { box-sizing: border-box; }
+html { font-family: sans-serif; }
+
+div {
+  margin: .4rem 0;
+  color: white;
+  font-size: 1.2rem;
+}
+
+.sample1 {
+  text-shadow:
+    black  1px 1px 0, black -1px -1px 0,
+    black -1px 1px 0, black  1px -1px 0,
+    black  0   1px 0, black  0   -1px 0,
+    black -1px 0   0, black  1px  0   0;
+}
+
+.sample2 {
+  text-shadow:
+    black 2px  0  , black -2px  0  ,
+    black 0   -2px, black  0    2px,
+    black 2px  2px, black -2px  2px,
+    black 2px -2px, black -2px -2px,
+    black 1px  2px, black -1px  2px,
+    black 1px -2px, black -1px -2px,
+    black 2px  1px, black -2px  1px,
+    black 2px -1px, black -2px -1px;
+}
+
+.sample3 {
+  text-shadow:
+    black 1px  1px 2px, black -1px  1px 2px,
+    black 1px -1px 2px, black -1px -1px 2px;
+}
+
+.sample4 {
+  text-shadow:
+    black 1px  1px 10px, black -1px  1px 10px,
+    black 1px -1px 10px, black -1px -1px 10px;
+}
+
+.sample5 {
+  text-shadow:
+    black 2px  0   2px, black -2px  0   2px,
+    black 0   -2px 2px, black -2px  0   2px,
+    black 2px  2px 2px, black -2px  2px 2px,
+    black 2px -2px 2px, black -2px -2px 2px,
+    black 1px  2px 2px, black -1px  2px 2px,
+    black 1px -2px 2px, black -1px -2px 2px,
+    black 2px  1px 2px, black -2px  1px 2px,
+    black 2px -1px 2px, black -2px -1px 2px,
+    black 1px  1px 2px, black -1px  1px 2px,
+    black 1px -1px 2px, black -1px -1px 2px;
+}
+
+    </style>
+  </head>
+  <body>
+
+<h1>Good Text-Shadow</h1>
+
+<div class="sample1">1px でキレイな縁取り</div>
+<div class="sample2">2px でキレイな縁取り</div>
+<div class="sample3">1px + ぼかし 2px</div>
+<div class="sample4">1px + ぼかし 10px</div>
+<div class="sample5">2px + ぼかし 2px</div>
+
+<ul>
+  <li>参考：<a href="http://qiita.com/NoxGit/items/eb0904822c0f0fe97650">ぼくの考えたさいきょうの CSS だけで 2px の縁取り文字</a></li>
+  <li>参考：<a href="http://qiita.com/NoxGit/items/59dfcb41b204008bea9f">ぼくの辿り着いた濃いめの text-shadow</a></li>
+</ul>
+
+  </body>
+</html>

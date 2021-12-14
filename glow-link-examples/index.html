@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Glow Link Examples</title>
+    <style>
+
+*, ::before, ::after { box-sizing: border-box; }
+
+@font-face {
+  font-family: "Yu Gothic M";
+  src: local("Yu Gothic Medium");
+}
+@font-face {
+  font-family: "Yu Gothic M";
+  src: local("Yu Gothic Bold");
+  font-weight: bold;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, HelveticaNeue, "Helvetica Neue", "Segoe UI", "游ゴシック体", YuGothic, "Yu Gothic M", "游ゴシック Medium", "Yu Gothic Medium", "ヒラギノ角ゴ ProN W3", "Hiragino Kaku Gothic ProN W3", HiraKakuProN-W3, "ヒラギノ角ゴ ProN", "Hiragino Kaku Gothic ProN", "ヒラギノ角ゴ Pro", "Hiragino Kaku Gothic Pro", "メイリオ", Meiryo, Osaka, "ＭＳ Ｐゴシック", "MS PGothic", sans-serif;
+  font-size: 21px;
+  color: #eee;
+  text-align: center;
+  background: #111;
+}
+
+a {
+  font-weight: bold;
+  transition: text-shadow .2s;
+}
+
+a.blue {
+  color: #6cf;
+  text-shadow: 0 0 8px rgba(120, 200, 255, .6);
+}
+  a.blue:hover {
+    text-shadow: 0 0 10px rgba(120, 200, 255, .9);
+  }
+
+a.green {
+  color: #cf6;
+  text-shadow: 0 0 8px rgba(200, 255, 120, .6);
+}
+  a.green:hover {
+    text-shadow: 0 0 10px rgba(200, 255, 120, .9);
+  }
+
+a.pink {
+  color: #f6c;
+  text-shadow: 0 0 8px rgba(255, 120, 200, .6);
+}
+  a.pink:hover {
+    text-shadow: 0 0 10px rgba(255, 120, 200, .9);
+  }
+
+    </style>
+  </head>
+  <body>
+
+<h1>Glow Link Examples</h1>
+<p><a href="#" class="blue">Glow Link</a></p>
+<p><a href="#" class="green">Glow Link</a></p>
+<p><a href="#" class="pink">Glow Link</a></p>
+
+<!-- デザインの参考にしたサイト https://unoh.github.io/ -->
+
+  </body>
+</html>

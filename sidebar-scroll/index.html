@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Sidebar Scroll</title>
+    <style>
+
+*, ::before, ::after { box-sizing: border-box; }
+html { font-family: sans-serif; }
+
+html,
+body {
+  /* ページの余白はなくしておく */
+  margin: 0;
+  padding: 0;
+}
+
+#sidebar {
+  /* サイドバーは position: absolute で浮遊させておく */
+  position: absolute;
+  background: #ccc;
+  width: 300px;
+  padding: 5px 10px;
+}
+
+#main {
+  /* メインは position: absolute を使わず作る・これが document.body の高さを決める */
+  padding: 5px 10px;
+  margin-left: 300px;
+}
+
+p {
+  margin: 3rem 0;
+}
+
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script>
+
+$(function() {
+  // 前回の scrollTop
+  let lastWindowPos = 0;
+  
+  // ウィンドウ・ページの高さ : リサイズ時に再取得が必要
+  let windowHeight;
+  let bodyHeight;
+  getHeight();
+  
+  // ウィンドウ・ページの高さを取得する
+  function getHeight() {
+    windowHeight = $(window).height();
+    bodyHeight   = $(document.body).height();
+  }
+  
+  // 最上部・最下部に着いた場合は何度も処理しないようフラグを立てる
+  let isTop = false;
+  let isBottom = false;
+  
+  // CSS の position: absolute; はそのままに top だけ追加する
+  function setOffsetTop() {
+    let topOffset = $('#sidebar').offset().top;
+    if(topOffset < 0) {
+      topOffset = 0;
+    }
+    $('#sidebar').attr('style', 'top: ' + topOffset + 'px;');
+  }
+  
+  // サイドバーのスクロール制御
+  function scrollSidebar() {
+    // 内容物の変化や可変幅の場合に高さが変わり得るので都度取得
+    const sidebarHeight = $('#sidebar').height();
+    
+    // 現在の位置
+    let windowPos = $(window).scrollTop();
+    
+    if(sidebarHeight > windowHeight) {
+      // サイドバーのスクロールが必要
+      
+      if(windowPos > lastWindowPos) {
+        // 下げたとき
+        
+        if(isTop) {
+          // 最上部に張り付いている時にスクロールを下げたら
+          // 現在の位置を position: absolute; の top に指定して固定しスクロールさせる
+          isTop = false;
+          setOffsetTop();
+        }
+        else if (!isBottom
+                 && (windowPos + windowHeight) > (sidebarHeight + $('#sidebar').offset().top)
+                 && sidebarHeight < bodyHeight) {
+          isBottom = true;
+          // 最下部に着いたら固定・CSS の position: absolute; は上書き
+          $('#sidebar').attr('style', 'position: fixed; bottom: 0;');
+        }
+      }
+      else if (windowPos < lastWindowPos) {
+        // 上げたとき
+        
+        if(isBottom) {
+          // 最下部に張り付いている時にスクロールを上げたら
+          // 現在の位置を position: absolute; の top に指定して固定しスクロールさせる
+          isBottom = false;
+          setOffsetTop();
+        }
+        else if (!isTop && windowPos < $('#sidebar').offset().top) {
+          // 最上部に張り付く位置に来たら固定
+          isTop = true;
+          $('#sidebar').attr('style', 'position: fixed; top: 0;');
+        }
+      }
+      else {
+        // リサイズ時など
+        // FIXME : ウィンドウの高さが広がると最下部を超えて下に余白が出来る場合がある
+        isTop = isBottom = false;
+        setOffsetTop();
+      }
+    }
+    else if(!isTop) {
+      // サイドバーのスクロールが要らないときは上に固定する
+      // 何度もスタイル指定が発生しないようにフラグ制御する
+      isTop = true;
+      $('#sidebar').attr('style', 'position: fixed;');
+    }
+    
+    lastWindowPos = windowPos;
+  }
+  
+  $(window)
+    .on('scroll', scrollSidebar)
+    .on('resize', () => {
+      getHeight();
+      scrollSidebar();
+    });
+});
+
+    </script>
+  </head>
+  <body>
+
+<div id="sidebar">
+  <h2>Sidebar Start</h2>
+  <p>Sidebar 0</p>
+  <p>Sidebar 1</p>
+  <p>Sidebar 2</p>
+  <p>Sidebar 3</p>
+  <p>Sidebar 4</p>
+  <p>Sidebar 5</p>
+  <p>Sidebar 6</p>
+  <p>Sidebar 7</p>
+  <p>Sidebar 8</p>
+  <p>Sidebar 9</p>
+  <h2>Sidebar End</h2>
+</div>
+
+<div id="main">
+  <h2>Sidebar Scroll</h2>
+  <ul>
+    <li>サイドバーはメインコンテンツに追随してスクロールする。</li>
+    <li>サイドバーが最下部までいくと以降のスクロールダウンは <code>position: fixed; bottom: 0;</code> 固定になる。</li>
+    <li>スクロールアップするとまたスクロールに追随する。</li>
+    <li>サイドバーが最上部までいくと以降のスクロールアップは <code>position: fixed; top: 0;</code> 固定になる。</li>
+  </ul>
+  <p>Contents 0</p>
+  <p>Contents 1</p>
+  <p>Contents 2</p>
+  <p>Contents 3</p>
+  <p>Contents 4</p>
+  <p>Contents 5</p>
+  <p>Contents 6</p>
+  <p>Contents 7</p>
+  <p>Contents 8</p>
+  <p>Contents 9</p>
+  <h2>Main</h2>
+  <p>Contents 0</p>
+  <p>Contents 1</p>
+  <p>Contents 2</p>
+  <p>Contents 3</p>
+  <p>Contents 4</p>
+  <p>Contents 5</p>
+  <p>Contents 6</p>
+  <p>Contents 7</p>
+  <p>Contents 8</p>
+  <p>Contents 9</p>
+  <h2>Main End</h2>
+</div>
+
+  </body>
+</html>

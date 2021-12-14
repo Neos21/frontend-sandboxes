@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Scroll Colour Bar</title>
+    <style>
+
+*, ::before, ::after { box-sizing: border-box; }
+html { font-family: sans-serif; }
+
+/* スクロール量に合わせて幅が可変するカラーバー */
+#scroll-colour-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 5px;
+  background: #08f;
+}
+
+/* ページの高さ稼ぎのためのスタイル */
+p {
+  font-size: 200%;
+  line-height: 3;
+}
+
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script>
+
+$(() => {
+  // スクロール量に合わせて要素の幅を変える関数
+  const scrollColourBar = () => {
+    window.requestAnimationFrame(() => {
+      const scrollAmount   = $(document).scrollTop();
+      const documentHeight = $(document).height();
+      const windowHeight   = $(window).height();
+      const scrollWidth = scrollAmount / (documentHeight - windowHeight) * 100;
+      const targetElem = $('#scroll-colour-bar');
+      targetElem.css('width', scrollWidth + '%');
+    });
+  };
+  
+  // 初期表示時 (ハッシュ付きでアクセスした場合にもスクロールする)
+  scrollColourBar();
+  
+  // スクロール・リサイズ時に再描画する
+  $(window).on('scroll resize', scrollColourBar);
+});
+
+    </script>
+  </head>
+  <body>
+
+<!-- スクロール量に合わせて幅が可変するカラーバー -->
+<div id="scroll-colour-bar"></div>
+
+<h1>Scroll Colour Bar</h1>
+<p>スクロール量に合わせて、ページ上部に青いカラーバーが表示されます。</p>
+
+<hr>
+<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+<hr>
+<h1>End</h1>
+
+  </body>
+</html>

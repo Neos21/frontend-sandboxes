@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Monochrome Emoji</title>
+    <style>
+
+*, ::before, ::after { box-sizing: border-box; }
+html { font-family: sans-serif; }
+
+/* サンプルのため絵文字フォントを指定 */
+.emoji {
+  font-family: "Apple Color Emoji", "Android Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji", "Noto Sans Emoji", "Noto Sans Symbols", "Noto Emoji", "Gecko Emoji";
+}
+
+/* 白黒化する */
+.mono {
+  filter: contrast(110%) grayscale(100%);
+}
+
+/* 以下デザイン用 */
+
+.container {
+  display: flex;
+}
+
+.container div {
+  padding: 0 1rem;
+}
+
+.container div:first-child {
+  border-right: 1px dashed #ccc;
+  padding-left: 0;
+}
+
+.container div:last-child {
+  border-left: 1px dashed #ccc;
+  padding-right: 0;
+}
+
+.container p {
+  font-size: 150%;
+}
+
+    </style>
+  </head>
+  <body>
+
+<h1>絵文字テキストを白黒にしてみる</h1>
+<div class="container">
+  <div>
+    <h2>フォント未指定</h2>
+    <p>&#x26A0; &#x3299; &#x2705;</p>
+  </div>
+  <div>
+    <h2>絵文字フォント指定</h2>
+    <p class="emoji">&#x26A0; &#x3299; &#x2705;</p>
+  </div>
+  <div>
+    <h2>白黒表示</h2>
+    <p class="emoji mono">&#x26A0; &#x3299; &#x2705;</p>
+  </div>
+</div>
+
+  </body>
+</html>

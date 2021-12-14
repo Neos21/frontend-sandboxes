@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Emoji Test</title>
+    <style>
+
+*, ::before, ::after { box-sizing: border-box; }
+html { font-family: sans-serif; }
+
+@font-face {
+  font-family: Emoji;
+  src: local('Gecko Emoji'),
+       local('Segoe UI Emoji'),
+       local('Segoe UI Symbol'),
+       local('Noto Emoji'),
+       local('Noto Color Emoji'),
+       local('Noto Sans Emoji'),
+       local('Noto Sans Symbols'),
+       local('Apple Color Emoji'),
+       local('Zapf Dingbats');
+}
+
+p {
+  font-family: Emoji;
+  color: transparent;
+  background: #f00;
+          background-clip: text;  /* 2021-12-14 コチラは効かなくなっている模様 */
+  -webkit-background-clip: text;
+}
+
+    </style>
+  </head>
+  <body>
+
+<h1>Emoji Test</h1>
+
+<p>
+  &#x25b6;<br>
+  &#x25b6;&#xfe0e;<br>
+  &#x25b6;&#xfe0f;<br>
+  ABCDEFG
+</p>
+
+  </body>
+</html>

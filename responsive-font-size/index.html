@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Responsive Font Size</title>
+    <style>
+
+*, ::before, ::after { box-sizing: border-box; }
+html { font-family: sans-serif; }
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+}
+
+#wrapper {
+  margin: 20px;
+}
+
+/* Minimum */
+html {
+  font-size: 16px;
+}
+
+/* Responsive */
+@media (min-width: 860px) {
+  html {
+    font-size: calc(1rem + ((1vw - 8.6px) * 1.9048));
+  }
+}
+
+/* Maximum */
+@media (min-width: 1280px) {
+  html {
+    font-size: 24px;
+  }
+}
+
+    </style>
+    <script>
+
+document.addEventListener('DOMContentLoaded', () => {
+  function getSizes() {
+    document.getElementById('window-width').innerHTML = `${window.innerWidth} px`;
+    document.getElementById('font-size').innerHTML = `${window.getComputedStyle(document.getElementById('font-size')).fontSize}`;
+  }
+  getSizes();
+  window.addEventListener('resize', getSizes);
+});
+
+    </script>
+  </head>
+  <body>
+
+<div id="wrapper">
+  <h1>Responsive Font Size</h1>
+  <div style="font-size: 16px;">|Text| : Minimum 16px</div>
+  <div>|Text| : Responsive</div>
+  <div style="font-size: 24px">|Text| : Maximum 24px</div>
+  <hr>
+  <ul>
+    <li>Current Window Width : <span id="window-width"></span></li>
+    <li>Current Font Size (Computed Style) : <span id="font-size"></span></li>
+  </ul>
+  <p><code>font-size: clamp()</code> が使えるようになる直前の頃に作ったモノ。</p>
+  <p><a href="scss.html">SCSS Mixin バージョン</a></p>
+</div>
+
+  </body>
+</html>

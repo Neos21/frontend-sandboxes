@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Line Marker</title>
+    <style>
+
+*, ::before, ::after { box-sizing: border-box; }
+html { font-family: sans-serif; }
+
+/* SCSS Version
+
+@mixin marker($color: transparent) {
+  background: linear-gradient(transparent 60%, $color 60%);
+}
+.marker-yellow { @include marker(#ff0); }
+.marker-blue   { @include marker(#0bf); }
+.marker-pink   { @include marker(#f9f); }
+*/
+
+.marker-yellow { background: linear-gradient(transparent 60%, #ff0 60%); }
+.marker-blue   { background: linear-gradient(transparent 60%, #0bf 60%); }
+.marker-pink   { background: linear-gradient(transparent 60%, #f9f 60%); }
+
+    </style>
+  </head>
+  <body>
+
+<h1>Line Marker</h1>
+
+<p>This is <em class="marker-yellow">line marker like</em> emphasis style. The color is <strong class="marker-blue">editable</strong>. For example, <span class="marker-pink">this marker is a pink</span>.</p>
+<p>文中に<em class="marker-yellow">蛍光ペンのような</em>強調を付ける。ラインマーカーの色は<strong class="marker-blue">変更可能</strong>で、例えば<span class="marker-pink">ピンク</span>にすることも可能。</p>
+
+  </body>
+</html>

@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Sans-Serif Fonts Test</title>
+    <style>
+
+*, ::before, ::after { box-sizing: border-box; }
+
+/* Windows 用 Medium 指定の游ゴシック */
+@font-face {
+  font-family: "Yu Gothic M";
+  src: local("Yu Gothic Medium");
+}
+/* font-weight: bold の時は通常どおり Bold 書体を使わせる */
+@font-face {
+  font-family: "Yu Gothic M";
+  src: local("Yu Gothic Bold");
+  font-weight: bold;
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+ul:not(.description) {
+  list-style: none;
+  margin-left: 0;
+  padding-left: 0;
+}
+
+.container {
+  display: flex;
+  justify-content: space-between;
+}
+
+.menu {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 25%;
+  height: 100%;
+  padding: 10px;
+  overflow: scroll;
+  -webkit-overflow-scrolling: touch;
+}
+  
+  .menu h1 {
+    margin:0;
+  }
+  
+  .menu .list li {
+    margin-left: 2rem;
+    height: 1.3rem;
+    white-space: nowrap;
+  }
+    
+    /* ソートの配置先を示す */
+    .menu .list li.sortable-placeholder {
+      height: 1.3rem;
+      background: rgba(255, 255, 0, .5);
+    }
+
+.main {
+  position: absolute;
+  top: 0;
+  left: 25%;
+  width: 75%;
+  height: 100%;
+  padding: 10px;
+  overflow: scroll;
+  -webkit-overflow-scrolling: touch;
+}
+  
+  .main li {
+    /* オレオレパーフェクト等幅フォント指定 */
+    font-family: MeiryoKe_Gothic, "Ricty Diminished", "Courier New", Courier, Monaco, Menlo, Consolas, "Lucida Console", "Osaka－等幅", "Osaka-等幅", Osaka-mono, "ＭＳ ゴシック", "MS Gothic", monospace;
+    white-space: nowrap;
+  }
+  
+  .main h1,
+  .main p {
+    margin: 0;
+    white-space: nowrap;
+    font-size: 150%;
+  }
+    
+    /* 静的に指定するパーフェクト設定用 */
+    .main h1.perfect,
+    .main p.perfect {
+      font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue",  HelveticaNeue, "Segoe UI", "游ゴシック体", YuGothic, "Yu Gothic M", "游ゴシック Medium", "Yu Gothic Medium", "ヒラギノ角ゴ ProN W3", "Hiragino Kaku Gothic ProN W3", HiraKakuProN-W3, "ヒラギノ角ゴ ProN", "Hiragino Kaku Gothic ProN", "ヒラギノ角ゴ Pro", "Hiragino Kaku Gothic Pro", "メイリオ", Meiryo, Osaka, "ＭＳ Ｐゴシック", "MS PGothic", sans-serif;
+      background: #dde;
+    }
+    
+    /* AppleSystem フォントのみ適用するサンプル */
+    .main h1.apple,
+    .main p.apple {
+      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #edd;
+    }
+    
+    /* 要素非表示用のクラス */
+    .main h1.hidden,
+    .main p.hidden {
+      display: none;
+    }
+    
+    /* テキストのアウトライン確認用 */
+    .main h1 span,
+    .main p span {
+      border: 1px solid #f00;
+    }
+  
+  .main .description li {
+    /* オレオレパーフェクト明朝フォント指定 */
+    font-family: Georgia, "游明朝体", "YuMincho", "游明朝", "Yu Mincho", "ヒラギノ明朝 ProN W3", "Hiragino Mincho ProN W3", HiraMinProN-W3, "ヒラギノ明朝 ProN", "Hiragino Mincho ProN", "ヒラギノ明朝 Pro", "Hiragino Mincho Pro", "HGS明朝E", "ＭＳ Ｐ明朝", "MS PMincho", serif;
+  }
+
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui-touch-punch/0.2.3/jquery.ui.touch-punch.min.js"></script>
+    <script>
+
+/**
+ * フォント定義
+ */
+ const fonts = {
+  // Apple システムフォント
+  'apple-mac'   : `-apple-system`     ,
+  'apple-blink' : `BlinkMacSystemFont`,
+  
+  // 英文フォント
+  'en-heln-1'   : `"Helvetica Neue"`,
+  'en-heln-2'   : `HelveticaNeue`   ,
+  'en-seo'      : `"Segoe UI"`      ,
+  // 英文フォント その他
+  'en-hel'      : `Helvetica`       ,
+  'en-arial'    : `Arial`           ,
+  'en-ver'      : `Verdana`         ,
+  
+  // 游ゴシック
+  'y-mac-j'     : `"游ゴシック体"`     ,
+  'y-mac-e'     : `YuGothic`           ,
+  'y-face'      : `"Yu Gothic M"`      ,  // @font-face 使用
+  'y-med-j'     : `"游ゴシック Medium"`,
+  'y-med-e'     : `"Yu Gothic Medium"` ,
+  'y-win-j'     : `"游ゴシック"`       ,
+  'y-win-e'     : `"Yu Gothic"`        ,
+  
+  // ヒラギノ・メイリオ
+  'h-w3'        : `"ヒラギノ角ゴ ProN W3"`        ,
+  'h-w3-en2'    : `"Hiragino Kaku Gothic ProN W3"`,
+  'h-w3-en1'    : `HiraKakuProN-W3`               ,
+  'h-n-j'       : `"ヒラギノ角ゴ ProN"`           ,
+  'h-n-e'       : `"Hiragino Kaku Gothic ProN"`   ,
+  'h-pro-j'     : `"ヒラギノ角ゴ Pro"`            ,
+  'h-pro-e'     : `"Hiragino Kaku Gothic Pro"`    ,
+  'm-j'         : `"メイリオ"`                    ,
+  'm-e'         : `Meiryo`                        ,
+  
+  // Osaka・MS P ゴシック
+  'o'           : `Osaka`            ,
+  'msp-j'       : `"ＭＳ Ｐゴシック"`,
+  'msp-e'       : `"MS PGothic"`     ,
+  
+  // 総称
+  'gen-serif'   : `"游明朝体", "YuMincho", "游明朝", "Yu Mincho", serif`,  // テスト用 (違いが分かるよう明朝体を用意)
+  'gen-sans'    : `sans-serif`
+};
+
+/**
+ * フォントを指定する
+ */
+const setFonts = () => {
+  // チェックされているフォント名を結合していく
+  let fontFamily = '';
+  $.each($('#list input[type="checkbox"]'), (i, elem) => {
+    const id = $(elem).prop('id');
+    const isChecked = $(elem).prop('checked');
+    if(isChecked) {
+      fontFamily += `${fonts[id]}, `;
+    }
+  });
+  
+  // いずれかのチェックがあれば、末尾2文字 (カンマとスペース) を除去する
+  // 空文字の場合はそのまま css() に設定し、font-family 指定を削除する
+  if(fontFamily !== '') {
+    fontFamily = fontFamily.slice(0, -2);
+  }
+  
+  // 設定する
+  $('.target').css('font-family', fontFamily);
+  $('#result').text(`${fontFamily};`);
+};
+
+/**
+ * リストを生成する
+ */
+const createList = () => {
+  // リストを生成する
+  let lists = '';
+  Object.keys(fonts).forEach((key) => {
+    const val = fonts[key];
+    lists += `<li><label><input type="checkbox" id="${key}"> ${val}</label></li>`;
+  });
+  
+  // リストを追加し、ソート設定をする
+  $('#list').append(lists).sortable({
+    cursor: 'move',
+    opacity: 0.7,
+    placeholder: "sortable-placeholder",
+    update: (event, ui) => {
+      // 順序を入れ替えたらフォントを再指定する
+      setFonts();
+    }
+  });
+  
+  // 予め明朝体になるようチェックを入れておく
+  $('#gen-serif').prop('checked', true);
+  
+  // 初期状態でフォント設定を実行する
+  setFonts();
+  
+  // イベントを設定する
+  $('#list input[type="checkbox"]').on('change', setFonts);
+};
+
+/**
+ * jQuery
+ */
+$(() => {
+  // リスト生成・初期化・イベント設定処理
+  createList();
+  
+  // リセットボタン押下時 : #list を空にしてから一連の初期処理を行う
+  $('#reset').on('click', () => {
+    $('#list').html('');
+    createList();
+  });
+  
+  // パーフェクト設定テキストの表示切替
+  $('#toggle-perfect').on('click', () => {
+    $('.perfect').toggleClass('hidden');
+  });
+  // Apple システムフォントのみ設定したテキストの表示切替
+  $('#toggle-apple').on('click', () => {
+    $('.apple').toggleClass('hidden');
+  });
+});
+
+    </script>
+  </head>
+  <body>
+
+<div class="container">
+  <div class="menu">
+    <h1>Sans-Serif Fonts Test</h1>
+    <ul class="controls">
+      <li><input type="button" id="reset" value="Reset Fonts"></li>
+      <li><input type="button" id="toggle-perfect" value="Toggle Perfect"></li>
+      <li><input type="button" id="toggle-apple" value="Toggle AppleSystem"></li>
+    </ul>
+    <ul id="list" class="list"></ul>
+  </div>
+  
+  <div class="main">
+    <h1>ゴシック体フォントのブラウザ解釈を検証するページ</h1>
+    <ul>
+      <li>font-family: <span id="result"></span></li>
+    </ul>
+    <hr>
+    
+    <h1 class="target" ><span>動的に Font Family を変更するサンプル。</span></h1>
+    <h1 class="perfect"><span>動的に Font Family を変更するサンプル。</span></h1>
+    <h1 class="apple"  ><span>動的に Font Family を変更するサンプル。</span></h1>
+    
+    <p  class="target" ><span>動的に Font Family を変更するサンプル。</span></p>
+    <p  class="perfect"><span>動的に Font Family を変更するサンプル。</span></p>
+    <p  class="apple"  ><span>動的に Font Family を変更するサンプル。</span></p>
+    
+    <hr>
+    <ul class="description">
+      <li>左のフォント一覧からチェックを入れると、そのフォントが右側のサンプル文章に適用される。</li>
+      <li>ドラッグするとフォントの順序を入れ替えることも可能。</li>
+      <li>どのような <code>font-family</code> が指定されているかはページトップに表示される。</li>
+      <li>青背景のサンプル文章は検証結果から導いたオレオレパーフェクト設定を適用しているモノ。「Toggle Perfect」ボタンで表示切替可能。</li>
+      <li>赤背景のサンプル文章は Apple システムフォントのみを適用しているモノ。iOS だと和文にもシステムフォントが適用されることが分かる。「Toggle AppleSystem」ボタンで切替可能。</li>
+      <li>Windows・Mac・iOS の標準フォントからゴシック体のものを列挙。</li>
+      <li>デフォルトの並び順の大方針は「Apple 向け → Windows 向け」で「日本語表記 → 英語表記」。</li>
+      <li>「"Yu Gothic M"」は、通常の游ゴシックが細く見えてしまう Windows 向けに <code>@font-face</code> を適用したカスタムフォント。</li>
+      <li>本検証ページの実装には jQuery・jQueryUI (Sortable)・jQuery UI Touch Punch (スマホ向けに Sortable を拡張) を使用。</li>
+    </ul>
+  </div>
+</div>
+
+  </body>
+</html>
