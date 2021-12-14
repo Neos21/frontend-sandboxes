@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Slide Toggle</title>
+    <style>
+
+*, ::before, ::after { box-sizing: border-box; }
+html { font-family: sans-serif; }
+
+html {
+  overflow-y: scroll;
+}
+
+section {
+  width: 80%;
+  margin: 1rem auto;
+  padding: 0 1rem;
+  border: 1px solid #999;
+  border-radius: 5px;
+}
+
+h1:hover {
+  color: #f09;
+  cursor: pointer;
+}
+
+    </style>
+    <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
+    <script>
+
+$(function() {
+  $('h1').click(function() {
+    $(this).nextAll().slideToggle();
+  });
+});
+
+    </script>
+  </head>
+  <body>
+
+<h1>Slide Toggle</h1>
+<section>
+  <h1>Hoge</h1>
+  <p>hoge hoge.</p>
+  <p>hoge hoge.</p>
+  <p>hoge hoge.</p>
+</section>
+<section>
+  <h1>Fuga</h1>
+  <p>fuga fuga.</p>
+  <p>fuga fuga.</p>
+  <p>fuga fuga.</p>
+</section>
+
+  </body>
+</html>

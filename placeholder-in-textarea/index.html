@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Placeholder In Textarea</title>
+    <style>
+
+*, ::before, ::after { box-sizing: border-box; }
+html { font-family: sans-serif; }
+
+/* Chrome 48 までは有効だった・50 では無効になった・Safari では有効 */
+#ph::-webkit-input-placeholder::after {
+  display: block; content: "Chrome\a改行";
+}
+
+/* Firefox・IE は同じ書き方をしても無効 */
+#ph::-moz-placeholder::after {
+  display: block; content: "Firefox\a改行";
+}
+#ph:-ms-input-placeholder::after {
+  display: block; content: "IE\a改行";
+}
+
+table { border-collapse: collapse; }
+td, th { border: 1px solid #08f; vertical-align: top; white-space: nowrap; }
+thead th { background: #def; }
+tbody th { text-align: left; }
+textarea { width: 250px; height: 4rem; }
+
+    </style>
+  </head>
+  <body>
+
+<h1>テキストエリアの placeholder 属性で改行する方法の検証</h1>
+<table>
+  <thead>
+    <tr>
+      <th rowspan="2">方法</th>
+      <th rowspan="2">サンプル</th>
+      <th colspan="3">Windows 7</th>
+      <th colspan="3">OSX El Capitan</th>
+    </tr>
+    <tr>
+      <th>Chrome 50</th>
+      <th>Firefox 46</th>
+      <th>IE 11</th>
+      <th>Chrome 50</th>
+      <th>Firefox 46</th>
+      <th>Safari 9.1</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>CSS で書いてみる</th>
+      <td><textarea placeholder="(この文字が見えていたら CSS 指定は効いていない)" id="ph"></textarea></td>
+      <td>× (※)</td><td>×</td><td>×</td>
+      <td>× (※)</td><td>×</td><td>○</td>
+    </tr>
+    <tr>
+      <th>実体参照 (HTML 10進数) で<br>CR LF (&amp;#13;&amp;#10;)</th>
+      <td><textarea placeholder="感想を&#13;&#10;お書き&#13;&#10;ください"></textarea></td>
+      <td>○</td><td>×</td><td>○</td>
+      <td>○</td><td>×</td><td>×</td>
+    </tr>
+    <tr>
+      <th>実体参照 (HTML 16進数) で<br>CR LF (&amp;#x000D;&amp;#x000A;)</th>
+      <td><textarea placeholder="感想を&#x000D;&#x000A;お書き&#x000D;&#x000A;ください"></textarea></td>
+      <td>○</td><td>×</td><td>○</td>
+      <td>○</td><td>×</td><td>×</td>
+    </tr>
+    <tr>
+      <th>属性値で改行</th>
+      <td><textarea placeholder="感想を
+お書き
+ください"></textarea></td>
+      <td>○</td><td>×</td><td>○</td>
+      <td>○</td><td>×</td><td>×</td>
+    </tr>
+    <tr>
+      <th>エスケープシーケンス (\r\n)<br>→ 効かない</th>
+      <td><textarea placeholder="感想を\r\nお書き\r\nください"></textarea></td>
+      <td>×</td><td>×</td><td>×</td>
+      <td>×</td><td>×</td><td>×</td>
+    </tr>
+  </tbody>
+</table>
+<ul>
+  <li>2016-05-08 手持ちのブラウザで確認。その方法で改行されれば「○」、改行されなければ「×」で表記。</li>
+  <li>※：Chrome 48 までは有効だったことを確認・Chrome 50 では無効だった。現時点で CSS での制御が有効なのは Safari のみか。</li>
+  <li>Chrome・Firefox は同じバージョンであれば Win・OSX 間で差異なし (OS によって差異がないなんて良い時代になったなぁ…)</li>
+  <li>Firefox ではどの方法でも改行不可能。Chrome と IE で有効になり、コーディング方法に制約ができない実体参照での記入が一番シンプルで良さそう。</li>
+</ul>
+
+  </body>
+</html>

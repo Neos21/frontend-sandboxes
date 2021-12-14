@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Placeholders</title>
+    <style>
+
+*, ::before, ::after { box-sizing: border-box; }
+html { font-family: sans-serif; }
+
+/* Standard */
+/* http://caniuse.com/#search=placeholder-shown */
+#ph:placeholder-shown { color: #f09; }
+
+/*
+ * ベンダプレフィックスはカンマ区切りで指定すると有効にならないので別々に書く
+ * https://hail2u.net/blog/webdesign/unknown-css-selector.html
+ */
+
+/* For Chrome */
+#ph::-webkit-input-placeholder { color: #f90; }
+
+/* 
+ * For Firefox
+ * http://eichisanden.hateblo.jp/entry/2014/07/22/131508
+ * デフォルトスタイルで opacity が指定されているのでリセット。Ver 18 以前はコロン1つ
+ */
+#ph::-moz-placeholder { color: #09f; opacity: 1; }
+
+/* For IE */
+#ph:-ms-input-placeholder {	color: #09f; }
+
+dt { font-weight:bold; }
+
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
+    <script>
+
+// Vanilla JS … style 属性やベント属性を HTML にゴリゴリ書いちゃう昔ながらのパターン
+// 参考：https://allabout.co.jp/gm/gc/23942/7/
+function hidePlaceholder(obj, placeholderText) {
+  if(obj.value === placeholderText) {
+    obj.value = '';
+    obj.style.color = '#000';
+  }
+}
+function showPlaceholder(obj, placeholderText) {
+  if(obj.value === '') {
+    obj.value = placeholderText;
+    obj.style.color = '#6c6';
+  }
+  else if(obj.value === placeholderText) {
+    obj.style.color = '#6c6';
+  }
+}
+
+// Vanilla JS … title 属性の値をプレースホルダとして使用する
+// アイデアの元ネタ：https://github.com/ahomu/jquery.ah-placeholder
+// 処理内容は以下の jQuery 版を参考に作成
+window.addEventListener('DOMContentLoaded', function() {
+  var input = document.getElementById('js'),
+      placeholderText = input.title,
+      placeholderColor = '#f6f',
+      defaultColor = input.style.color;
+  input.value = input.title;
+  input.title = '';
+  input.style.color = placeholderColor;
+  input.addEventListener('focus', function() {
+    if(this.value === placeholderText) {
+      this.value = '';
+      this.style.color = defaultColor;
+    }
+  }, false);
+  input.addEventListener('blur', function() {
+    if(this.value === '') {
+      this.value = placeholderText;
+      this.style.color = placeholderColor;
+    }
+    else if(this.value === placeholderText) {
+      this.style.color = placeholderColor;
+    }
+  }, false);
+}, false);
+
+// jQuery 版
+// 参考：http://terkel.jp/archives/2010/07/html5-placeholder-fix-with-jquery/
+// CodePen 上でのテスト用に placeholder 属性を使わず、id 指定で動作させるよう書き換えている
+$(function () {
+  var input = $('#jq'),
+      placeholderText = input.data('placeholder'),
+      placeholderColor = '#f66',
+      defaultColor = input.css('color');
+  input.
+    focus(function() {
+      if(input.val() === placeholderText) {
+        input.val('').css('color', defaultColor);
+      }
+    }).
+    blur(function() {
+      if(input.val() === '') {
+        input.val(placeholderText).css('color', placeholderColor);
+      }
+      else if(input.val() === placeholderText) {
+        input.css('color', placeholderColor);
+      }
+    }).
+    blur();
+});
+
+    </script>
+  </head>
+  <body>
+
+<h1>placeholder 属性がなかった時代のプレースホルダ実装</h1>
+<dl>
+  <dt>Default</dt>
+	<dd>
+    <p><input type="text" placeholder="氏名"></p>
+  </dd>
+  <dt>CSS</dt>
+  <dd>
+    <p><input type="text" placeholder="住所" id="ph"></p>
+  </dd>
+  <dt>Vanilla JS (All About Version)</dt>
+  <dd>
+    <p><input type="text" value="電話番号" style="color:#6c6;" onfocus="hidePlaceholder(this, '電話番号');" onblur="showPlaceholder(this, '電話番号');"></p>
+  </dd>
+  <dt>Vanilla JS (Use Title Attribution)</dt>
+  <dd>
+    <p><input type="text" title="年齢" id="js"></p>
+  </dd>
+  <dt>jQuery</dt>
+  <dd>
+    <p><input type="text" data-placeholder="郵便番号" id="jq"></p>
+  </dd>
+</dl>
+
+  </body>
+</html>

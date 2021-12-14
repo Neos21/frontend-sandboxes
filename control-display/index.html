@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Control Display</title>
+    <style>
+
+*, ::before, ::after { box-sizing: border-box; }
+html { font-family: sans-serif; }
+
+table {
+  border-collapse: collapse;
+}
+
+td {
+  text-align: center;
+  padding: 5px;
+  width: 80px;
+  height: 25px;
+  border: 1px solid #00f;
+}
+
+    </style>
+    <script>
+
+document.addEventListener('DOMContentLoaded', function() {
+  // key が親区分のリストの value に対応する・value の連想配列がそれぞれの子区分のプルダウンを構成する
+  var categories = {
+    1: {
+      0: '子区分 1-Default',
+      1: '子区分 1-1'
+    },
+    2: {
+      0: '子区分 2-Default',
+      1: '子区分 2-1',
+      2: '子区分 2-2',
+      3: '子区分 2-3',
+      4: '子区分 2-4',
+      5: '子区分 2-5'
+    },
+    3: {
+      0: '子区分 3-Default',
+      1: '子区分 3-1',
+      2: '子区分 3-2',
+      3: '子区分 3-3'
+    }
+  };
+  
+  // 表示・非表示を決める要素名を配列で持つ
+  var parts = [ 'parts-1', 'parts-2', 'parts-3', 'parts-4', 'parts-5' ];
+  
+  // 外側の key は親区分のコード値。内側の key は子区分のコード値。
+  // その中の配列は parts の並び順と合わせて 1 (表示) or 0 (非表示) を管理する
+  var display = {
+    1: {
+      0: [ 1, 1, 1, 1, 1 ],
+      1: [ 1, 1, 0, 1, 1 ]
+    },
+    2: {
+      0: [ 1, 1, 1, 1, 1 ],
+      1: [ 1, 1, 0, 1, 0 ],
+      2: [ 0, 0, 1, 0, 1 ],
+      3: [ 1, 1, 0, 1, 1 ],
+      4: [ 1, 1, 1, 0, 1 ],
+      5: [ 1, 0, 1, 1, 1 ]
+    },
+    3: {
+      0: [ 1, 1, 1, 1, 1 ],
+      1: [ 1, 1, 0, 1, 0 ],
+      2: [ 0, 0, 1, 0, 1 ],
+      3: [ 1, 1, 0, 1, 1 ]
+    }
+  };
+  
+  /** 親区分のプルダウンを変えた時に子区分のプルダウンを再構築する */
+  function changeChildCategory() {
+    var selected = document.getElementById('parent-category').value;
+    var child = document.getElementById('child-category');
+    while(child.lastChild) {
+      child.removeChild(child.lastChild);
+    }
+    for(var i in categories[selected]) {
+      var option = document.createElement('option');
+      option.setAttribute('value', i);
+      option.innerHTML = categories[selected][i];
+      child.appendChild(option);
+    }
+    // 子区分のプルダウンが再構築されるのでデフォルト値で表示・非表示を制御させる
+    controlDisplay();
+  }
+  document.getElementById('parent-category').addEventListener('change', changeChildCategory, false);
+  changeChildCategory();  // onload
+  
+  // 区分のコード値を基に要素の表示・非表示を決める
+  // parentCode : categories の key に当たる親区分のコード値
+  // childCode : categories の value の一つに当たる子区分のコード値
+  function controlDisplay() {
+    var parent = document.getElementById('parent-category').value;
+    var child = document.getElementById('child-category').value;
+    for(var i = 0; i < parts.length; i++) {
+      if(display[parent][child][i]) {
+        console.log(parent + ':' + child + ':' + i + ' … 表示');
+        document.getElementById(parts[i]).style.display = 'inline';
+      }
+      else {
+        console.log(parent + ':' + child + ':' + i + ' … 非表示');
+        document.getElementById(parts[i]).style.display = 'none';
+      }
+    }
+  }
+  document.getElementById('child-category').addEventListener('change', controlDisplay, false);
+});
+
+    </script>
+  </head>
+  <body>
+
+<p>
+  <select id="parent-category">
+    <option value="1">親区分 1</option>
+    <option value="2">親区分 2</option>
+    <option value="3">親区分 3</option>
+  </select>
+  <select id="child-category">
+    <option value="0">Default</option>
+  </select>
+</p>
+
+<table>
+  <tr>
+    <td><input type="button" id="parts-1" value="Parts 1"></td>
+    <td><input type="button" id="parts-2" value="Parts 2"></td>
+    <td><input type="button" id="parts-3" value="Parts 3"></td>
+    <td><input type="button" id="parts-4" value="Parts 4"></td>
+    <td><input type="button" id="parts-5" value="Parts 5"></td>
+  </tr>
+</table>
+
+  </body>
+</html>
