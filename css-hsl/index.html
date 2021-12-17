@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>CSS HSL</title>
+    <script src="https://cdn.jsdelivr.net/npm/@neos21/in-browser-sass@1.0.10/dist/in-browser-sass.bundle.min.js"></script>
+    <style type="text/scss">
+
+*, ::before, ::after { box-sizing: border-box; }
+html { font-family: sans-serif; }
+
+@mixin hsl-table($hue: 0%) {
+  border: 1px solid #ccc;
+  td { border: 1px solid #ccc; width: 20px; height: 20px; }
+  tbody {
+    tr:nth-child(1) {
+      td:nth-child(1) { background: hsl($hue,   0%, 100%); }
+      td:nth-child(2) { background: hsl($hue,   0%,  75%); }
+      td:nth-child(3) { background: hsl($hue,   0%,  50%); }
+      td:nth-child(4) { background: hsl($hue,   0%,  25%); }
+      td:nth-child(5) { background: hsl($hue,   0%,   0%); }
+    }
+    tr:nth-child(2) {
+      td:nth-child(1) { background: hsl($hue,  25%, 100%); }
+      td:nth-child(2) { background: hsl($hue,  25%,  75%); }
+      td:nth-child(3) { background: hsl($hue,  25%,  50%); }
+      td:nth-child(4) { background: hsl($hue,  25%,  25%); }
+      td:nth-child(5) { background: hsl($hue,  25%,   0%); }
+    }
+    tr:nth-child(3) {
+      td:nth-child(1) { background: hsl($hue,  50%, 100%); }
+      td:nth-child(2) { background: hsl($hue,  50%,  75%); }
+      td:nth-child(3) { background: hsl($hue,  50%,  50%); }
+      td:nth-child(4) { background: hsl($hue,  50%,  25%); }
+      td:nth-child(5) { background: hsl($hue,  50%,   0%); }
+    }
+    tr:nth-child(4) {
+      td:nth-child(1) { background: hsl($hue,  75%, 100%); }
+      td:nth-child(2) { background: hsl($hue,  75%,  75%); }
+      td:nth-child(3) { background: hsl($hue,  75%,  50%); }
+      td:nth-child(4) { background: hsl($hue,  75%,  25%); }
+      td:nth-child(5) { background: hsl($hue,  75%,   0%); }
+    }
+    tr:nth-child(5) {
+      td:nth-child(1) { background: hsl($hue, 100%, 100%); }
+      td:nth-child(2) { background: hsl($hue, 100%,  75%); }
+      td:nth-child(3) { background: hsl($hue, 100%,  50%); }
+      td:nth-child(4) { background: hsl($hue, 100%,  25%); }
+      td:nth-child(5) { background: hsl($hue, 100%,   0%); }
+    }
+  }
+}
+
+.hsl-red     { @include hsl-table(  0%); }
+.hsl-yellow  { @include hsl-table( 60%); }
+.hsl-green   { @include hsl-table(120%); }
+.hsl-skyblue { @include hsl-table(180%); }
+.hsl-blue    { @include hsl-table(240%); }
+.hsl-purple  { @include hsl-table(300%); }
+
+#wrapper {
+  display: flex;
+  
+  .container {
+    margin: 10px;
+  }
+}
+
+    </style>
+    <script>
+
+document.addEventListener('DOMContentLoaded', function() {
+  createTable('red');
+  createTable('yellow');
+  createTable('green');
+  createTable('skyblue');
+  createTable('blue');
+  createTable('purple');
+}, false);
+
+function createTable(colourName) {
+  const container = document.createElement('div');
+  container.className = `container container-${colourName}`;
+  container.innerHTML = `
+    <table class="hsl-${colourName}">
+      <caption>${colourName.charAt(0).toUpperCase()}${colourName.slice(1)}</caption>
+      <tbody>
+        <tr><td></td><td></td><td></td><td></td><td></td></tr>
+        <tr><td></td><td></td><td></td><td></td><td></td></tr>
+        <tr><td></td><td></td><td></td><td></td><td></td></tr>
+        <tr><td></td><td></td><td></td><td></td><td></td></tr>
+        <tr><td></td><td></td><td></td><td></td><td></td></tr>
+      </tbody>
+    </table>
+  `;
+  document.getElementById('wrapper').appendChild(container);
+}
+
+    </script>
+  </head>
+  <body>
+
+<h1>CSS HSL</h1>
+<p>CSS の <code>hsl()</code> プロパティを使ってみた。</p>
+
+<div id="wrapper"></div>
+
+  </body>
+</html>

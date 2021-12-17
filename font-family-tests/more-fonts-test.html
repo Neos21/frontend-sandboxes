@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>More Fonts Test</title>
+    <style>
+
+*, ::before, ::after { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; overflow: hidden; line-height: 1; }
+#wrapper { padding: 1rem; height: 100%; overflow-y: scroll; -webkit-overflow-scrolling: touch; }
+
+ol { font-size: 30px; margin: 1rem; }
+
+
+.serif-y1 { font-family: "游明朝体" , Meiryo, sans-serif; }
+.serif-y2 { font-family: YuMincho   , Meiryo, sans-serif; }
+.serif-y3 { font-family: "游明朝"   , Meiryo, sans-serif; }
+.serif-y4 { font-family: "Yu Mincho", Meiryo, sans-serif; }
+
+.serif-hn1 { font-family: "ヒラギノ明朝 ProN W3"   , YuGothic, "Yu Gothic", sans-serif; }
+.serif-hn2 { font-family: "Hiragino Mincho ProN W3", YuGothic, "Yu Gothic", sans-serif; }
+.serif-hn3 { font-family: HiraMinProN-W3           , YuGothic, "Yu Gothic", sans-serif; }
+.serif-hn4 { font-family: "ヒラギノ明朝 ProN"      , YuGothic, "Yu Gothic", sans-serif; }
+.serif-hn5 { font-family: "Hiragino Mincho ProN"   , YuGothic, "Yu Gothic", sans-serif; }
+.serif-hn6 { font-family: HiraMinProN              , YuGothic, "Yu Gothic", sans-serif; }
+
+.serif-hp1 { font-family: "ヒラギノ明朝 Pro W3"    , YuGothic, "Yu Gothic", sans-serif; }
+.serif-hp2 { font-family: "Hiragino Mincho Pro W3" , YuGothic, "Yu Gothic", sans-serif; }
+.serif-hp3 { font-family: HiraMinPro-W3            , YuGothic, "Yu Gothic", sans-serif; }
+.serif-hp4 { font-family: "ヒラギノ明朝 Pro"       , YuGothic, "Yu Gothic", sans-serif; }
+.serif-hp5 { font-family: "Hiragino Mincho Pro"    , YuGothic, "Yu Gothic", sans-serif; }
+.serif-hp6 { font-family: HiraMinPro               , YuGothic, "Yu Gothic", sans-serif; }
+
+
+.sans-serif-hs1 { font-family: "Hiragino Sans"               , YuMincho, "Yu Mincho", serif; }
+.sans-serif-hs2 { font-family: "ヒラギノ角ゴシック"          , YuMincho, "Yu Mincho", serif; }
+
+.sans-serif-hn1 { font-family: "ヒラギノ角ゴ ProN W3"        , YuMincho, "Yu Mincho", serif; }
+.sans-serif-hn2 { font-family: "Hiragino Kaku Gothic ProN W3", YuMincho, "Yu Mincho", serif; }
+.sans-serif-hn3 { font-family: HiraKakuProN-W3               , YuMincho, "Yu Mincho", serif; }
+.sans-serif-hn4 { font-family: "ヒラギノ角ゴ ProN"           , YuMincho, "Yu Mincho", serif; }
+.sans-serif-hn5 { font-family: "Hiragino Kaku Gothic ProN"   , YuMincho, "Yu Mincho", serif; }
+.sans-serif-hn6 { font-family: HiraKakuProN                  , YuMincho, "Yu Mincho", serif; }
+
+.sans-serif-hp1 { font-family: "ヒラギノ角ゴ Pro W3"         , YuMincho, "Yu Mincho", serif; }
+.sans-serif-hp2 { font-family: "Hiragino Kaku Gothic Pro W3" , YuMincho, "Yu Mincho", serif; }
+.sans-serif-hp3 { font-family: HiraKakuPro-W3                , YuMincho, "Yu Mincho", serif; }
+.sans-serif-hp4 { font-family: "ヒラギノ角ゴ Pro"            , YuMincho, "Yu Mincho", serif; }
+.sans-serif-hp5 { font-family: "Hiragino Kaku Gothic Pro"    , YuMincho, "Yu Mincho", serif; }
+.sans-serif-hp6 { font-family: HiraKakuPro                   , YuMincho, "Yu Mincho", serif; }
+
+/*
+
+| クラス名        | フォント名                     | Mac    |         |        | iOS    | Windows |         |      |    |
+|                 |                                | Chrome | Firefox | Safari | Safari | Chrome  | Firefox | Edge | IE |
+|-----------------|--------------------------------|--------|---------|--------|--------|---------|---------|------|----|
+| .serif-y1       | "游明朝体"                     | -      | ○      | ○     | -      | -       | -       | -    | -  |
+| .serif-y2       | YuMincho                       | ○     | ○      | ○     | -      | -       | -       | -    | -  |
+| .serif-y3       | "游明朝"                       | -      | -       | -      | -      | ○      | ○      | ○   | ○ |
+| .serif-y4       | "Yu Mincho"                    | -      | -       | -      | -      | ○      | ○      | ○   | ○ |
+| .serif-hn1      | "ヒラギノ明朝 ProN W3"         | -      | ○      | ○     | ○     | ？      | ？      | ？   | ？ |
+| .serif-hn2      | "Hiragino Mincho ProN W3"      | -      | ○      | ○     | ○     | ？      | ？      | ？   | ？ |
+| .serif-hn3      | HiraMinProN-W3                 | ○     | -       | ○     | ○     | ？      | ？      | ？   | ？ |
+| .serif-hn4      | "ヒラギノ明朝 ProN"            | -      | ○      | ○     | ○     | ？      | ？      | ？   | ？ |
+| .serif-hn5      | "Hiragino Mincho ProN"         | ○     | ○      | ○     | ○     | ？      | ？      | ？   | ？ |
+| .serif-hn6      | HiraMinProN                    | -      | -       | -      | -      | ？      | ？      | ？   | ？ |
+| .serif-hp1      | "ヒラギノ明朝 Pro W3"          | -      | ○      | ○     | ○     | -       | -       | ○   | ○ |
+| .serif-hp2      | "Hiragino Mincho Pro W3"       | -      | ○      | ○     | ○     | -       | -       | ○   | -  |
+| .serif-hp3      | HiraMinPro-W3                  | ○     | -       | ○     | ○     | -       | -       | ○   | -  |
+| .serif-hp4      | "ヒラギノ明朝 Pro"             | -      | ○      | ○     | ○     | ○      | ○      | ○   | ○ |
+| .serif-hp5      | "Hiragino Mincho Pro"          | ○     | ○      | ○     | ○     | ○      | ○      | ○   | ○ |
+| .serif-hp6      | HiraMinPro                     | -      | -       | -      | -      | -       | -       | -    | -  |
+
+| クラス名        | フォント名                     | Mac    |         |        | iOS    | Windows |         |      |    |
+|                 |                                | Chrome | Firefox | Safari | Safari | Chrome  | Firefox | Edge | IE |
+|-----------------|--------------------------------|--------|---------|--------|--------|---------|---------|------|----|
+| .sans-serif-hs1 | "Hiragino Sans"                | ○太   | ○太    | ○太   | ○     | ？      | ？      | ？   | ？ |
+| .sans-serif-hs2 | "ヒラギノ角ゴシック"           | -      | ○太    | ○太   | ○     | ？      | ？      | ？   | ？ |
+| .sans-serif-hn1 | "ヒラギノ角ゴ ProN W3"         | -      | ○      | ○     | ○     | ？      | ？      | ？   | ？ |
+| .sans-serif-hn2 | "Hiragino Kaku Gothic ProN W3" | -      | ○      | ○     | ○     | ？      | ？      | ？   | ？ |
+| .sans-serif-hn3 | HiraKakuProN-W3                | ○     | -       | ○     | ○     | ？      | ？      | ？   | ？ |
+| .sans-serif-hn4 | "ヒラギノ角ゴ ProN"            | -      | ○      | ○     | ○     | ？      | ？      | ？   | ？ |
+| .sans-serif-hn5 | "Hiragino Kaku Gothic ProN"    | ○     | ○      | ○     | ○     | ？      | ？      | ？   | ？ |
+| .sans-serif-hn6 | HiraKakuProN                   | -      | -       | -      | -      | ？      | ？      | ？   | ？ |
+| .sans-serif-hp1 | "ヒラギノ角ゴ Pro W3"          | -      | ○      | ○     | ○     | -       | -       | ○   | ○ |
+| .sans-serif-hp2 | "Hiragino Kaku Gothic Pro W3"  | -      | ○      | ○     | ○     | -       | -       | ○   | -  |
+| .sans-serif-hp3 | HiraKakuPro-W3                 | ○     | -       | ○     | ○     | -       | -       | ○   | -  |
+| .sans-serif-hp4 | "ヒラギノ角ゴ Pro"             | -      | ○      | ○     | ○     | ○      | ○      | ○   | ○ |
+| .sans-serif-hp5 | "Hiragino Kaku Gothic Pro"     | ○     | ○      | ○     | ○     | ○      | ○      | ○   | ○ |
+| .sans-serif-hp6 | HiraKakuPro                    | -      | -       | -      | -      | -       | -       | -    | -  |
+
+*/
+
+    </style>
+  </head>
+  <body>
+
+<h1>More Fonts Test</h1>
+
+<div id="wrapper">
+  <h1>serif になっているかどうか</h1>
+  <ol>
+    <li class="serif-y1">フォント文字列 Test てすと</li>
+    <li class="serif-y2">フォント文字列 Test てすと</li>
+    <li class="serif-y3">フォント文字列 Test てすと</li>
+    <li class="serif-y4">フォント文字列 Test てすと</li>
+  </ol>
+  <ol>
+    <li class="serif-hn1">フォント文字列 Test てすと</li>
+    <li class="serif-hn2">フォント文字列 Test てすと</li>
+    <li class="serif-hn3">フォント文字列 Test てすと</li>
+    <li class="serif-hn4">フォント文字列 Test てすと</li>
+    <li class="serif-hn5">フォント文字列 Test てすと</li>
+    <li class="serif-hn6">フォント文字列 Test てすと</li>
+  </ol>
+  <ol>
+    <li class="serif-hp1">フォント文字列 Test てすと</li>
+    <li class="serif-hp2">フォント文字列 Test てすと</li>
+    <li class="serif-hp3">フォント文字列 Test てすと</li>
+    <li class="serif-hp4">フォント文字列 Test てすと</li>
+    <li class="serif-hp5">フォント文字列 Test てすと</li>
+    <li class="serif-hp6">フォント文字列 Test てすと</li>
+  </ol>
+  
+  <hr>
+  
+  <h1>ヒラギノになっているかどうか</h1>
+  <ol>
+    <li class="sans-serif-hs1">フォント文字列 Test てすと</li>
+    <li class="sans-serif-hs2">フォント文字列 Test てすと</li>
+  </ol>
+  <ol>
+    <li class="sans-serif-hn1">フォント文字列 Test てすと</li>
+    <li class="sans-serif-hn2">フォント文字列 Test てすと</li>
+    <li class="sans-serif-hn3">フォント文字列 Test てすと</li>
+    <li class="sans-serif-hn4">フォント文字列 Test てすと</li>
+    <li class="sans-serif-hn5">フォント文字列 Test てすと</li>
+    <li class="sans-serif-hn6">フォント文字列 Test てすと</li>
+  </ol>
+  <ol>
+    <li class="sans-serif-hp1">フォント文字列 Test てすと</li>
+    <li class="sans-serif-hp2">フォント文字列 Test てすと</li>
+    <li class="sans-serif-hp3">フォント文字列 Test てすと</li>
+    <li class="sans-serif-hp4">フォント文字列 Test てすと</li>
+    <li class="sans-serif-hp5">フォント文字列 Test てすと</li>
+    <li class="sans-serif-hp6">フォント文字列 Test てすと</li>
+  </ol>
+</div>
+
+  </body>
+</html>

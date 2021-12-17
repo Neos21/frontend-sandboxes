@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Notch CSS</title>
+    <style>
+
+*, ::before, ::after { box-sizing: border-box; }
+html { font-family: sans-serif; }
+
+.bezel-less-notch .notch {
+  position: fixed;
+  top: 0;
+  left: 50%;
+  width: 56%;
+  height: 26px;
+  border-radius: 0 0 17px 17px;
+  background: #000;
+  transform: translateX(-50%);
+  z-index: 99999;
+}
+.bezel-less-notch .notch::before,
+.bezel-less-notch .notch::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  width: 10px;
+  height: 10px;
+}
+.bezel-less-notch .notch::before {
+  left : -9.8px;
+  background: radial-gradient(circle at bottom left , transparent, transparent 70%, #000 71%, #000);
+}
+.bezel-less-notch .notch::after {
+  right: -9.8px;
+  background: radial-gradient(circle at bottom right, transparent, transparent 70%, #000 71%, #000);
+}
+
+.bezel-less-notch .corner {
+  position: fixed;
+  width: 34px;
+  height: 34px;
+  z-index: 99999;
+}
+.bezel-less-notch .corner.top-left {
+  top: 0;
+  left : 0;
+  background: radial-gradient(circle at bottom right, transparent, transparent 70%, #000 71%, #000);
+}
+.bezel-less-notch .corner.top-right {
+  top: 0;
+  right: 0;
+  background: radial-gradient(circle at bottom left , transparent, transparent 70%, #000 71%, #000);
+}
+.bezel-less-notch .corner.bottom-left {
+  bottom: 0;
+  left : 0;
+  background: radial-gradient(circle at top right, transparent, transparent 70%, #000 71%, #000);
+}
+.bezel-less-notch .corner.bottom-right {
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at top left , transparent, transparent 70%, #000 71%, #000);
+}
+
+    </style>
+  </head>
+  <body>
+
+<div class="bezel-less-notch">
+  <div class="notch"></div>
+  <div class="corner top-left"></div>
+  <div class="corner top-right"></div>
+  <div class="corner bottom-left"></div>
+  <div class="corner bottom-right"></div>
+</div>
+
+<!-- Example Contents -->
+<div style="margin: 40px 30px;">
+  <h1>Notch CSS</h1>
+  <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+  <p>Dummy</p>
+  <p>Dummy</p>
+  <p>Dummy</p>
+  <p>Dummy</p>
+  <p>Dummy</p>
+  <p>Dummy</p>
+  <p>End</p>
+</div>
+
+  </body>
+</html>

@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>English Japanese Serif Fonts Test</title>
+    <style>
+
+*, ::before, ::after { box-sizing: border-box; }
+
+html { overflow-y: scroll; -webkit-text-size-adjust: 100%; }
+body { margin: 1rem; line-height: 1.7; }
+html, body { font-size: 14px; font-family: "游ゴシック体", YuGothic, "Yu Gothic M", "游ゴシック Medium", "Yu Gothic Medium", sans-serif; }
+h1, h2, h3, h4, h5, h6, p, hr, dl, dt, dd, ol, l, pre, table { margin-top: 0; margin-bottom: 1rem; }
+@font-face { font-family: "Yu Gothic M"; src: local("Yu Gothic Medium"); }
+@font-face { font-family: "Yu Gothic M"; src: local("Yu Gothic Bold"); font-weight: bold; }
+
+.example { position: relative; margin-left: 80px; padding-left: 1rem; width: calc(50% - 80px); }
+.example .checkbox { position: absolute; }
+.example .title { font-size: 1.05rem; font-weight: bold; }
+.overlay { position: fixed; top: 1rem; left: 50%; }
+
+    </style>
+    <script>
+
+function createCss(id, css) {
+  return `#${id} { font-family: ${css}, "游ゴシック体", YuGothic, "Yu Gothic M", "游ゴシック Medium", "Yu Gothic Medium", sans-serif; }`;
+}
+function createHtml(id, title, checkboxOffsetX, checkboxOffsetY) {
+  return `
+    <div class="example" id="${id}">
+      <input type="checkbox" class="checkbox" style="top: ${checkboxOffsetY}px; left: ${checkboxOffsetX}px;">
+      <div class="title">${title}</div>
+      <div class="text">Lorem ipsum dolor sit amet, consectetur adipiscing elit,<br>sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.<br>lorem ipsum (ロレム・イプサム、略してリプサム lipsum ともいう) とは、<br>出版、Web デザイン、Graphic デザインなどの諸分野において使用されているテキスト。<br>書籍やウェブページや広告などのデザインのプロトタイプを制作したり顧客に<br>プレゼンテーションしたりする際に、視覚的なデザインを調整したりわかりやすく見せる。</div>
+    </div>
+  `;
+}
+function toggle(id) {
+  document.getElementById(id).classList.toggle('overlay');
+}
+
+const enFonts = [
+  { title: 'Georgia'        , name: 'g', css: 'Georgia' },
+  { title: 'Times'          , name: 'n', css: 'Times'   },
+  { title: 'Times New Roman', name: 'h', css: '"Times New Roman"' }
+];
+const jaFonts = [
+  { title: 'YuMincho'   , name: 'y', css: '"游明朝体", YuMincho, "游明朝", "Yu Mincho"' },
+  { title: 'Hiragino'   , name: 'h', css: '"ヒラギノ明朝 ProN W3", "Hiragino Mincho ProN W3", HiraMinProN-W3, "ヒラギノ明朝 ProN", "Hiragino Mincho ProN", "ヒラギノ明朝 Pro", "Hiragino Mincho Pro"' },
+  { title: 'HGS Mincho' , name: 'g', css: '"HGS明朝E"' },
+  { title: 'MS P Mincho', name: 'p', css: '"ＭＳ Ｐ明朝", "MS PMincho"' }
+];
+
+document.addEventListener('DOMContentLoaded', () => {
+  const wrapper = document.getElementById('wrapper');
+  let style = '<style>';
+  
+  const checkboxSize = 20;
+  const negativeOffset = enFonts.length * -checkboxSize;
+  
+  jaFonts.forEach((jaFont, indexY) => {
+    const offsetY = indexY * checkboxSize;
+    
+    // 和英混在フォントのみ出力
+    const jaOnlyId = `f${jaFont.name}`;
+    style += createCss(jaOnlyId, jaFont.css);
+    const jaOnlyOffsetX = negativeOffset - checkboxSize;
+    const jaOnlyHtml = createHtml(jaOnlyId, jaFont.title, jaOnlyOffsetX, offsetY);
+    wrapper.insertAdjacentHTML('beforeend', jaOnlyHtml);
+    document.querySelector(`#${jaOnlyId} input`).addEventListener('click', () => { toggle(jaOnlyId); });
+    
+    // 英字フォントを手前に配置したバリエーション
+    enFonts.forEach((enFont, indexX) => {
+      const id = `f${enFont.name}${jaFont.name}`;
+      style += createCss(id, `${enFont.css}, ${jaFont.css}`);
+      const offsetX = negativeOffset + indexX * checkboxSize;
+      const html = createHtml(id, `${enFont.title} + ${jaFont.title}`, offsetX, offsetY);
+      wrapper.insertAdjacentHTML('beforeend', html);
+      document.querySelector(`#${id} input`).addEventListener('click', () => { toggle(id); });
+    });
+  });
+  
+  style += '</style>';
+  wrapper.insertAdjacentHTML('beforebegin', style);
+});
+
+    </script>
+  </head>
+  <body>
+
+<h1>英語 + 和英混在 Serif フォントのテスト</h1>
+<div id="wrapper"></div>
+
+  </body>
+</html>

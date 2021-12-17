@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Lock Orientation</title>
+    <style>
+
+*, ::before, ::after { box-sizing: border-box; }
+html { font-family: sans-serif; }
+
+html, body {
+  transition: .5s;
+}
+
+    </style>
+    <script>
+
+window.addEventListener('orientationchange', () => {
+  switch(window.orientation) {
+    case -90:
+      document.documentElement.style.color = '#ff0000';
+      document.documentElement.style.transform = 'rotate(90deg)';
+      break;
+    case 0:
+      document.documentElement.style.color = '#000000';
+      document.documentElement.style.transform = 'rotate(0deg)';
+      break;
+    case 90:
+      document.documentElement.style.color = '#0000ff';
+      document.documentElement.style.transform = 'rotate(-90deg)';
+      break;
+    case 180:
+      document.documentElement.style.color = '#ff00ff';
+      document.documentElement.style.transform = 'rotate(180deg)';
+      break;
+  }
+});
+
+    </script>
+  </head>
+  <body>
+
+<h1>Lock Orientation</h1>
+<ul>
+  <li>https://teratail.com/questions/9087</li>
+</ul>
+
+  </body>
+</html>

@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Survey Helpers Parts</title>
+    <style>
+
+*, ::before, ::after { box-sizing: border-box; }
+html { font-family: sans-serif; }
+
+h1, h2 {
+  margin-top: 0;
+}
+
+#wrapper {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-gap: 1rem;
+}
+
+#wrapper > div {
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: .5rem 1rem 0;
+}
+
+    </style>
+    <script>
+
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('select-city').addEventListener('click', () => {
+    selectCity('東京');
+  });
+  document.getElementById('set-age').addEventListener('click', () => {
+    setAge(25, 3);
+  });
+  document.getElementById('select-gender').addEventListener('click', () => {
+    selectGender(false, 3);
+  });
+});
+
+/**
+ * select 要素から指定の都道府県名を含む選択肢を選択する
+ * 
+ * @param cityName 都道府県名称。「沖縄県」なら「沖縄」というように、短めに指定しておく
+ */
+function selectCity(cityName) {
+  Array.prototype.forEach.call(document.querySelectorAll('option'), (option) => {
+    if(option.innerHTML.includes(cityName)) {
+      option.selected = true;
+    }
+  });
+  
+  // ブックマークレット用 : S = 選択したい都道府県名称
+  // javascript:((S)=>{Array.prototype.forEach.call(document.querySelectorAll('option'),e=>{e.innerHTML.includes(S)&&(e.selected=!0)})})('東京');
+}
+
+/**
+ * 周辺に「歳」か「才」の字があるテキストボックスに年齢を設定する
+ * 
+ * @param age 設定する年齢
+ * @param loop 親要素を遡るループ回数。テキストボックスを起点に、親要素に遡って innerHTML に「歳 or 才」の字がないか探すので、
+ *             対象のページ構造に合わせてループ回数を指定しておく。大体 3〜5 階層くらいで良いかと
+ */
+function setAge(age, loop) {
+  Array.prototype.forEach.call(document.querySelectorAll('input[type="text"]'), (text, parent, finished, i) => {
+    parent = text;
+    finished = false;
+    for(i = loop; i--;) {  // 親要素を遡る
+      if(!finished) {
+        parent = parent.parentNode;
+        if(parent.innerHTML.includes('歳') || parent.innerHTML.includes('才')) {
+          text.value = age;  // 年齢を設定する
+          finished = true;
+        }
+      }
+    }
+  });
+  
+  // ブックマークレット用 : A = 年齢・L = 最大ループ回数
+  // javascript:((A,L)=>{Array.prototype.forEach.call(document.querySelectorAll('input[type="text"]'),(e,r,n,t)=>{for(r=e,n=!1,t=L;t--;)n||((r=r.parentNode).innerHTML.includes('歳')||r.innerHTML.includes('才'))&&(e.value=A,n=!0)})})(25,3);
+}
+
+/**
+ * 任意の性別のラジオボタンを選択する
+ * 
+ * @param gender true で男・false で女を選択する
+ * @param loop 親要素を遡るループ回数。テキストボックスを起点に、親要素に遡って innerHTML に「歳 or 才」の字がないか探すので、
+ *             対象のページ構造に合わせてループ回数を指定しておく。大体 3〜5 階層くらいで良いかと
+ */
+function selectGender(gender, loop, ARRAY) {
+  // 引数 ARRAY は引数としては利用せず、ローカル変数の宣言回避のために引数の形を取っている
+  ARRAY = [];
+  
+  Array.prototype.forEach.call(document.querySelectorAll('input[type="radio"]'), (radio, parent, finished, i) => {
+    if(!ARRAY.includes(radio.name)) {
+      parent = radio;
+      finished = false;
+      for(i = loop; i--;) {  // 親要素を遡る
+        if(!finished) {
+          parent = parent.parentNode;
+          
+          if(parent.innerHTML.includes(gender ? '女' : '男')) {
+            // 選択した方と逆の性別が含まれている場合
+            // このラジオボタンを起点とした探索を終わらせる
+            finished = true;
+          }
+          else if(parent.innerHTML.includes(gender ? '男' : '女')) {
+            // 選択した方の性別が含まれている場合
+            radio.checked = true;
+            finished = true;
+            // 一度選択したラジオボタン群を無視するため、ラジオボタンの名前を控えておく
+            ARRAY.push(radio.name);
+          }
+        }
+      }
+    }
+  });
+  
+  // ブックマークレット用 : G = 性別 (!0 = true で男・!1 = false で女)・L = 最大ループ回数 (A は引数不要)
+  // javascript:((G,L,A)=>{A=[],Array.prototype.forEach.call(document.querySelectorAll('input[type="radio"]'),(e,n,r,o)=>{if(!A.includes(e.name))for(n=e,r=!1,o=L;o--;)r||((n=n.parentNode).innerHTML.includes(G?'女':'男')?r=!0:n.innerHTML.includes(G?'男':'女')&&(e.checked=!0,r=!0,A.push(e.name)))})})(!1,3);
+}
+
+    </script>
+  </head>
+  <body>
+
+<h1>Survey Helpers Parts</h1>
+
+<div id="wrapper">
+  <div>
+    <h2>Select City</h2>
+    <p><input type="button" id="select-city" value="都道府県を選択する"></p>
+    <ul>
+      <li><select><option value="" selected>都道府県</option><option value="1">北海道</option><option value="2">青森県</option><option value="3">岩手県</option><option value="4">宮城県</option><option value="5">秋田県</option><option value="6">山形県</option><option value="7">福島県</option><option value="8">茨城県</option><option value="9">栃木県</option><option value="10">群馬県</option><option value="11">埼玉県</option><option value="12">千葉県</option><option value="13">東京都</option><option value="14">神奈川県</option><option value="15">新潟県</option><option value="16">富山県</option><option value="17">石川県</option><option value="18">福井県</option><option value="19">山梨県</option><option value="20">長野県</option><option value="21">岐阜県</option><option value="22">静岡県</option><option value="23">愛知県</option><option value="24">三重県</option><option value="25">滋賀県</option><option value="26">京都府</option><option value="27">大阪府</option><option value="28">兵庫県</option><option value="29">奈良県</option><option value="30">和歌山県</option><option value="31">鳥取県</option><option value="32">島根県</option><option value="33">岡山県</option><option value="34">広島県</option><option value="35">山口県</option><option value="36">徳島県</option><option value="37">香川県</option><option value="38">愛媛県</option><option value="39">高知県</option><option value="40">福岡県</option><option value="41">佐賀県</option><option value="42">長崎県</option><option value="43">熊本県</option><option value="44">大分県</option><option value="45">宮崎県</option><option value="46">鹿児島県</option><option value="47">沖縄県</option></select></li>
+      <li><select><option value="" selected>都道府県 (短)</option><option value="1">北海道</option><option value="2">青森</option><option value="3">岩手</option><option value="4">宮城</option><option value="5">秋田</option><option value="6">山形</option><option value="7">福島</option><option value="8">茨城</option><option value="9">栃木</option><option value="10">群馬</option><option value="11">埼玉</option><option value="12">千葉</option><option value="13">東京</option><option value="14">神奈川</option><option value="15">新潟</option><option value="16">富山</option><option value="17">石川</option><option value="18">福井</option><option value="19">山梨</option><option value="20">長野</option><option value="21">岐阜</option><option value="22">静岡</option><option value="23">愛知</option><option value="24">三重</option><option value="25">滋賀</option><option value="26">京都</option><option value="27">大阪</option><option value="28">兵庫</option><option value="29">奈良</option><option value="30">和歌山</option><option value="31">鳥取</option><option value="32">島根</option><option value="33">岡山</option><option value="34">広島</option><option value="35">山口</option><option value="36">徳島</option><option value="37">香川</option><option value="38">愛媛</option><option value="39">高知</option><option value="40">福岡</option><option value="41">佐賀</option><option value="42">長崎</option><option value="43">熊本</option><option value="44">大分</option><option value="45">宮崎</option><option value="46">鹿児島</option><option value="47">沖縄</option></select></li>
+    </ul>
+  </div>
+  
+  <div>
+    <h2>Set Age</h2>
+    <p><input type="button" id="set-age" value="年齢を設定する"></p>
+    <ul>
+      <li><input type="text" size="3"> 歳</li>
+      <li>
+        <p>
+          <label>
+            <span><input type="text" size="3"></span>
+            <span>才</span>
+          </label>
+        </p>
+      </li>
+    </ul>
+  </div>
+  
+  <div>
+    <h2>Select Gender</h2>
+    <p><input type="button" id="select-gender" value="性別を設定する"></p>
+    <ul>
+      <li>
+        <ul>
+          <li><input type="radio" name="gender-1" value="1"> 1. 男性</li>
+          <li><input type="radio" name="gender-1" value="2"> 2. 女性</li>
+        </ul>
+      </li>
+      <li>
+        <div>
+          <span><input type="radio" name="gender-2" value="1"></span>
+          <span>1. 男性</span>
+        </div>
+        <div>
+          <span><input type="radio" name="gender-2" value="2"> 2. 女性</span>
+        </div>
+      </li>
+    </ul>
+  </div>
+</div>
+
+  </body>
+</html>

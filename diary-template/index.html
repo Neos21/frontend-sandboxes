@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Diary Template</title>
+    <style>
+
+*, ::before, ::after { box-sizing: border-box; }
+html { font-family: sans-serif; }
+
+/* New Source (Made In 2019) */
+
+.diary-wrapper {
+  min-width: 20em;
+  margin: 1px 1px calc(1px + 1em);  /* 1px = outline width */
+  outline: 1px solid #00bfff;
+  border-width: 1px;
+  border-style: solid;
+  border-color: #ffffff #00bfff #00bfff #ffffff;
+  background: #87ceeb;
+  padding: 2px;
+}
+.diary-header {
+  display: grid;
+  grid-template-areas: "diary-title diary-date" "diary-after diary-after";
+  grid-template-columns: auto 10em;
+  border: 1px  solid #00bfff;
+  border-bottom: 0;
+  padding: .5em .25em 0;
+  background: #fff;
+}
+.diary-header .diary-title {
+  grid-area: diary-title;
+  padding-left: .25em;
+  padding-right: 1em;
+}
+.diary-header .diary-date {
+  grid-area: diary-date;
+  padding-right: .25em;
+  text-align: right;
+  white-space: nowrap;
+}
+.diary-header::after {
+  grid-area: diary-after;
+  margin-top: .5em;
+  display: block;
+  content: "";
+  border: 2px dotted #00bfff;
+}
+.diary-contents {
+  border: 1px  solid #00bfff;
+  border-top: 0;
+  background: #ffffff;
+  padding: .5em;
+}
+
+
+/* Old Source (Made In 2003) */
+
+.t1{border:1px solid deepskyblue;width:100%;}
+.t2{background-color:skyblue;border-width:1px;border-style:solid;border-color:white deepskyblue deepskyblue white;padding:2px;}
+.t3{border:1px solid deepskyblue;background-color:white;width:100%;}
+.t4{border:2px dotted deepskyblue;}
+
+
+/* Page */
+
+body {
+  padding: 0 1em 1em;
+}
+
+    </style>
+  </head>
+  <body>
+
+<h1>Diary Template</h1>
+
+<h2>New Source (Made In 2019)</h2>
+
+<div class="diary-wrapper">
+  <div class="diary-header">
+    <div class="diary-title">Title</div>
+    <div class="diary-date">YYYY-MM-DD</div>
+  </div>
+  <div class="diary-contents">
+    <div>Text</div>
+  </div>
+</div>
+
+<h2>Old Source (Made In 2003)</h2>
+
+<div class="t1">
+  <div class="t2">
+    <table class="t3">
+      <tbody>
+        <tr>
+          <td>Title</td>
+          <td align="right">YYYY-MM-DD</td>
+        </tr>
+        <tr>
+          <td colspan="2"><hr class="t4">Text</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+  </body>
+</html>

@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Detect Actual Font Family</title>
+    <style>
+
+*, ::before, ::after { box-sizing: border-box; }
+html { font-family: sans-serif; }
+
+#dest {
+  font-family: "デタラメゴシック", "游ゴシック";
+}
+
+    </style>
+    <script>
+
+// getComputedStyle() では style 属性値が拾えるだけ
+// このサンプルの場合、「"デタラメゴシック", "游ゴシック"」という文字列が取れてしまい、
+// 「デタラメゴシック」が効いているのか、「游ゴシック」が効いているのかは判断できない
+function check1() {
+  document.getElementById('result1').innerHTML = '判定結果 : ' + window.getComputedStyle(document.getElementById('dest')).fontFamily;
+}
+
+// canvas 要素に書き出してフォントをチェックするコードを利用
+// font-family で「游ゴシック」と指定した時のフォントでレンダリングされていることが確認できる
+function check2() {
+  document.getElementById('result2').innerHTML = '判定結果 : ' + renderedfont(document.getElementById('dest'));
+}
+
+// https://stackoverflow.com/a/38910481
+// どの指定が効いているかは分かる
+function renderedfont(ele) {
+    // スタイル未指定時のブラウザデフォルトフォントを拾っている
+    var getDefaultFonts = function () {
+        var iframe = document.createElement('iframe');
+        var html = '<html><body>';
+        var fonts;
+        document.body.appendChild(iframe);
+        iframe.contentWindow.document.open();
+        iframe.contentWindow.document.write(html);
+        var subele = iframe.contentWindow.document.createElement(ele.tagName);
+        iframe.contentWindow.document.body.appendChild(subele);
+        fonts = getComputedStyle(subele)['font-family'];
+        document.body.removeChild(iframe);
+        return fonts;
+    }
+    var fonts = getComputedStyle(ele)['font-family'] + ',' + getDefaultFonts();
+    var fontsArray = fonts.split(',');
+    var canvas = document.createElement('canvas');
+    var ctx = canvas.getContext("2d");
+    var testString = "abcdefghijklmnopqrstuvwxyz!@#$%^&*()ñ";
+    var prevImageData;
+    document.body.appendChild(canvas);
+    canvas.width = 500;
+    canvas.height = 300;
+    fontsArray.unshift('"Font That Doesnt Exists ' + Math.random() + '"');
+    
+    for (var i = 0; i < fontsArray.length; i++) {
+        var fontName = fontsArray[i].trim();
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.font = '16px ' + fontName + ', monospace';
+        ctx.fillText(testString, 10, 100);
+        var idata = ctx.getImageData(0, 0, canvas.width, canvas.height); 
+        var data = idata.data
+        if (prevImageData) {
+            for (var j = 0; j < data.length; j += 3) {
+                if (prevImageData[j + 3] !== data[j + 3]) {
+                    document.body.removeChild(canvas);
+                    return fontName;
+                }
+            }
+        }
+        prevImageData = data;
+    }
+    
+    document.body.removeChild(canvas);
+    return 'monospace';
+}
+
+    </script>
+  </head>
+  <body>
+
+<h1>Detect Actual Font Family</h1>
+<p id="dest">この要素に指定されているフォント名を取得します。</p>
+<hr>
+<p><button type="button" onclick="check1()">チェック : getComputedStyle() 使用</button></p>
+<p id="result1">判定結果</p>
+<hr>
+<p><button type="button" onclick="check2()">チェック 2 : canvas 要素でチェック</button></p>
+<p id="result2">判定結果</p>
+
+  </body>
+</html>

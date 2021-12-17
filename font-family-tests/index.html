@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>font-family Tests</title>
+    <!-- <link rel="stylesheet" href="styles.css"> -->
+    <style>
+
+*, ::before, ::after { box-sizing: border-box; }
+html { font-family: sans-serif; }
+
+html {
+  width: 100%;
+  height: 100%;
+  color: #000;
+  font-size: 16px;
+  background: #fff;
+}
+
+body {
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+/* 子要素でスクロールさせる */
+#wrapper {
+  padding: .5rem;
+  width: 100%;
+  height: 100%;
+  overflow-x: hidden;
+  overflow-y: scroll;
+  -webkit-overflow-scrolling: touch;
+}
+
+h1, h2, p {
+  margin: 0 0 1rem;
+}
+
+h1 {
+  font-size: 2rem;
+}
+
+h2 {
+  font-size: 1.5rem;
+}
+
+.fonts {
+  margin: 1rem 0;
+  border-top: 1px solid #ccc;
+  padding-top: 1rem;
+}
+
+.fallback {
+  font-size: 1rem;
+  font-weight: normal;
+}
+
+.font {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-gap: .5rem;
+  font-size: 1.2rem;
+  white-space: nowrap;
+}
+
+.font-example, .font-name {
+  overflow: hidden;
+}
+
+    </style>
+    <script>
+
+const fonts = [
+  {
+    family: 'sans-serif',
+    fallback: '"游明朝体", YuMincho, "游明朝", "Yu Mincho", serif',
+    names: [
+      '-apple-system',
+      'BlinkMacSystemFont',
+      '"游ゴシック体"',
+      'YuGothic',
+      '"游ゴシック"',
+      '"Yu Gothic"',
+      '"游ゴシック Medium"',
+      '"Yu Gothic Medium"',
+      '"ヒラギノ角ゴ ProN W3"',
+      '"Hiragino Kaku Gothic ProN W3"',
+      'HiraKakuProN-W3',
+      '"ヒラギノ角ゴ ProN"',
+      '"Hiragino Kaku Gothic ProN"',
+      '"ヒラギノ角ゴ Pro"',
+      '"Hiragino Kaku Gothic Pro"',
+      '"メイリオ"',
+      'Meiryo',
+      'Osaka',
+      '"ＭＳ Ｐゴシック"',
+      '"MS PGothic"',
+      '"Helvetica Neue"',
+      'HelveticaNeue',
+      'Helvetica',
+      'Arial',
+      '"Segoe UI"'
+    ]
+  },
+  {
+    family: 'serif',
+    fallback: '"游ゴシック体", YuGothic, "游ゴシック", "Yu Gothic", sans-serif',
+    names: [
+      '"游明朝体"',
+      'YuMincho',
+      '"游明朝"',
+      '"Yu Mincho"',
+      '"ヒラギノ明朝 ProN W3"',
+      '"Hiragino Mincho ProN W3"',
+      'HiraMinProN-W3',
+      '"ヒラギノ明朝 ProN"',
+      '"Hiragino Mincho ProN"',
+      '"ヒラギノ明朝 Pro"',
+      '"Hiragino Mincho Pro"',
+      '"HGS明朝E"',
+      '"ＭＳ Ｐ明朝"',
+      '"MS PMincho"',
+      'Georgia',
+      'Times',
+      '"Times New Roman"'
+    ]
+  },
+  {
+    family: 'monospace',
+    fallback: '"游明朝体", YuMincho, "游明朝", "Yu Mincho", serif',
+    names: [
+      'MeiryoKe_Gothic',
+      '"Ricty Diminished"',
+      '"Osaka－等幅"',
+      '"Osaka-等幅"',
+      'Osaka-mono',
+      '"ＭＳ ゴシック"',
+      '"MS Gothic"',
+      'SFMono-Regular',
+      '"Courier New"',
+      'Courier',
+      'Monaco',
+      'Menlo',
+      'Consolas',
+      '"Lucida Console"'
+    ]
+  }
+];
+
+const appendFonts = (fontData) => {
+  const family   = fontData.family;
+  const fallback = fontData.fallback;
+  
+  let style = '<style>';
+  let html  = `<div class="fonts"><h2>${family} <small class="fallback">(Fallback : ${fallback})</small></h2>`;
+  fontData.names.forEach((name, index) => {
+    const className = `${family}-${index}`;
+    style += `.${className} { font-family: ${name}, ${fallback}; }`;
+    html  += `<div class="font ${className}"><div class="font-example ${className}">2019-01-01 Lorem Ipsum テスト文字列</div><div class="font-name ${className}">${name}</div></div>`;
+  });
+  style += '</style>';
+  html  += '</div>';
+  
+  document.querySelector('#wrapper').insertAdjacentHTML('beforeend', `${style}${html}`);
+};
+
+document.addEventListener('DOMContentLoaded', () => {
+  fonts.forEach((fontData) => {
+    appendFonts(fontData);
+  });
+});
+
+    </script>
+  </head>
+  <body>
+
+<div id="wrapper">
+  <h1>font-family Tests</h1>
+  <ul>
+    <li><time>2019-01-12</time> : <a href="./mac-fonts-test.html">Mac Fonts Test</a></li>
+    <li><time>2019-01-01</time> : <a href="./more-monospace-fonts-test.html">More Monospace Fonts Test</a></li>
+    <li><time>2019-01-01</time> : <a href="./more-fonts-test.html">More Fonts Test</a></li>
+    <li><time>2018-12-28</time> : <a href="./english-japanese-serif-fonts-test.html">English Japanese Serif Fonts Test</a></li>
+    <li><time>2018-12-28</time> : <a href="./english-japanese-sans-serif-fonts-test.html">English Japanese Sans-Serif Fonts Test</a></li>
+  </ul>
+  <!-- JS Inserted Here -->
+</div>
+
+  </body>
+</html>

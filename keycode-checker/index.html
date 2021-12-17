@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>KeyCode Checker</title>
+    <!-- <link rel="stylesheet" href="styles.css"> -->
+    <style>
+
+*, ::before, ::after { box-sizing: border-box; }
+html { font-family: sans-serif; }
+
+table { margin: 0 auto; border-collapse: collapse; }
+caption { padding-bottom: .5rem; font-weight: bold; }
+td, th { border: 1px solid #000; padding: .5rem; }
+p { text-align: center; }
+
+thead th { background: #f0f0f0; }
+thead th:nth-child(1)     { min-width:  7rem; }
+thead th:nth-child(2)     { min-width: 10rem; }
+thead th:nth-child(3)     { min-width: 10rem; }
+thead th:nth-child(n + 4) { min-width:  6rem; }
+
+tbody th { text-align: left; background: #f9f9f9; }
+tbody td:nth-child(n + 4) { text-align: center; }
+
+    </style>
+    <script>
+
+function displayValues(event, eventName) {
+  document.getElementById(eventName + '-key'      ).innerHTML = event.key            || '-';
+  document.getElementById(eventName + '-code'     ).innerHTML = event.code           || '-';
+  document.getElementById(eventName + '-location' ).innerHTML = event.location       || '-';
+  document.getElementById(eventName + '-shift-key').innerHTML = event.shiftKey ? '○' : '-';
+  document.getElementById(eventName + '-ctrl-key' ).innerHTML = event.ctrlKey  ? '○' : '-';
+  document.getElementById(eventName + '-alt-key'  ).innerHTML = event.altKey   ? '○' : '-';
+  document.getElementById(eventName + '-meta-key' ).innerHTML = event.metaKey  ? '○' : '-';
+  document.getElementById(eventName + '-repeat'   ).innerHTML = event.repeat   ? '○' : '-';
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  displayValues({}, 'keydown');
+  displayValues({}, 'keypress');
+  displayValues({}, 'keyup');
+  
+  document.addEventListener('keydown', (event) => {
+    displayValues(event, 'keydown');
+  });
+  
+  document.addEventListener('keypress', (event) => {
+    displayValues(event, 'keypress');
+  });
+  
+  document.addEventListener('keyup', (event) => {
+    displayValues(event, 'keyup');
+  });
+});
+
+    </script>
+  </head>
+  <body>
+
+<table>
+  <caption>KeyCode Checker</caption>
+  <thead>
+    <tr>
+      <th>Event</th>
+      <th>key</th>
+      <th>code</th>
+      <th>location</th>
+      <th>shiftKey</th>
+      <th>ctrlKey</th>
+      <th>altKey</th>
+      <th>metaKey</th>
+      <th>repeat</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>keydown</th>
+      <td id="keydown-key"></td>
+      <td id="keydown-code"></td>
+      <td id="keydown-location"></td>
+      <td id="keydown-shift-key"></td>
+      <td id="keydown-ctrl-key"></td>
+      <td id="keydown-alt-key"></td>
+      <td id="keydown-meta-key"></td>
+      <td id="keydown-repeat"></td>
+    </tr>
+    <tr>
+      <th>keypress</th>
+      <td id="keypress-key"></td>
+      <td id="keypress-code"></td>
+      <td id="keypress-location"></td>
+      <td id="keypress-shift-key"></td>
+      <td id="keypress-ctrl-key"></td>
+      <td id="keypress-alt-key"></td>
+      <td id="keypress-meta-key"></td>
+      <td id="keypress-repeat"></td>
+    </tr>
+    <tr>
+      <th>keyup</th>
+      <td id="keyup-key"></td>
+      <td id="keyup-code"></td>
+      <td id="keyup-location"></td>
+      <td id="keyup-shift-key"></td>
+      <td id="keyup-ctrl-key"></td>
+      <td id="keyup-alt-key"></td>
+      <td id="keyup-meta-key"></td>
+      <td id="keyup-repeat"></td>
+    </tr>
+  </tbody>
+</table>
+
+  </body>
+</html>

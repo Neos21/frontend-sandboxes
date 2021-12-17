@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Hexagon</title>
+    <style>
+
+*, ::before, ::after { box-sizing: border-box; }
+html { font-family: sans-serif; }
+
+.hexagon-horizontal {
+  position: relative;
+  width: 100px;
+  height: 57.74px;
+  margin: 28.87px 0;
+  background: rgba(255, 0, 0, .25);
+}
+  .hexagon-horizontal::before,
+  .hexagon-horizontal::after {
+    content: "";
+    position: absolute;
+    border-left: 50px solid transparent;
+    border-right: 50px solid transparent;
+  }
+  .hexagon-horizontal::before {
+    bottom: 100%;
+    border-bottom: 28.87px solid rgba(0, 255, 0, .25);
+  }
+  .hexagon-horizontal::after {
+    top: 100%;
+    border-top: 28.87px solid rgba(0, 0, 255, .25);
+  }
+
+.hexagon-vertical {
+  position: relative;
+  width: 57.74px;
+  height: 100px;
+  margin: 0 28.87px;
+  background: rgba(255, 0, 0, .25);
+}
+  .hexagon-vertical::before,
+  .hexagon-vertical::after {
+    content: "";
+    position: absolute;
+    border-top: 50px solid transparent;
+    border-bottom: 50px solid transparent;
+  }
+  .hexagon-vertical::before {
+    right: 100%;
+    border-right: 28.87px solid rgba(0, 255, 0, .25);
+  }
+  .hexagon-vertical::after {
+    left: 100%;
+    border-left: 28.87px solid rgba(0, 0, 255, .25);
+  }
+
+    </style>
+  </head>
+  <body>
+
+<h1>Hexagon</h1>
+
+<p>Horizontal</p>
+<div class="hexagon-horizontal"></div>
+
+<p>Vertical</p>
+<div class="hexagon-vertical"></div>
+
+  </body>
+</html>

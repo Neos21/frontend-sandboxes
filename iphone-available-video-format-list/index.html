@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>iPhone Available Video Format List</title>
+    <style>
+
+*, ::before, ::after { box-sizing: border-box; }
+html { font-family: sans-serif; }
+
+body {
+  margin: 1rem;
+}
+
+h1, p, table, hr {
+  margin: 0 0 1rem;
+}
+
+table {
+  white-space: nowrap;
+  border-collapse: collapse;
+}
+
+th, td {
+  border: 1px solid #999;
+  padding: .15rem .4rem;
+  font-family: monospace, monospace;
+  text-align: center;
+}
+
+th {
+  background: #dff;
+}
+
+thead tr:nth-of-type(1) th {
+  background: #bff;
+}
+
+tbody th {
+  text-align: left;
+}
+
+    </style>
+  </head>
+  <body>
+
+<h1>iPhone Available Video Format List</h1>
+<p>iPhone6 以降で撮れる動画の解像度と FPS 性能をまとめます。カタログスペックおよび「設定」アプリで設定できる限界性能の情報のみ記載・<code>AVFoundation</code> で制御できる詳細については割愛。</p>
+<table>
+  <thead>
+    <tr>
+      <th rowspan="2">iPhone<br>Model</th>
+      <th colspan="2">Camera 1</th>
+      <th colspan="2">Camera 2</th>
+      <th colspan="2">Zoom</th>
+      <th rowspan="2">Video<br>Stabilizer</th>
+      <th colspan="5">720p</th>
+      <th colspan="5">1080p</th>
+      <th colspan="5">4K</th>
+    </tr>
+    <tr>
+      <th>Pixels</th>
+      <th>Focal</th>
+      <th>Pixels</th>
+      <th>Focal</th>
+      <th>Optical</th>
+      <th>Digital</th>
+      <th>24p</th>
+      <th>30p</th>
+      <th>60p</th>
+      <th>120p</th>
+      <th>240p</th>
+      <th>24p</th>
+      <th>30p</th>
+      <th>60p</th>
+      <th>120p</th>
+      <th>240p</th>
+      <th>24p</th>
+      <th>30p</th>
+      <th>60p</th>
+      <th>120p</th>
+      <th>240p</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>6</th>
+      <td>&nbsp;8MP</td>
+      <td>f2.2</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>3x</td>
+      <td>-</td>
+      <td>-</td>
+      <td>○</td>
+      <td>-</td>
+      <td>○</td>
+      <td>○</td>
+      <td>-</td>
+      <td>○</td>
+      <td>○</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+    </tr>
+    <tr>
+      <th>6 Plus</th>
+      <td>&nbsp;8MP</td>
+      <td>f2.2</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>3x</td>
+      <td>-</td>
+      <td>-</td>
+      <td>○</td>
+      <td>-</td>
+      <td>○</td>
+      <td>○</td>
+      <td>-</td>
+      <td>○</td>
+      <td>○</td>
+      <td>○</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+    </tr>
+    <tr>
+      <th>SE</th>
+      <td>12MP</td>
+      <td>f2.2</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>3x</td>
+      <td>-</td>
+      <td>-</td>
+      <td>○</td>
+      <td>-</td>
+      <td>○</td>
+      <td>○</td>
+      <td>-</td>
+      <td>○</td>
+      <td>○</td>
+      <td>○</td>
+      <td>-</td>
+      <td>-</td>
+      <td>○</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+    </tr>
+    <tr>
+      <th>6s</th>
+      <td>12MP</td>
+      <td>f2.2</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>3x</td>
+      <td>-</td>
+      <td>-</td>
+      <td>○</td>
+      <td>-</td>
+      <td>○</td>
+      <td>○</td>
+      <td>-</td>
+      <td>○</td>
+      <td>○</td>
+      <td>○</td>
+      <td>-</td>
+      <td>-</td>
+      <td>○</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+    </tr>
+    <tr>
+      <th>6s Plus</th>
+      <td>12MP</td>
+      <td>f2.2</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>3x</td>
+      <td>○</td>
+      <td>-</td>
+      <td>○</td>
+      <td>-</td>
+      <td>○</td>
+      <td>○</td>
+      <td>-</td>
+      <td>○</td>
+      <td>○</td>
+      <td>○</td>
+      <td>-</td>
+      <td>-</td>
+      <td>○</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>12MP</td>
+      <td>f1.8</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>3x</td>
+      <td>○</td>
+      <td>-</td>
+      <td>○</td>
+      <td>-</td>
+      <td>○</td>
+      <td>○</td>
+      <td>-</td>
+      <td>○</td>
+      <td>○</td>
+      <td>○</td>
+      <td>-</td>
+      <td>-</td>
+      <td>○</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+    </tr>
+    <tr>
+      <th>7 Plus</th>
+      <td>12MP</td>
+      <td>f1.8</td>
+      <td>12MP</td>
+      <td>f2.8</td>
+      <td>2x</td>
+      <td>6x</td>
+      <td>○</td>
+      <td>-</td>
+      <td>○</td>
+      <td>-</td>
+      <td>○</td>
+      <td>○</td>
+      <td>-</td>
+      <td>○</td>
+      <td>○</td>
+      <td>○</td>
+      <td>-</td>
+      <td>-</td>
+      <td>○</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>12MP</td>
+      <td>f1.8</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>3x</td>
+      <td>○</td>
+      <td>-</td>
+      <td>○</td>
+      <td>-</td>
+      <td>○</td>
+      <td>○</td>
+      <td>-</td>
+      <td>○</td>
+      <td>○</td>
+      <td>○</td>
+      <td>○</td>
+      <td>○</td>
+      <td>○</td>
+      <td>○</td>
+      <td>-</td>
+      <td>-</td>
+    </tr>
+    <tr>
+      <th>8 Plus</th>
+      <td>12MP</td>
+      <td>f1.8</td>
+      <td>12MP</td>
+      <td>f2.8</td>
+      <td>2x</td>
+      <td>6x</td>
+      <td>○</td>
+      <td>-</td>
+      <td>○</td>
+      <td>-</td>
+      <td>○</td>
+      <td>○</td>
+      <td>-</td>
+      <td>○</td>
+      <td>○</td>
+      <td>○</td>
+      <td>○</td>
+      <td>○</td>
+      <td>○</td>
+      <td>○</td>
+      <td>-</td>
+      <td>-</td>
+    </tr>
+    <tr>
+      <th>X</th>
+      <td>12MP</td>
+      <td>f1.8</td>
+      <td>12MP</td>
+      <td>f2.4</td>
+      <td>2x</td>
+      <td>6x</td>
+      <td>○</td>
+      <td>-</td>
+      <td>○</td>
+      <td>-</td>
+      <td>○</td>
+      <td>○</td>
+      <td>-</td>
+      <td>○</td>
+      <td>○</td>
+      <td>○</td>
+      <td>○</td>
+      <td>○</td>
+      <td>○</td>
+      <td>○</td>
+      <td>-</td>
+      <td>-</td>
+    </tr>
+    <tr>
+      <th>XR</th>
+      <td>12MP</td>
+      <td>f1.8</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>3x</td>
+      <td>○</td>
+      <td>-</td>
+      <td>○</td>
+      <td>-</td>
+      <td>○</td>
+      <td>○</td>
+      <td>-</td>
+      <td>○</td>
+      <td>○</td>
+      <td>○</td>
+      <td>○</td>
+      <td>○</td>
+      <td>○</td>
+      <td>○</td>
+      <td>-</td>
+      <td>-</td>
+    </tr>
+    <tr>
+      <th>XS / XS Max</th>
+      <td>12MP</td>
+      <td>f1.8</td>
+      <td>12MP</td>
+      <td>f2.4</td>
+      <td>2x</td>
+      <td>6x</td>
+      <td>○</td>
+      <td>-</td>
+      <td>○</td>
+      <td>-</td>
+      <td>○</td>
+      <td>○</td>
+      <td>-</td>
+      <td>○</td>
+      <td>○</td>
+      <td>○</td>
+      <td>○</td>
+      <td>○</td>
+      <td>○</td>
+      <td>○</td>
+      <td>-</td>
+      <td>-</td>
+    </tr>
+  </tbody>
+</table>
+
+  </body>
+</html>

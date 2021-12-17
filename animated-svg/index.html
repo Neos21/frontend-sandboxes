@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Animated SVG</title>
+    <!-- <link rel="stylesheet" href="styles.css"> -->
+    <style>
+
+*, ::before, ::after { box-sizing: border-box; }
+html { font-family: sans-serif; }
+
+.inp {
+  position: relative;
+  margin: auto;
+  width: 100%;
+  max-width: 280px;
+}
+.inp .label {
+  position: absolute;
+  top: 16px;
+  left: 0;
+  font-size: 16px;
+  color: #9098a9;
+  font-weight: 500;
+  transform-origin: 0 0;
+  transition: all 0.2s ease;
+}
+.inp svg {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 26px;
+  fill: none;
+}
+.inp svg path {
+  stroke: #f09;  /* #c8ccd4; */
+  stroke-width: 2;
+}
+.inp svg path d {
+  transition: all 0.2s ease;
+}
+.inp .border {
+  position: absolute;
+  bottom: 0;
+  left: 120px;
+  height: 2px;
+  right: 0;
+  background: #c8ccd4;
+}
+.inp input {
+  -webkit-appearance: none;
+  width: 100%;
+  border: 0;
+  font-family: inherit;
+  padding: 12px 0;
+  height: 48px;
+  font-size: 16px;
+  font-weight: 500;
+  background: none;
+  border-radius: 0;
+  color: #223254;
+  transition: all 0.15s ease;
+}
+.inp input:not(:placeholder-shown) + span {
+  color: #5a667f;
+  transform: translateY(-26px) scale(0.75);
+}
+.inp input:focus {
+  background: none;
+  outline: none;
+}
+.inp input:focus + span {
+  color: #07f;
+  transform: translateY(-26px) scale(0.75);
+  transition-delay: 0.1s;
+}
+.inp input:focus + span + svg path {
+  stroke: #07f;
+  animation: elasticInput 0.4s ease forwards;
+}
+.inp input:focus + span + svg + .border {
+  background: #07f;
+}
+
+@keyframes elasticInput {
+  50% {
+    d: path("M2,2 C21,17 46,25 74,25 C102,25 118,25 120,25");
+  }
+}
+
+    </style>
+  </head>
+  <body>
+
+<h1>Animated SVG</h1>
+<label for="inp" class="inp">
+  <input type="text" id="inp" placeholder="&nbsp;">
+  <span class="label">Label</span>
+  <svg width="120px" height="26px" viewBox="0 0 120 26">
+    <path d="M0,25 C21,25 46,25 74,25 C102,25 118,25 120,25"></path>
+  </svg>
+  <span class="border"></span>
+</label>
+<ul>
+  <li>参考 : <a href="https://coliss.com/articles/build-websites/operation/css/elastic-input-animation.html">https://coliss.com/articles/build-websites/operation/css/elastic-input-animation.html</a></li>
+</ul>
+
+  </body>
+</html>

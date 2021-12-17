@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Two Double</title>
+    <style>
+
+*, ::before, ::after { box-sizing: border-box; }
+html { font-family: sans-serif; }
+
+    </style>
+    <script>
+
+function toDouble(num) {
+  document.getElementById('wrapper').insertAdjacentHTML('afterbegin', `${num} + ${num} = ${num + num}`);
+  return Promise.resolve(num + num);
+}
+
+function sleep(second, returnValue) {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve(returnValue);
+    }, 1000 * second);
+  });
+}
+
+function continues(num) {
+  if(num > 590000000000000000000) {
+    document.getElementById('wrapper').insertAdjacentHTML('afterbegin', `End : ${num}`);
+    return Promise.reject(num);  // Reject して止めている
+  }
+  
+  return toDouble(num)
+    .then((num) => {
+      return sleep(.1, num);
+    });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  [...Array(100).keys()].reduce((previous, current) => {
+    return previous
+      .then((num) => {
+        return continues(num);
+      });
+  }, Promise.resolve(1));
+});
+
+    </script>
+  </head>
+  <body>
+
+<h1>Two Double</h1>
+<div id="wrapper"></div>
+
+  </body>
+</html>

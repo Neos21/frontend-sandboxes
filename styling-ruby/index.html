@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Styling Ruby</title>
+    <style>
+
+*, ::before, ::after { box-sizing: border-box; }
+html { font-family: sans-serif; }
+
+.examples-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  margin-bottom: 2rem;
+  border-bottom: 1px solid #ccc;
+  padding-bottom: 1rem;
+}
+.examples-row p {
+  margin: 0;
+  text-decoration: underline;
+  word-break: break-all;
+}
+
+.line-height-only p {
+  line-height: 2.25;  /* 2.25 が ruby なしと行間が揃う最低値 (Mac Chrome で検証) */
+}
+
+.data-ruby p {
+  line-height: 1.7;  /* ルビ分を適当に広げておく */
+}
+.data-ruby [data-ruby] {
+  display: inline-block;
+  position: relative;
+}
+.data-ruby [data-ruby]::before {
+  content: attr(data-ruby);
+  display: inline-block;
+  position: absolute;
+  top: -.8em;
+  right: 0;
+  left: 0;  /* right・left に 0 を入れて中央揃えにする */
+  margin-left: .25em;  /* letter-spacing が文字の右側に付くので左端に同値を付ける */
+  font-size: .5em;
+  text-align: center;
+  letter-spacing: .25em;
+  white-space: nowrap;
+}
+.data-ruby [data-ruby] rt {
+  display: none;
+}
+
+    </style>
+    <script>
+
+document.addEventListener('DOMContentLoaded', () => {
+  // 指定の要素内にある ruby 要素を探索し、rt 要素の中身を抜き出して data-ruby 属性を付与するサンプル (本サンプル内では未使用)
+  Array.prototype.forEach.call(document.querySelectorAll('#some-target ruby'), (ruby) => {
+    let rubyText = '';
+    Array.prototype.forEach.call(ruby.querySelectorAll('rt'), (rt) => {
+      rubyText += rt.innerHTML;
+    });
+    ruby.setAttribute('data-ruby', rubyText);
+  });
+});
+
+    </script>
+  </head>
+  <body>
+
+<h1>Styling Ruby</h1>
+
+<p>まずは <code>line-height</code> 指定だけで、<code>ruby</code> 要素入りの行と <code>ruby</code> 要素なしの行の行間を揃えてみる。行の高さが揃っているか確認するため <code>text-decoration: underline</code> を指定している。同じ行間になる最小値は <code>line-height: 2.25</code> あたりだった。</p>
+
+<div class="examples-row line-height-only">
+  <p>
+  <strong>通常の ruby 要素を使ったルビありテキストで行間を揃えるサンプル :</strong><br>
+    <ruby>亜米利加<rp>(</rp><rt>アメリカ</rt><rp>)</rp></ruby> Lorem ipsum dolor sit amet,<br>
+    consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.<br>
+    Ut enim ad minim veniam, quis nostrud exercitation <ruby>亜米利加<rp>(</rp><rt>アメリカ</rt><rp>)</rp></ruby> ullamco laboris nisi ut aliquip ex ea commodo consequat.<br>
+    Duis aute irure dolor in reprehenderit in voluptate <ruby>米<rp>(</rp><rt>アメリカ</rt><rp>)</rp></ruby> velit esse cillum dolore eu fugiat nulla pariatur.<br>
+    Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+  </p>
+  <p>
+    <strong>ルビなしテキストで行間を揃えるサンプル :</strong><br>
+    亜米利加 Lorem ipsum dolor sit amet,<br>
+    consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.<br>
+    Ut enim ad minim veniam, quis nostrud exercitation 亜米利加 ullamco laboris nisi ut aliquip ex ea commodo consequat.<br>
+    Duis aute irure dolor in reprehenderit in voluptate 米 velit esse cillum dolore eu fugiat nulla pariatur.<br>
+    Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+  </p>
+
+</div>
+
+<p>次は、<code>rt</code> 要素を使わず、<code>data-ruby</code> 属性を用意し、CSS でルビっぽくスタイリングしてみる。</p>
+
+<div class="examples-row data-ruby">
+  <p>
+    <strong>通常の ruby 要素のみのサンプル :</strong><br>
+    <ruby>亜米利加<rp>(</rp><rt>アメリカ</rt><rp>)</rp></ruby> Lorem ipsum dolor sit amet,<br>
+    consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.<br>
+    Ut enim ad minim veniam, quis nostrud exercitation <ruby>亜<rt>ア</rt>米<rt>メ</rt>利<rt>リ</rt>加<rt>カ</rt></ruby> ullamco laboris nisi ut aliquip ex ea commodo consequat.<br>
+    Duis aute irure dolor in reprehenderit in voluptate <ruby>米<rp>(</rp><rt>アメリカ</rt><rp>)</rp></ruby> velit esse cillum dolore eu fugiat nulla pariatur.<br>
+    Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+  </p>
+  <p>
+    <strong>data-ruby 属性を使ったサンプル :</strong><br>
+    <ruby data-ruby="アメリカ">亜米利加<rp>(</rp><rt>アメリカ</rt><rp>)</rp></ruby> Lorem ipsum dolor sit amet,<br>
+    consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.<br>
+    Ut enim ad minim veniam, quis nostrud exercitation <ruby data-ruby="アメリカ">亜<rt>ア</rt>米<rt>メ</rt>利<rt>リ</rt>加<rt>カ</rt></ruby> ullamco laboris nisi ut aliquip ex ea commodo consequat.<br>
+    Duis aute irure dolor in reprehenderit in voluptate <ruby data-ruby="アメリカ">米<rp>(</rp><rt>アメリカ</rt><rp>)</rp></ruby> velit esse cillum dolore eu fugiat nulla pariatur.<br>
+    Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+  </p>
+</div>
+
+<p><code>data-ruby</code> 属性によるスタイリングで一見それなりに見えているが、ルビの長さや構成によっては <code>rt</code> 要素のスタイリングとは全く異なる見た目になってしまう。</p>
+
+<div class="examples-row data-ruby">
+  <p>
+    <strong>通常の ruby 要素のみのサンプル :</strong><br>
+    通常文章<br>
+    よくあるルビ<ruby>亜米利加<rp>(</rp><rt>アメリカ</rt><rp>)</rp></ruby>はこうなる<br>
+    複数 rt を data-ruby ではひとまとめ<ruby>亜<rt>ア</rt>米<rt>メ</rt>利<rt>リ</rt>加<rt>カ</rt></ruby>はこうなる<br>
+    1文字に長めのルビ<ruby>米<rp>(</rp><rt>アメリカ</rt><rp>)</rp></ruby>はこうなる<br>
+    長めのルビを複数持つ場合<ruby>凄<rt>ものすごく</rt>長<rt>ながーい</rt>瑠尾<rt>ルビを振る</rt></ruby>はこうなる<br>
+    別々のルビが近くにある場合<ruby>独<rt>ドイツ帝国</rt></ruby>/<ruby>仏<rt>フランス共和国</rt></ruby>はこうなる<br>
+    通常文章・以上
+  </p>
+  <p>
+    <strong>data-ruby 属性を使ったサンプル :</strong><br>
+    通常文章<br>
+    よくあるルビ<ruby data-ruby="アメリカ">亜米利加<rp>(</rp><rt>アメリカ</rt><rp>)</rp></ruby>はこうなる<br>
+    複数 rt を data-ruby ではひとまとめ<ruby data-ruby="アメリカ">亜<rt>ア</rt>米<rt>メ</rt>利<rt>リ</rt>加<rt>カ</rt></ruby>はこうなる<br>
+    1文字に長めのルビ<ruby data-ruby="アメリカ">米<rp>(</rp><rt>アメリカ</rt><rp>)</rp></ruby>はこうなる<br>
+    長めのルビを複数持つ場合<ruby data-ruby="ものすごくながーいルビを振る">凄<rt>ものすごく</rt>長<rt>ながーい</rt>瑠尾<rt>ルビを振る</rt></ruby>はこうなる<br>
+    別々のルビが近くにある場合<ruby data-ruby="ドイツ帝国">独<rt>ドイツ帝国</rt></ruby>/<ruby data-ruby="フランス共和国">仏<rt>フランス共和国</rt></ruby>はこうなる<br>
+    通常文章・以上
+  </p>
+</div>
+
+<p><code>rt</code> 要素の内容の方が多い場合はいずれの場合も行の折り返しなどの箇所で不自然になる感じ。</p>
+
+  </body>
+</html>

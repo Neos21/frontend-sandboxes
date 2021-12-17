@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>SVG Triangle Generator</title>
+    <style>
+
+*, ::before, ::after { box-sizing: border-box; }
+html { font-family: sans-serif; }
+
+.main-wrapper {
+  clear: both;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.form-wrapper {
+  float: left;
+  width: 225px;
+  padding-right: 25px;
+}
+.form-wrapper fieldset {
+  border: 0;
+}
+.form-wrapper label {
+  display: block;
+  padding-bottom: 5px;
+}
+.form-wrapper input {
+  border: 1px solid #8f8f8f;
+  padding: 5px 10px;
+}
+.form-wrapper input[type="button"] {
+  display: inline-block;
+  border-color: #33a996;
+  color: #ffffff;
+  background-color: #39bda7;
+  cursor: pointer;
+}
+
+.results-wrapper {
+  float: left;
+  width: 925px;
+  height: 300px;
+  padding-top: 15px;
+  padding-left: 25px;
+}
+.results-wrapper span {
+  display: block;
+  padding-bottom: 5px;
+}
+.results-wrapper .list-wrapper {
+  border: 1px solid #8f8f8f;
+  background-color: #ffffff;
+  width: 28%;
+  margin-right: 1.5%;
+  float: left;
+  padding: 15px;
+  min-height: 250px;
+}
+.results-wrapper .list-wrapper span {
+  color: #8f8f8f;
+  font-size: 12px;
+  padding-bottom: 5px;
+  margin-bottom: 10px;
+  display: block;
+  border-bottom: 1px solid #8f8f8f;
+}
+
+.list {
+  list-style: none;
+  padding-left: 0;
+}
+.list li {
+  padding-bottom: 10px;
+}
+
+p {
+  clear: both;
+}
+
+    </style>
+    <script>
+
+/** 三角形が作れる条件は、最も長い棒の長さ < 他の2本の棒の長さ */
+function isTriangle(side1, side2, side3) {
+  return (side1 < side2 + side3) && (side2 < side1 + side3) && (side3 < side1 + side2);
+};
+
+/** 正三角形かどうか */
+function isEquilateral(side1, side2, side3) {
+  return (side1 === side2) && (side2 === side3);
+}
+
+/** 二等辺三角形かどうか */
+function isIsoscales(side1, side2, side3) {
+  return (side1 === side2) || (side2 === side3) || (side3 === side1);
+}
+
+/** 三角形を描画する */
+function drawTriangle(side1, side2, side3) {
+  // 三辺の値を大きいものから順に並べる
+  const sides = [side1, side2, side3].sort((a, b) => {
+    return b - a;
+  });
+  
+  const scale = 50 / (sides[0]);
+  const peakX = (scale * sides[1] * Math.sin(Math.PI / 2 - Math.acos((Math.pow(sides[0], 2) + Math.pow(sides[1], 2) - Math.pow(sides[2], 2)) / (2 * sides[0] * sides[1])))).toFixed(1);
+  const peakY = (scale * Math.sqrt(Math.pow(sides[1], 2) - Math.pow(peakX / scale, 2))).toFixed(1);
+  
+  return `<svg width="100" height="${peakY}"><polygon points="0,0 50,0 ${peakX},${peakY}" style="fill: #39bda7; stroke: #8f8f8f; stroke-width: 1;"></svg>`;
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('submit').addEventListener('click', () => {
+    const side1Elem = document.getElementById('side-1');
+    const side2Elem = document.getElementById('side-2');
+    const side3Elem = document.getElementById('side-3');
+    
+    const side1 = parseFloat(side1Elem.value);
+    const side2 = parseFloat(side2Elem.value);
+    const side3 = parseFloat(side3Elem.value);
+    
+    if(!isTriangle(side1, side2, side3)) {
+      alert('NG');
+      return;
+    }
+    
+    // 結果を描画するリストを選定する
+    let resultList = document.querySelector('.scalene-list');
+    if(isEquilateral(side1, side2, side3)) {
+      resultList = document.querySelector('.equilateral-list');
+    }
+    else if(isIsoscales(side1, side2, side3)) {
+      resultList = document.querySelector('.isosceles-list');
+    }
+    
+    // 要素を生成し追加する
+    const item = document.createElement('li');
+    item.innerHTML = `${side1} - ${side2} - ${side3}<div>${drawTriangle(side1, side2, side3)}</div>`;
+    resultList.appendChild(item);
+    // フォームをリセットする
+    side1Elem.value = side2Elem.value = side3Elem.value = '';
+  });
+});
+
+    </script>
+  </head>
+  <body>
+
+<div class="main-wrapper">
+  <div class="form-wrapper">
+    <fieldset><label for="side-1">a:</label><input type="text" id="side-1" placeholder="Enter side 1 length"></fieldset>
+    <fieldset><label for="side-2">b:</label><input type="text" id="side-2" placeholder="Enter side 2 length"></fieldset>
+    <fieldset><label for="side-3">c:</label><input type="text" id="side-3" placeholder="Enter side 3 length"></fieldset>
+    <fieldset><input type="button" id="submit" value="Submit"></fieldset>
+  </div> 
+  <div class="results-wrapper">
+    <span>Generated result:</span>
+    <div class="list-wrapper"><span>Equilateral triangles:</span><ul class="list equilateral-list"></ul></div>
+    <div class="list-wrapper"><span>Isoscales triangles:  </span><ul class="list isosceles-list">  </ul></div>
+    <div class="list-wrapper"><span>Scalene triangles:    </span><ul class="list scalene-list">    </ul></div>
+  </div>
+</div>
+
+  </body>
+</html>

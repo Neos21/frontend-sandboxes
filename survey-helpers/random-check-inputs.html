@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Random Check Inputs</title>
+    <style>
+
+*, ::before, ::after { box-sizing: border-box; }
+html { font-family: sans-serif; }
+
+.row {
+  display: flex;
+}
+
+.col {
+  margin-right: 1rem;
+}
+
+h1, h2 {
+  margin: 0;
+}
+
+    </style>
+    <script>
+
+function randomCheckInputs() {
+  const elems = {};
+  [].forEach.call(document.querySelectorAll('[type=radio],[type=checkbox]'), (elem) => {
+    if(!elem.name) {
+      return;
+    }
+    
+    if(elems[elem.name] === undefined) {
+      elems[elem.name] = [];
+    }
+    elems[elem.name].push(elem);
+  });
+  Object.keys(elems).forEach((name) => {
+    elems[name][Math.floor(Math.random() * elems[name].length)].click();
+  });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('exec').addEventListener('click', () => {
+    randomCheckInputs();
+  });
+});
+
+    </script>
+  </head>
+  <body>
+
+<h1>Random Check Inputs</h1>
+<div class="row">
+  <div class="col">
+    <h2>Radio</h2>
+    <ul>
+      <li><label><input type="radio" name="r1" value="1"> R1 1</label></li>
+      <li><label><input type="radio" name="r1" value="2"> R1 2</label></li>
+      <li><label><input type="radio" name="r1" value="3"> R1 3</label></li>
+    </ul>
+    <ul>
+      <li><label><input type="radio" name="r2" value="A"> R2 A</label></li>
+      <li><label><input type="radio" name="r2" value="B"> R2 B</label></li>
+      <li><label><input type="radio" name="r2" value="C"> R2 C</label></li>
+    </ul>
+  </div>
+  <div class="col">
+    <h2>Checkbox</h2>
+    <ul>
+      <li><label><input type="checkbox" name="c1" value="1"> C1 1</label></li>
+      <li><label><input type="checkbox" name="c1" value="2"> C1 2</label></li>
+      <li><label><input type="checkbox" name="c1" value="3"> C1 3</label></li>
+    </ul>
+    <ul>
+      <li><label><input type="checkbox" name="c2" value="1"> C2 1</label></li>
+      <li><label><input type="checkbox" name="c2" value="2"> C2 2</label></li>
+      <li><label><input type="checkbox" name="c2" value="3"> C2 3</label></li>
+    </ul>
+  </div>
+</div>
+<p><button id="exec" type="button">Exec</button></p>
+
+  </body>
+</html>

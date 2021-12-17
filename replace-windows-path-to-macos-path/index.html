@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Replace Windows Path To MacOS Path</title>
+    <style>
+
+*, ::before, ::after { box-sizing: border-box; }
+html { font-family: sans-serif; }
+
+body {
+  margin: 1rem 1.5rem;
+}
+
+dt {
+  margin: 1rem 0 .5rem;
+  font-weight: bold;
+}
+
+dd {
+  display: block;
+}
+
+input {
+  width: 100%;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  padding: .5rem;
+}
+
+#feedback {
+  visibility: hidden;
+}
+
+    </style>
+    <script>
+
+document.addEventListener('DOMContentLoaded', () => {
+  const input    = document.getElementById('input');
+  const output   = document.getElementById('output');
+  const feedback = document.getElementById('feedback');
+  
+  const replacePath = () => {
+    const rawInput = input.value;
+    const replaced = rawInput.replace(/^(\\\\|file:\/\/\/)/gu, 'smb://').replace(/\\/gu, '/');
+    output.value = replaced;
+  };
+  input.addEventListener('keyup', replacePath);
+  input.addEventListener('blur' , replacePath);
+  
+  const copyPath = () => {
+    if(output.value.length === 0) {
+      return;
+    }
+    
+    output.select();
+    document.execCommand('copy');
+    feedback.style.visibility = 'visible';
+    setTimeout(() => {
+      feedback.style.visibility = 'hidden';
+    }, 2000);
+  };
+  output.addEventListener('click', copyPath);
+  output.addEventListener('focus', copyPath);
+});
+
+    </script>
+  </head>
+  <body>
+
+<h1>Replace Windows Path To MacOS Path</h1>
+<dl>
+  <dt>Windows Path</dt>
+  <dd>
+    <input type="text" id="input" value="" placeholder="Windows Path (ex. \\127.0.0.1\Some\Path\To\File.txt)" autocomplete="off">
+  </dd>
+  <dt>MacOS Path</dt>
+  <dd>
+    <input type="text" id="output" value="" placeholder="MacOS Path (ex. smb://127.0.0.1/Some/Path/To/File.txt)" readonly>
+  </dd>
+</dl>
+<p id="feedback">Copied!</p>
+
+  </body>
+</html>

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Practice SVG</title>
+    <style>
+
+*, ::before, ::after { box-sizing: border-box; }
+
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script>
+
+document.addEventListener('DOMContentLoaded', () => {
+  const contents = `
+- svg 要素
+    - xmlns : HTML 内に書く場合は省略可能
+    - width
+    - height
+    - viewBox : 0 0 (width) (height) : 同値にすれば座標 1 を 1px と扱える。書かなければそうなるっぽい。
+- circle 要素 : 丸
+    - cx : 中心の X 座標 (Center X)
+    - cy : 中心の Y 座標 (Center Y)
+    - r : 半径 (Radius)
+    - fill : 塗り色。カラーコード
+- rect 要素 : 四角
+    - x : 配置 X (左上)
+    - y : 配置 Y
+    - width
+    - height
+    - rx : X 方向の角の丸み (Round X)
+    - ry : Y 方向の角の丸み (Round Y)
+    - fill : 塗り
+- ellipse 要素 : 楕円
+    - cx・cy
+    - rx・ry (Radius)
+- line 要素 : 直線
+    - x1・y1 : 始点の座標
+    - x2・y2 : 終点の座標
+- polyline 要素 : 折れ線
+    - points : \`x1,y1 x2,y2…\` と X・Y 座標の組をスペースで列挙していく
+    - stroke : 線の色。他のヤツにも使えるっぽい
+    - fill : \`none\` で塗りなし。座標を結ぶ空間が塗られる
+- polygon : 多角形。polyline と違って始点と終点で線が閉じて形になる
+    - points : X・Y 座標
+- path : 複雑な図形が描ける
+    - d : pathData。座標の他にコマンドを付与する。
+- その他属性
+    - stroke-width : \`5\` で太さ。
+    - stroke-opacity : 線の透明度。
+    - fill-opacity : \`0.5\` で 50% 透明。
+- 参考文献
+    - <https://app.codegrid.net/entry/svg-basic>
+    - <http://ascii.jp/elem/000/001/014/1014703/> : ViewBox の意味が分かりやすい
+    - <http://ascii.jp/elem/000/001/014/1014703/index-2.html>
+    - <https://developer.mozilla.org/ja/docs/Web/SVG/Attribute>
+`;
+  document.getElementById('notes').innerHTML =marked.parse(contents);
+});
+
+    </script>
+  </head>
+  <body>
+
+<h1>Practice SVG</h1>
+<div style="display: inline-block; border:1px solid #000;">
+  <svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 400 400">
+    <circle cx="400" cy="0" r="100" fill="#06f"></circle>
+    <rect x="10" y="10" width="50" height="100" rx="20" ry="20" fill="#090"></rect>
+    <ellipse cx="100" cy="100" rx="100" ry="50" stroke="#00f"></ellipse>
+    <line x1="50" y1="50" x2="200" y2="150" stroke="#f00"></line>
+    <polyline points="50,50 55,100 100,100 100,200" stroke="#f0f" fill="#f00"></polyline>
+    <polygon points="0,50 86,5 172,50 172,150 86,200" fill="#999"></polygon>
+    <path d="M100,100 L200,200 C300,300 300,100 100,100 Z" fill="#f00" fill-opacity="0.5" stroke="#00f" stroke-width="5" stroke-opacity="0.2"></path>
+  </svg>
+</div>
+<div id="notes"></div>
+
+  </body>
+</html>

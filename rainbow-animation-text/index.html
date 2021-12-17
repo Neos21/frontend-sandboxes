@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Rainbow Animation Text</title>
+    <style>
+
+*, ::before, ::after { box-sizing: border-box; }
+
+.example {
+  /* フォントサイズなど任意指定 */
+  font: bold clamp(1rem, 5vmin, 10rem) / 1 Verdana, Helvetica, Arial, sans-serif;
+  text-transform: uppercase;
+  /* 背景グラデーションを指定・幅を 200% にしておく */
+  background: linear-gradient(to right, #f00 0%, #f80 14.28%, #dd0 28.56%, #0d0 42.85%, #0dd 57.14%, #00f 71.42%, #e0e 85.71%, #f00 100%) 0% center / 200% auto;
+  /* 背景画像を文字でマスクする */
+          background-clip: text;
+  -webkit-background-clip: text;
+  /* 文字色を透明にできればよく color: transparent でも color: rgba(0, 0, 0, 0) でも可 */
+          text-fill-color: transparent;
+  -webkit-text-fill-color: transparent;
+  /* アニメーション指定 */
+  animation: example 4s linear infinite;
+}
+
+/* 背景の横位置をズラす */
+@keyframes example {
+  to { background-position-x: 200%; }
+}
+
+body {
+  text-align: center;
+}
+
+    </style>
+  </head>
+  <body>
+
+<div>
+  <span class="example">Rainbow Animation Text</span>
+</div>
+
+  </body>
+</html>

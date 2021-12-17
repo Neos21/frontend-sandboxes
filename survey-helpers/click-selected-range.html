@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Click Selected Range</title>
+    <style>
+
+*, ::before, ::after { box-sizing: border-box; }
+html { font-family: sans-serif; }
+
+table {
+  margin: 20px;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+th, td {
+  min-width: 300px;
+  border: 1px solid #999;
+  padding: 5px 20px;
+  text-align: center;
+  white-space: normal;
+}
+
+tr th:first-child,
+tr td:first-child {
+  min-width: 500px;
+  text-align: left;
+}
+
+    </style>
+    <script>
+
+document.addEventListener('DOMContentLoaded', () => {
+  // Click Selected Range
+  ((win, doc, addEvent, getRect, sty, px, isMouseDown, isDragging, defaultStyle, createElement, rangeElem, pointElem, beginX, beginY, beginScrollX, beginScrollY) => {
+    // 要素を生成して返す関数を作る
+    createElement = (elem) => {
+      elem = doc.createElement('i');
+      doc.body.appendChild(elem);
+      return elem;
+    };
+    // 選択範囲を示す要素
+    rangeElem = createElement();
+    // ポインタ要素
+    pointElem = createElement();
+    
+    // マウスボタン押下
+    doc[addEvent]('mousedown', (event) => {
+      // マウスボタン押下中
+      isMouseDown = true;
+      // 選択範囲を消すため初期値を再指定する
+      rangeElem[sty].cssText = defaultStyle + 'border:1px solid rgba(0,0,255,.2);background:rgba(99,255,255,.2)';
+      pointElem[sty].cssText = defaultStyle;
+      // 選択開始位置を控えておく
+      beginX = event.pageX;
+      beginY = event.pageY;
+      // 選択開始時のスクロール位置を控えておく
+      beginScrollX = win.scrollX;
+      beginScrollY = win.scrollY;
+    });
+    
+    // マウス移動中
+    doc[addEvent]('mousemove', (event, x, y) => {
+      // マウスボタン押下中の移動なら処理する
+      if(isMouseDown) {
+        // ドラッグ中
+        isDragging = true;
+        // 始点より左に移動する場合を考慮して left を制御する
+        x = event.pageX - beginX;
+        rangeElem[sty].left = (x < 0 ? beginX + x : beginX) + px;
+        // 始点より上に移動する場合を考慮して top を制御する
+        y = event.pageY - beginY;
+        rangeElem[sty].top = (y < 0 ? beginY + y : beginY) + px;
+        // 始点と現在の位置の差を絶対値にして幅・高さとして設定する
+        rangeElem[sty].width  = Math.abs(x) + px;
+        rangeElem[sty].height = Math.abs(y) + px;
+      }
+    });
+    
+    // マウスボタンを離した時
+    doc[addEvent]('mouseup', (event, endX, endY, clickedElems, x, y, position, elem) => {
+      // マウスボタンを離した
+      isMouseDown = false;
+      // ドラッグ中なら処理する
+      if(isDragging) {
+        // ドラッグ終了
+        isDragging = false;
+        // 終了位置を控えておく
+        endX = event.pageX;
+        endY = event.pageY;
+        // クリックした要素を入れておく配列
+        clickedElems = [];
+        // 左上から 9px ずつズラす (圧縮時に1桁の数値で済ませたいので…)
+        // elementFrompoint はスクロールして画面上に要素が見えていないと null になってしまうので、スクロールして対象要素が画面内に表示されている状態にしている
+        for(  y = Math.min(beginY, endY); y < Math.max(beginY, endY); y += 9) {
+          // 開始位置にスクロールし直す
+          win.scrollTo(beginScrollX, beginScrollY);
+          for(x = Math.min(beginX, endX); x < Math.max(beginX, endX); x += 9) {
+            pointElem[sty].top  = y + px;
+            pointElem[sty].left = x + px;
+            // 絶対配置したポインタ要素の位置にスクロールする
+            position = pointElem[getRect]();
+            win.scrollTo(position.left, position.top);
+            // ポインタ要素の座標を再度拾い、その位置にある要素を取得する
+            position = pointElem[getRect]();
+            elem = doc.elementFromPoint(position.left, position.top);
+            // クリック済の要素は無視してクリックする
+            if(elem && !clickedElems.includes(elem)) {
+              elem.click();
+              clickedElems.push(elem);
+            }
+          }
+        }
+      }
+    });
+  })(
+    window,                   // win
+    document,                 // doc
+    'addEventListener',       // addEvent
+    'getBoundingClientRect',  // gr
+    'style',                  // sty
+    'px',                     // px
+    false,                    // isMouseDown
+    false,                    // isDragging
+    'position:absolute;top:0;left:0;width:1px;height:1px;pointer-events:none;'  // defaultStyle
+    // createElem
+    // rangeElem
+    // pointElem
+    // beginX
+    // beginY
+    // beginScrollX
+    // beginScrollY
+  );
+});
+
+// ブックマークレット用に以下
+// javascript:((e,t,o,a,l,n,p,s,i,d,r,h,c,g,m,u)=>{r=(d=(e=>(e=t.createElement("i"),t.body.appendChild(e),e)))(),h=d(),t[o]("mousedown",t=>{p=!0,r[l].cssText=i+"border:1px solid rgba(0,0,255,.2);background:rgba(99,255,255,.2)",h[l].cssText=i,c=t.pageX,g=t.pageY,m=e.scrollX,u=e.scrollY}),t[o]("mousemove",(e,t,o)=>{p&&(s=!0,t=e.pageX-c,r[l].left=(t<0?c+t:c)+n,o=e.pageY-g,r[l].top=(o<0?g+o:g)+n,r[l].width=Math.abs(t)+n,r[l].height=Math.abs(o)+n)}),t[o]("mouseup",(o,i,d,r,b,f,x,M)=>{if(p=!1,s)for(s=!1,i=o.pageX,d=o.pageY,r=[],f=Math.min(g,d);f<Math.max(g,d);f+=9)for(e.scrollTo(m,u),b=Math.min(c,i);b<Math.max(c,i);b+=9)h[l].top=f+n,h[l].left=b+n,x=h[a](),e.scrollTo(x.left,x.top),x=h[a](),(M=t.elementFromPoint(x.left,x.top))&&!r.includes(M)&&(M.click(),r.push(M))})})(window,document,"addEventListener","getBoundingClientRect","style","px",!1,!1,"position:absolute;top:0;left:0;width:1px;height:1px;pointer-events:none;");
+
+    </script>
+  </head>
+  <body>
+
+<h1>Click Selected Range</h1>
+<p>ドラッグ・アンド・ドロップで選択した領域をクリックする。一括でチェックボックスやラジオボタンを選択したい時に。</p>
+<table>
+  <tr><th>State Name    </th><th>Example 01             </th><th>Example 02             </th><th>Example 03             </th><th>Example 04             </th><th>Example 05             </th><th>Example 06             </th><th>Example 07             </th><th>Example 08             </th><th>Example 09             </th><th>Example 10             </th></tr>
+  <tr><td>Alabama       </td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="radio"></td></tr>
+  <tr><td>Alaska        </td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="radio"></td></tr>
+  <tr><td>Arizona       </td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="radio"></td></tr>
+  <tr><td>Arkansas      </td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="radio"></td></tr>
+  <tr><td>California    </td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="radio"></td></tr>
+  <tr><td>Colorado      </td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="radio"></td></tr>
+  <tr><td>Connecticut   </td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="radio"></td></tr>
+  <tr><td>Delaware      </td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="radio"></td></tr>
+  <tr><td>Florida       </td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="radio"></td></tr>
+  <tr><td>Georgia       </td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="radio"></td></tr>
+  <tr><td>Hawaii        </td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="radio"></td></tr>
+  <tr><td>Idaho         </td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="radio"></td></tr>
+  <tr><td>Illinois      </td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="radio"></td></tr>
+  <tr><td>Indiana       </td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="radio"></td></tr>
+  <tr><td>Iowa          </td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="radio"></td></tr>
+  <tr><td>Kansas        </td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="radio"></td></tr>
+  <tr><td>Kentucky      </td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="radio"></td></tr>
+  <tr><td>Louisiana     </td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="radio"></td></tr>
+  <tr><td>Maine         </td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="radio"></td></tr>
+  <tr><td>Maryland      </td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="radio"></td></tr>
+  <tr><td>Massachusetts </td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="radio"></td></tr>
+  <tr><td>Michigan      </td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="radio"></td></tr>
+  <tr><td>Minnesota     </td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="radio"></td></tr>
+  <tr><td>Mississippi   </td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="radio"></td></tr>
+  <tr><td>Missouri      </td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="radio"></td></tr>
+  <tr><td>Montana       </td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="radio"></td></tr>
+  <tr><td>Nebraska      </td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="radio"></td></tr>
+  <tr><td>Nevada        </td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="radio"></td></tr>
+  <tr><td>New Hampshire </td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="radio"></td></tr>
+  <tr><td>New Jersey    </td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="radio"></td></tr>
+  <tr><td>New Mexico    </td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="radio"></td></tr>
+  <tr><td>New York      </td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="radio"></td></tr>
+  <tr><td>North Carolina</td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="radio"></td></tr>
+  <tr><td>North Dakota  </td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="radio"></td></tr>
+  <tr><td>Ohio          </td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="radio"></td></tr>
+  <tr><td>Oklahoma      </td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="radio"></td></tr>
+  <tr><td>Oregon        </td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="radio"></td></tr>
+  <tr><td>Pennsylvania  </td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="radio"></td></tr>
+  <tr><td>Rhode Island  </td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="radio"></td></tr>
+  <tr><td>South Carolina</td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="radio"></td></tr>
+  <tr><td>South Dakota  </td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="radio"></td></tr>
+  <tr><td>Tennessee     </td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="radio"></td></tr>
+  <tr><td>Texas         </td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="radio"></td></tr>
+  <tr><td>Utah          </td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="radio"></td></tr>
+  <tr><td>Vermont       </td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="radio"></td></tr>
+  <tr><td>Virginia      </td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="radio"></td></tr>
+  <tr><td>Washington    </td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="radio"></td></tr>
+  <tr><td>West Virginia </td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="radio"></td></tr>
+  <tr><td>Wisconsin     </td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="radio"></td></tr>
+  <tr><td>Wyoming       </td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="checkbox"></td><td><input type="radio"></td></tr>
+</table>
+
+  </body>
+</html>

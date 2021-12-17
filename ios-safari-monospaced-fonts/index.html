@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>iOS Safari Monospaced Fonts</title>
+    <style>
+
+*, ::before, ::after { box-sizing: border-box; }
+
+* { font-size: 16px; line-height: 1; }
+h1, p { margin: .5rem 0; }
+.courier-new { font-family: "Courier New"; }
+.courier     { font-family: Courier      ; }
+.menlo       { font-family: Menlo        ; }
+.monospace   { font-family: monospace    ; }
+
+@font-face {
+  font-family: "SF Mono";
+  font-weight: 700;
+  src: url("https://sf.abarba.me/SFMono-Bold.otf");
+}
+
+.sfmono      { font-family: SFMono-Regular  ; }
+.sfmono-quot { font-family: "SFMono-Regular"; }
+.sfmono-web  { font-family: "SF Mono"       ; }
+
+    </style>
+  </head>
+  <body>
+
+<h1>iOS Safari Monospaced Fonts</h1>
+<hr>
+<p class="courier-new"><mark>テスト</mark>文字列 Courier New<br><mark>ﾃｽﾄﾃｽﾄ</mark>文字列 Lorem Ipsum</p>
+<p class="courier"    ><mark>テスト</mark>文字列 Courier    <br><mark>ﾃｽﾄﾃｽﾄ</mark>文字列 Lorem Ipsum</p>
+<p class="menlo"      ><mark>テスト</mark>文字列 Menlo      <br><mark>ﾃｽﾄﾃｽﾄ</mark>文字列 Lorem Ipsum</p>
+<p class="monospace"  ><mark>テスト</mark>文字列 monospace  <br><mark>ﾃｽﾄﾃｽﾄ</mark>文字列 Lorem Ipsum</p>
+<hr>
+<p class="sfmono"     ><mark>テスト</mark>文字列 SFMono-Regular            <br><mark>ﾃｽﾄﾃｽﾄ</mark>文字列 Lorem Ipsum</p>
+<p class="sfmono-quot"><mark>テスト</mark>文字列 &quot;SFMono-Regular&quot;<br><mark>ﾃｽﾄﾃｽﾄ</mark>文字列 Lorem Ipsum</p>
+<p class="sfmono-web" ><mark>テスト</mark>文字列 &quot;SF Mono&quot;       <br><mark>ﾃｽﾄﾃｽﾄ</mark>文字列 Lorem Ipsum</p>
+
+  </body>
+</html>

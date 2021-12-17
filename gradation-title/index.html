@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Gradation Title</title>
+    <style>
+
+*, ::before, ::after { box-sizing: border-box; }
+html { font-family: sans-serif; }
+
+body {
+  color: #fff;
+  background: #1d1d1d;
+}
+
+h2 {
+  font-family: serif;
+  /* Clip */
+  -webkit-text-fill-color: transparent;
+  background: linear-gradient(#90d7ec, #e91e63);
+  -webkit-background-clip: text;
+  /* Shadow */
+  filter: drop-shadow(#000 0 0 3px);
+}
+
+code {
+  margin: 0 2px;
+  padding: 1px 5px;
+  border-radius: 5px;
+  text-shadow: #000 0 0 5px;
+  background: linear-gradient(100deg, #0097a7 47%, #9e9e9e);
+}
+
+    </style>
+  </head>
+  <body>
+
+<h1>Gradation Title</h1>
+
+<h2>タイトル Title タイトル</h2>
+<p>テキスト <code>Code</code> テキスト</p>
+
+<ul>
+  <li>参考：<a href="https://blog.rainy.me/">浅色圆锥曲线爱好者</a></li>
+</ul>
+
+  </body>
+</html>

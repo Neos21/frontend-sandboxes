@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Check Negative</title>
+    <style>
+
+*, ::before, ::after { box-sizing: border-box; }
+html { font-family: sans-serif; }
+
+    </style>
+    <script>
+
+const d = document;
+d.addEventListener('DOMContentLoaded', () => {
+  d.getElementById('exec').addEventListener('click', () => {
+    exec();
+  });
+});
+
+function exec() {
+  // ネガティブワード集
+  const negativeWords = new RegExp('当てはまらない|当てはまるものはない|特になし|特にない|該当しない');
+  
+  // チェックボックス・ラジオボタンを取得する
+  const rawElems = d.querySelectorAll('[type="checkbox"],[type="radio"]');
+  
+  // name 属性ごとにグループ化する
+  const elemsByName = {};
+  [].forEach.call(rawElems, (elem) => {
+    if(!elem.name) { return; }
+    if(elemsByName[elem.name] === undefined) { elemsByName[elem.name] = []; }
+    elemsByName[elem.name].push(elem);
+  });
+  
+  // グループ化した name ごとに処理する
+  Object.keys(elemsByName).forEach((key) => {
+    // その要素グループ
+    const elems = elemsByName[key];
+    // 当該 name 属性値が1つの場合は操作しない … TODO : 上手いこと扱えんかのう…
+    if(elems.length === 1) { return; }
+    
+    // ネガティブワードを見付けられた階層
+    let nearestLevel = 999;
+    // ネガティブワードに一番近い要素を控えておく
+    let nearestElem = null;
+    // 要素ごとに親要素を探索していく
+    elems.forEach((elem) => {
+      // 親要素を控える変数
+      let parentElem = elem;
+      // ネガティブワードを見付けた時に遡った親要素の数 (これがグループ内で一番少ない要素をクリックする)
+      let foundLevel = 999;
+      // 適当に5階層ぐらい遡る
+      for(let i = 0; i < 5; i++) {
+        parentElem = parentElem.parentNode;
+        // 親要素がなければ終了
+        if(!parentElem || !parentElem.innerHTML) { break; }
+        // 親要素内からネガティブワードを拾い上げられたら終了
+        if(negativeWords.test(parentElem.innerHTML)) {
+          foundLevel = i;
+          break;
+        }
+      }
+      // より近い階層でネガティブワードを拾い上げられていたらそちらの要素を控える
+      if(nearestLevel > foundLevel) {
+        nearestLevel = foundLevel;
+        nearestElem = elem;
+      }
+    });
+    
+    // 未チェックの場合のみクリックしてチェックする
+    if(nearestElem && !nearestElem.checked) {
+      nearestElem.click();
+    }
+  });
+}
+
+    </script>
+  </head>
+  <body>
+
+<h1>Check Negative</h1>
+<ul>
+  <li><input type="radio" name="r1" value="a"> <label>A である</label></li>
+  <li><input type="radio" name="r1" value="b"> <label>B である</label></li>
+  <li><input type="radio" name="r1" value="none"> <label>特にない</label></li>
+</ul>
+<ul>
+  <li><input type="radio" name="r2-1" value="a"> <label>A である</label></li>
+  <li><input type="radio" name="r2-2" value="b"> <label>B である</label></li>
+  <li><input type="radio" name="r2-3" value="none"> <label>いずれにも当てはまらない</label></li>
+</ul>
+<hr>
+<ul>
+  <li><input type="checkbox" name="c1" value="a"> <label>A である</label></li>
+  <li><input type="checkbox" name="c1" value="b"> <label>B である</label></li>
+  <li><input type="checkbox" name="c1" value="none"> <label>いずれにも当てはまらない</label></li>
+</ul>
+<ul>
+  <li><input type="checkbox" name="c2-1" value="a"> <label>A である</label></li>
+  <li><input type="checkbox" name="c2-2" value="b"> <label>B である</label></li>
+  <li><input type="checkbox" name="c2-3" value="none"> <label>いずれにも当てはまらない</label></li>
+</ul>
+<hr>
+<p><button type="button" id="exec">Exec</button></p>
+
+  </body>
+</html>

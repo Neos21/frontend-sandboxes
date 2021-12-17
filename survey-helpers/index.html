@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Survey Helpers</title>
+    <style>
+
+*, ::before, ::after { box-sizing: border-box; }
+html { font-family: sans-serif; }
+
+h1, h2 { margin-top: 0; }
+ul { padding-left: 1rem; }
+
+#wrapper {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+  grid-gap: .5rem;
+}
+
+#wrapper > div {
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: .5rem 1rem 0;
+}
+
+    </style>
+    <script>
+
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('execute').addEventListener('click', () => {
+    SurveyHelpers({
+      // 個人情報
+      cityName    : '神奈川',
+      districtName: '北',
+      age         : 24,
+      ageRange    : 20,
+      birthYear   : 1990,
+      birthMonth  : 1,
+      birthDate   : 2,
+      gender      : '女',
+      marriage    : '既婚',
+      jobRegExp   : '正社|社員'
+    }, {
+      loop        : 5
+    });
+  });
+});
+
+function SurveyHelpers(myInfo, settings) {
+  // 引数未指定の場合は中止する
+  if(!myInfo || !settings) {
+    return;
+  }
+  
+  // 個人情報
+  const cityName     = myInfo.cityName     || '都道府県';  // 都道府県 : 「都道府県」は書かない
+  const districtName = myInfo.districtName || '行政区';    // 行政区 : 東京23区用・「区」は書かない
+  const age          = myInfo.age          || 999;         // 年齢
+  const ageRange     = myInfo.ageRange     || 999;         // 年齢層 : 「20代」とか「20～29歳」とかの選択肢用
+  const birthYear    = myInfo.birthYear    || 9999;        // 誕生年
+  const birthMonth   = myInfo.birthMonth   || 13;          // 誕生月
+  const birthDate    = myInfo.birthDate    || 32;          // 誕生日
+  const gender       = myInfo.gender       || '性別';      // 性別 : '男' か '女' あたりを想定
+  const marriage     = myInfo.marriage     || '婚姻状態';  // 婚姻状態 : '未婚' か '既婚' あたりを想定
+  const jobRegExp    = myInfo.jobRegExp    || '職業';      // 職業 : 正規表現 "()" で囲んで OR 検索するので "|" で区切る
+  
+  // 設定項目
+  const loop = settings.loop || 5;  // 親要素を遡る階層数
+  
+  
+  // セレクトボックス選択
+  // --------------------------------------------------------------------------------
+  
+  // セレクトボックスで使用する条件まとめ
+  const optionConditions = {
+    // 住所か年齢か誕生日
+    something: new RegExp(cityName
+                          + '|' + districtName
+                          + '|' + age + '.*[歳|才]'
+                          + '|' + birthYear
+                          + '|' + birthMonth + '.*月'
+                          + '|' + birthDate + '.*日')
+  };
+  
+  // select 要素を探索する
+  Array.prototype.forEach.call(document.querySelectorAll('select'), (select) => {
+    // その select 要素内の option 要素で探索が終わった場合は処理を中断するためのフラグ
+    let finished = false;
+    
+    Array.prototype.forEach.call(select.querySelectorAll('option'), (option) => {
+      // この select 要素が探索済なら中断する
+      if(finished) {
+        return;
+      }
+      
+      const innerHTML = option.innerHTML;
+      
+      if(optionConditions.something.test(innerHTML)) {
+        // いずれかの情報に合致したら option 要素を選択する
+        option.selected = true;
+        finished = true;
+      }
+      else if(/1|2/.test(innerHTML)) {
+        // 1 か 2 が含まれていたら月か日のセレクトボックスと予想して処理する
+        let isMonth = false;
+        let isDate  = false;
+        
+        // その option 要素が所属する select 要素を全探索して、セレクトボックスが月か日のセレクトボックスかどうか判定する
+        Array.prototype.forEach.call(select.querySelectorAll('option'), (selectOption) => {
+          const selectOptionInnerHTML = selectOption.innerHTML;
+          
+          if(selectOptionInnerHTML.includes(12)) {
+            // 12 を含む選択肢があれば「月」セレクトボックスと予想する
+            isMonth = true;
+          }
+          else if(selectOptionInnerHTML.includes(13)) {
+            // 13 を含む選択肢があれば「月」ではなく「日」セレクトボックスと予想する
+            isMonth = false;
+            isDate = true;
+          }
+          else if(selectOptionInnerHTML.includes(32)) {
+            // 32 を含む選択肢があれば「月」でも「日」でもない (都道府県セレクトボックスなどの項番と判定)
+            isMonth = false;
+            isDate = false;
+          }
+        });
+        
+        // 「月」セレクトボックスもしくは「日」セレクトボックスと予想した時に対象の option 要素を選択する
+        if((isMonth && innerHTML.includes(birthMonth)) || (isDate && innerHTML.includes(birthDate))) {
+          option.selected = true;
+          finished = true;
+        }
+      }
+    });
+  });
+  
+  
+  // テキストボックス入力
+  // --------------------------------------------------------------------------------
+  
+  // Type が text か tel の要素を探索する
+  Array.prototype.forEach.call(document.querySelectorAll('[type=text],[type=tel]'), (textbox) => {
+    // 親要素に遡っていくための変数
+    let parent = textbox;
+    // 親要素を遡っての探索が済んでいることを示すフラグ
+    let finished = false;
+    
+    // 親要素を遡る
+    for(let i = 0; i < loop; i++) {
+      // 探索済なら中断する
+      if(finished) {
+        continue;
+      }
+      
+      // 親要素の innerHTML を取得する
+      parent = parent.parentNode;
+      const innerHTML = parent.innerHTML;
+      
+      // 親要素の innerHTML からそれらしい文言を見付けたら対応する値を設定する
+      if(/歳|才/.test(innerHTML)) {
+        textbox.value = age;
+        finished = true;
+      }
+      else if(innerHTML.includes('年')) {
+        textbox.value = birthYear;
+        finished = true;
+      }
+      else if(innerHTML.includes('月')) {
+        textbox.value = birthMonth;
+        finished = true;
+      }
+      else if(innerHTML.includes('日')) {
+        textbox.value = birthDate;
+        finished = true;
+      }
+    }
+  });
+  
+  
+  // ラジオボタン選択
+  // --------------------------------------------------------------------------------
+  
+  // ラジオボタンで使用する条件まとめ
+  const radioConditions = {
+    // 都道府県か行政区か性別か年齢層か職業か婚姻状態
+    something: new RegExp(cityName
+                          + '|' + districtName
+                          + '|' + gender
+                          + '|' + ageRange + '.*[～|代](?!未満)'
+                          + '|' + '(' + jobRegExp + ')'
+                          + '|' + marriage)
+  };
+  
+  // 1つ前に探索したラジオボタンの情報を控えておく : よりラジオボタンに近い階層で該当項目を見付けた方を優先させるため
+  const radioPrev = {
+    name: '',
+    loop: -1
+  };
+  
+  // Type が radio の要素を探索する
+  Array.prototype.forEach.call(document.querySelectorAll('[type=radio]'), (radio) => {
+    // 異なるラジオボタン群が出てきたら、直前に探索したラジオボタンの情報をリセットする
+    if((radioPrev.name !== '' && radioPrev.loop !== -1) && radio.name !== radioPrev.name) {
+      radioPrev.name = '';
+      radioPrev.loop = -1;
+    }
+    
+    // 親要素に遡っていくための変数
+    let parent = radio;
+    // 親要素を遡っての探索が済んでいることを示すフラグ
+    let finished = false;
+    
+    // 親要素を遡る
+    for(let i = 0; i < loop; i++) {
+      // 探索済なら中断する
+      if(finished) {
+        continue;
+      }
+      
+      // 親要素の innerHTML を取得する
+      parent = parent.parentNode;
+      let innerHTML = parent.innerHTML;
+      
+      // そのラジオボタン群で初めての場合か、より近いラジオボタンを見付けたら
+      if(radioConditions.something.test(innerHTML)
+         && ((radioPrev.name === '' && radioPrev.loop === -1) || (radio.name === radioPrev.name && i < radioPrev.loop))) {
+        // 探索したラジオボタンの情報として登録しておく
+        radioPrev.name = radio.name;
+        radioPrev.loop = i;
+        radio.checked = true;
+        finished = true;
+      }
+    }
+  });
+}
+
+    </script>
+  </head>
+  <body>
+
+<h1>Survey Helpers <button type="button" id="execute">Execute</button></h1>
+
+<div id="wrapper">
+  
+  <div>
+    <h2>City</h2>
+    <ul>
+      <li><select><option></option><option>北海道</option><option>青森県</option><option>千葉県</option><option>東京都</option><option>神奈川県</option><option>京都府</option><option>大阪府</option><option>沖縄県</option></select></li>
+      <li><select><option></option><option>北海道</option><option>青森</option><option>千葉</option><option>東京</option><option>神奈川</option><option>京都</option><option>大阪</option><option>沖縄</option></select></li>
+      <li><ul><li><input type="radio" name="city-1" value="1"> 北海道</li><li><input type="radio" name="city-1" value="2"> 青森県</li><li><input type="radio" name="city-1" value="3"> 千葉県</li><li><input type="radio" name="city-1" value="4"> 東京都</li><li><input type="radio" name="city-1" value="5"> 神奈川県</li><li><input type="radio" name="city-1" value="6"> 京都府</li><li><input type="radio" name="city-1" value="7"> 大阪府</li><li><input type="radio" name="city-1" value="8"> 沖縄県</li></ul></li>
+      <li><ul><li><input type="radio" name="city-2" value="1"> 北海道</li><li><input type="radio" name="city-2" value="2"> 青森</li><li><input type="radio" name="city-2" value="3"> 千葉</li><li><input type="radio" name="city-2" value="4"> 東京</li><li><input type="radio" name="city-2" value="5"> 神奈川</li><li><input type="radio" name="city-2" value="6"> 京都</li><li><input type="radio" name="city-2" value="7"> 大阪</li><li><input type="radio" name="city-2" value="8"> 沖縄</li></ul></li>
+    </ul>
+  </div>
+  
+  <div>
+    <h2>Age</h2>
+    <ul>
+      <li><input type="text" size="3"> 歳</li>
+      <li><div><label><span><input type="text" size="3"></span><span>才</span></label></div></li>
+      <li><input type="tel" size="3"> 歳</li>
+      <li><div><label><span><input type="tel" size="3"></span><span>才</span></label></div></li>
+      <li>
+        <ul>
+          <li><input type="radio" name="age-range-1" value="1"> 10代</li>
+          <li><input type="radio" name="age-range-1" value="2"> 20代</li>
+          <li><input type="radio" name="age-range-1" value="3"> 30代</li>
+        </ul>
+      </li>
+      <li><ul><li><input type="radio" name="age-range-2" value="1"> 20代未満</li><li><input type="radio" name="age-range-2" value="2"> 20代</li><li><input type="radio" name="age-range-2" value="3"> 30代</li></ul></li>
+    </ul>
+  </div>
+  
+  <div>
+    <h2>Gender</h2>
+    <ul>
+      <li><ul><li><input type="radio" name="gender-1" value="1"> 1. 男性</li><li><input type="radio" name="gender-1" value="2"> 2. 女性</li></ul></li>
+      <li><div><span><input type="radio" name="gender-2" value="1"></span><span>1. 男性</span></div><div><span><input type="radio" name="gender-2" value="2"> 2. 女性</span></div></li>
+    </ul>
+  </div>
+  
+  <div>
+    <h2>Birth Year</h2>
+    <ul>
+      <li><input type="text" size="3"> 年</li>
+      <li><div><label><span><input type="text" size="3"></span><span>年</span></label></div></li>
+      <li><select><option>Year</option><option>1989</option><option>1990</option><option>1991</option><option>1992</option></select></li>
+      <li><select><option>Year</option><option>1989年</option><option>1990年</option><option>1991年</option><option>1992年</option></select></li>
+    </ul>
+  </div>
+  
+  <div>
+    <h2>Birth Month</h2>
+    <ul>
+      <li><input type="text" size="3"> 月</li>
+      <li><div><label><span><input type="text" size="3"></span><span>月</span></label></div></li>
+      <li><select><option>Month</option><option>1</option><option>2</option><option>9</option><option>10</option><option>11</option><option>12</option></select></li>
+      <li><select><option>Month</option><option>01</option><option>02</option><option>09</option><option>10</option><option>11</option><option>12</option></select></li>
+      <li><select><option>Month</option><option>1月</option><option>2月</option><option>9月</option><option>10月</option><option>11月</option><option>12月</option></select></li>
+      <li><select><option>Month</option><option>1 月</option><option>2 月</option><option>9 月</option><option>10 月</option><option>11 月</option><option>12 月</option></select></li>
+    </ul>
+  </div>
+  
+  <div>
+    <h2>Birth Date</h2>
+    <ul>
+      <li><input type="text" size="3"> 日</li>
+      <li><div><label><span><input type="text" size="3"></span><span>日</span></label></div></li>
+      <li><select><option>Date</option><option>1</option><option>2</option><option>9</option><option>10</option><option>11</option><option>12</option><option>13</option><option>28</option></select></li>
+      <li><select><option>Date</option><option>01</option><option>02</option><option>09</option><option>10</option><option>11</option><option>12</option><option>13</option><option>28</option></select></li>
+      <li><select><option>Date</option><option>1日</option><option>2日</option><option>9日</option><option>10日</option><option>11日</option><option>12日</option><option>13日</option><option>28日</option></select></li>
+      <li><select><option>Date</option><option>1 日</option><option>2 日</option><option>9 日</option><option>10 日</option><option>11 日</option><option>12 日</option><option>13 日</option><option>28 日</option></select></li>
+    </ul>
+  </div>
+  
+  <div>
+    <h2>District</h2>
+    <ul>
+      <li>
+        <ul><li><input type="radio" name="district-1" value="1"> 足立区</li><li><input type="radio" name="district-1" value="2"> 板橋区</li><li><input type="radio" name="district-1" value="3"> 江戸川区</li><li><input type="radio" name="district-1" value="4"> 中央区</li><li><input type="radio" name="district-1" value="5"> 豊島区</li><li><input type="radio" name="district-1" value="6"> 北区</li></ul></li>
+    </ul>
+  </div>
+  
+  <div>
+    <h2>Marriage</h2>
+    <ul>
+      <li><ul><li><input type="radio" name="marriage-1" value="1"> 未婚</li><li><input type="radio" name="marriage-1" value="2"> 既婚</li><li><input type="radio" name="marriage-1" value="3"> 死別</li></ul></li>
+    </ul>
+  </div>
+  
+  <div>
+    <h2>Job</h2>
+    <ul>
+      <li><ul><li><input type="radio" name="job-1" value="1"> 会社役員</li><li><input type="radio" name="job-1" value="2"> 会社員</li><li><input type="radio" name="job-1" value="3"> 自営業</li><li><input type="radio" name="job-1" value="4"> その他</li></ul></li>
+      <li><ul><li><input type="radio" name="job-2" value="1"> 社長</li><li><input type="radio" name="job-2" value="2"> 正社員</li><li><input type="radio" name="job-2" value="3"> 自営業</li><li><input type="radio" name="job-2" value="4"> 派遣社員</li></ul></li>
+    </ul>
+  </div>
+  
+</div>
+
+<ul>
+  <li><time>2018-09-18</time> : <a href="./check-negative.html">Check Negative</a></li>
+  <li><time>2018-09-11</time> : <a href="./random-check-inputs.html">Random Check Inputs</a></li>
+  <li><time>2018-03-04</time> : <a href="./survey-helpers-parts.html">Survey Helpers Parts</a></li>
+  <li><time>2018-03-03</time> : <a href="./click-selected-range.html">Click Selected Range</a></li>
+</ul>
+
+  </body>
+</html>

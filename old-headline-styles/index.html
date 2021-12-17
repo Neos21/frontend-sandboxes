@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Old Headline Styles</title>
+    <style>
+
+*, ::before, ::after { box-sizing: border-box; }
+html { font-family: sans-serif; }
+
+.headline-1 {
+  border: 1px solid #09f;
+  border-width: 0 0 1px 1.3rem;
+  padding: 0 .4rem .2rem;
+}
+
+.headline-2 {
+  border: 1px solid #06f;
+  border-width: 1px 0;
+  padding: .4rem .2rem;
+  background: #eff;
+}
+
+.headline-3 {
+  padding: .3rem;
+  color: #fff;
+  background: #0080ff;
+}
+.headline-3::before {
+  display: inline;
+  margin-right: .3rem;
+  content: "■";
+}
+
+.headline-4 {
+  margin: 2rem 0 1rem;
+  padding: 0 .5rem .5rem;
+  border: 1px solid #000;
+}
+.headline-4 h1 {
+  margin: 0 2rem -1rem;
+  padding: .5rem;
+  border: 1px solid #000;
+  color: #fff;
+  text-align: center;
+  background: #158aff;
+  transform: translateY(-50%);
+}
+.headline-4 h1::before,
+.headline-4 h1::after {
+  content: "▼";
+  padding: 0 .3rem;
+  color: #009;
+}
+
+.headline-5 h1 {
+  display: inline-block;
+  margin: 0;
+  padding: .2rem .4rem;
+  border: 1px solid #158aff;
+  border-bottom: 0;
+}
+.headline-5 .headline-5-contents {
+  border: 1px solid #158aff;
+  padding: 0 1rem;
+}
+
+body {
+  padding: 1rem;
+}
+
+h1 {
+  margin: 1rem 0;
+  font-size: 1rem;
+  font-weight: bold;
+}
+
+p {
+  margin: 1rem 0;
+}
+
+    </style>
+  </head>
+  <body>
+
+<h1 class="headline-1">お知らせ</h1>
+
+<h1 class="headline-2">お知らせ</h1>
+
+<h1 class="headline-3">お知らせ</h1>
+
+<div class="headline-4">
+  <h1>お知らせ</h1>
+  <p>Text</p>
+</div>
+
+<div class="headline-5">
+  <h1>お知らせ</h1>
+  <div class="headline-5-contents">
+    <p>Text</p>
+  </div>
+</div>
+
+  </body>
+</html>
