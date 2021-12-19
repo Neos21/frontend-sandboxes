@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Animated Border Link</title>
+    <style>
+
+*, ::before, ::after { box-sizing: border-box; }
+html { font-family: sans-serif; }
+
+body {
+  margin: 2rem;
+  color: #fff;
+  background: #1b1f27;
+}
+
+a {
+  color: #fff;
+}
+
+.menu {
+  position: relative;
+  display: inline-block;  /* To enable line-height */
+  padding: 0 15px;
+  color: rgba(255, 255, 255, .7);  /* Serve both as border-color */
+  text-decoration: none;
+  line-height: 35px;
+  transition: all .3s;
+}
+  .menu::before, .menu::after {
+    content: '';
+    position: absolute;
+    border-style: solid;
+    border-radius: 3px;
+    box-sizing: content-box;
+    transition: all .3s;
+  }
+  
+  .menu::before {
+    top: -1px;
+    right: 0;
+    width: 0;
+    height: 100%;
+    border-width: 1px 0 1px 0;
+  }
+  
+  .menu::after {
+    bottom: 0;
+    left: -1px;
+    width: 100%;
+    height: 0;
+    border-width: 0 1px 0 1px;
+    transition-delay: .05s;
+  }
+  
+  .menu:hover {
+    color: #fff;
+  }
+    .menu:hover::before { width : 100%; }
+    .menu:hover::after  { height: 100%; }
+
+    </style>
+  </head>
+  <body>
+
+<h1>Animated Border Link</h1>
+
+<p><a href="#" class="menu">Menu</a></p>
+
+<hr>
+<ul>
+  <li>Reference : <a href="https://lightning.bitflyer.com/docs?lang=ja">BitFlyer Lightning API</a></li>
+</ul>
+
+  </body>
+</html>

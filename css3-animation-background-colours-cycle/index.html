@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>CSS3 Animation Background Colours Cycle</title>
+    <style>
+
+*, ::before, ::after { box-sizing: border-box; }
+html { font-family: sans-serif; }
+
+body {
+          animation: change-colours 50s;
+  -webkit-animation: change-colours 50s;  /* Safari And Chrome */
+}
+
+@keyframes change-colours {
+      0% { background: #f00; }
+   25% { background: #ff0; }
+   50% { background: #00f; }
+   75% { background: #0f0; }
+  100% { background: #f00; }
+}
+
+@-webkit-keyframes change-colours {  /* Safari And Chrome - Necessary Duplicate */
+    0% { background: #f00; }
+   25% { background: #ff0; }
+   50% { background: #00f; }
+   75% { background: #0f0; }
+  100% { background: #f00; }
+}
+
+    </style>
+  </head>
+  <body>
+
+<h1>CSS3 Animation Background Colours Cycle</h1>
+
+  </body>
+</html>

@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Japanese Monospaced Fonts</title>
+    <style>
+
+*, ::before, ::after { box-sizing: border-box; }
+
+@font-face {
+  font-family: "Noto Sans Mono CJK JP";
+  font-weight: 100;
+  src: url("https://cdn.jsdelivr.net/npm/@neos21/japanese-monospaced-fonts@1.0.2/NotoSansMonoCJKjp-Regular.woff2")              format("woff2"),
+       url("https://unpkg.com/@neos21/japanese-monospaced-fonts@1.0.2/NotoSansMonoCJKjp-Regular.woff2")                         format("woff2"),
+       url("https://cdn.jsdelivr.net/npm/@neos21/japanese-monospaced-fonts@1.0.2/NotoSansMonoCJKjp-Regular.woff")               format("woff"),
+       url("https://unpkg.com/@neos21/japanese-monospaced-fonts@1.0.2/NotoSansMonoCJKjp-Regular.woff")                          format("woff"),
+       url("https://cdn.jsdelivr.net/npm/@neos21/japanese-monospaced-fonts@1.0.2/NotoSansMonoCJKjp-Regular.otf")                format("opentype"),
+       url("https://unpkg.com/@neos21/japanese-monospaced-fonts@1.0.2/NotoSansMonoCJKjp-Regular.otf")                           format("opentype"),
+       url("https://cdn.jsdelivr.net/npm/@japanese-monospaced-fonts/noto-sans-mono-cjk-jp@1.0.1/NotoSansMonoCJKJP-Regular.otf") format("opentype"),
+       url("https://unpkg.com/@japanese-monospaced-fonts/noto-sans-mono-cjk-jp@1.0.1/NotoSansMonoCJKJP-Regular.otf")            format("opentype");
+}
+@font-face {
+  font-family: "Noto Sans Mono CJK JP";
+  font-weight: 200;
+  src: url("https://cdn.jsdelivr.net/npm/@neos21/japanese-monospaced-fonts@1.0.2/NotoSansMonoCJKjp-Regular.woff2")              format("woff2"),
+       url("https://unpkg.com/@neos21/japanese-monospaced-fonts@1.0.2/NotoSansMonoCJKjp-Regular.woff2")                         format("woff2"),
+       url("https://cdn.jsdelivr.net/npm/@neos21/japanese-monospaced-fonts@1.0.2/NotoSansMonoCJKjp-Regular.woff")               format("woff"),
+       url("https://unpkg.com/@neos21/japanese-monospaced-fonts@1.0.2/NotoSansMonoCJKjp-Regular.woff")                          format("woff"),
+       url("https://cdn.jsdelivr.net/npm/@neos21/japanese-monospaced-fonts@1.0.2/NotoSansMonoCJKjp-Regular.otf")                format("opentype"),
+       url("https://unpkg.com/@neos21/japanese-monospaced-fonts@1.0.2/NotoSansMonoCJKjp-Regular.otf")                           format("opentype"),
+       url("https://cdn.jsdelivr.net/npm/@japanese-monospaced-fonts/noto-sans-mono-cjk-jp@1.0.1/NotoSansMonoCJKJP-Regular.otf") format("opentype"),
+       url("https://unpkg.com/@japanese-monospaced-fonts/noto-sans-mono-cjk-jp@1.0.1/NotoSansMonoCJKJP-Regular.otf")            format("opentype");
+}
+@font-face {
+  font-family: "Noto Sans Mono CJK JP";
+  font-weight: 300;
+  src: url("https://cdn.jsdelivr.net/npm/@neos21/japanese-monospaced-fonts@1.0.2/NotoSansMonoCJKjp-Regular.woff2")              format("woff2"),
+       url("https://unpkg.com/@neos21/japanese-monospaced-fonts@1.0.2/NotoSansMonoCJKjp-Regular.woff2")                         format("woff2"),
+       url("https://cdn.jsdelivr.net/npm/@neos21/japanese-monospaced-fonts@1.0.2/NotoSansMonoCJKjp-Regular.woff")               format("woff"),
+       url("https://unpkg.com/@neos21/japanese-monospaced-fonts@1.0.2/NotoSansMonoCJKjp-Regular.woff")                          format("woff"),
+       url("https://cdn.jsdelivr.net/npm/@neos21/japanese-monospaced-fonts@1.0.2/NotoSansMonoCJKjp-Regular.otf")                format("opentype"),
+       url("https://unpkg.com/@neos21/japanese-monospaced-fonts@1.0.2/NotoSansMonoCJKjp-Regular.otf")                           format("opentype"),
+       url("https://cdn.jsdelivr.net/npm/@japanese-monospaced-fonts/noto-sans-mono-cjk-jp@1.0.1/NotoSansMonoCJKJP-Regular.otf") format("opentype"),
+       url("https://unpkg.com/@japanese-monospaced-fonts/noto-sans-mono-cjk-jp@1.0.1/NotoSansMonoCJKJP-Regular.otf")            format("opentype");
+}
+@font-face {
+  font-family: "Noto Sans Mono CJK JP";
+  font-weight: 400;
+  src: url("https://cdn.jsdelivr.net/npm/@neos21/japanese-monospaced-fonts@1.0.2/NotoSansMonoCJKjp-Regular.woff2")              format("woff2"),
+       url("https://unpkg.com/@neos21/japanese-monospaced-fonts@1.0.2/NotoSansMonoCJKjp-Regular.woff2")                         format("woff2"),
+       url("https://cdn.jsdelivr.net/npm/@neos21/japanese-monospaced-fonts@1.0.2/NotoSansMonoCJKjp-Regular.woff")               format("woff"),
+       url("https://unpkg.com/@neos21/japanese-monospaced-fonts@1.0.2/NotoSansMonoCJKjp-Regular.woff")                          format("woff"),
+       url("https://cdn.jsdelivr.net/npm/@neos21/japanese-monospaced-fonts@1.0.2/NotoSansMonoCJKjp-Regular.otf")                format("opentype"),
+       url("https://unpkg.com/@neos21/japanese-monospaced-fonts@1.0.2/NotoSansMonoCJKjp-Regular.otf")                           format("opentype"),
+       url("https://cdn.jsdelivr.net/npm/@japanese-monospaced-fonts/noto-sans-mono-cjk-jp@1.0.1/NotoSansMonoCJKJP-Regular.otf") format("opentype"),
+       url("https://unpkg.com/@japanese-monospaced-fonts/noto-sans-mono-cjk-jp@1.0.1/NotoSansMonoCJKJP-Regular.otf")            format("opentype");
+}
+@font-face {
+  font-family: "Noto Sans Mono CJK JP";
+  font-weight: 500;
+  src: url("https://cdn.jsdelivr.net/npm/@neos21/japanese-monospaced-fonts@1.0.2/NotoSansMonoCJKjp-Regular.woff2")              format("woff2"),
+       url("https://unpkg.com/@neos21/japanese-monospaced-fonts@1.0.2/NotoSansMonoCJKjp-Regular.woff2")                         format("woff2"),
+       url("https://cdn.jsdelivr.net/npm/@neos21/japanese-monospaced-fonts@1.0.2/NotoSansMonoCJKjp-Regular.woff")               format("woff"),
+       url("https://unpkg.com/@neos21/japanese-monospaced-fonts@1.0.2/NotoSansMonoCJKjp-Regular.woff")                          format("woff"),
+       url("https://cdn.jsdelivr.net/npm/@neos21/japanese-monospaced-fonts@1.0.2/NotoSansMonoCJKjp-Regular.otf")                format("opentype"),
+       url("https://unpkg.com/@neos21/japanese-monospaced-fonts@1.0.2/NotoSansMonoCJKjp-Regular.otf")                           format("opentype"),
+       url("https://cdn.jsdelivr.net/npm/@japanese-monospaced-fonts/noto-sans-mono-cjk-jp@1.0.1/NotoSansMonoCJKJP-Regular.otf") format("opentype"),
+       url("https://unpkg.com/@japanese-monospaced-fonts/noto-sans-mono-cjk-jp@1.0.1/NotoSansMonoCJKJP-Regular.otf")            format("opentype");
+}
+@font-face {
+  font-family: "Noto Sans Mono CJK JP";
+  font-weight: 600;
+  src: url("https://cdn.jsdelivr.net/npm/@neos21/japanese-monospaced-fonts@1.0.2/NotoSansMonoCJKjp-Regular.woff2")              format("woff2"),
+       url("https://unpkg.com/@neos21/japanese-monospaced-fonts@1.0.2/NotoSansMonoCJKjp-Regular.woff2")                         format("woff2"),
+       url("https://cdn.jsdelivr.net/npm/@neos21/japanese-monospaced-fonts@1.0.2/NotoSansMonoCJKjp-Regular.woff")               format("woff"),
+       url("https://unpkg.com/@neos21/japanese-monospaced-fonts@1.0.2/NotoSansMonoCJKjp-Regular.woff")                          format("woff"),
+       url("https://cdn.jsdelivr.net/npm/@neos21/japanese-monospaced-fonts@1.0.2/NotoSansMonoCJKjp-Regular.otf")                format("opentype"),
+       url("https://unpkg.com/@neos21/japanese-monospaced-fonts@1.0.2/NotoSansMonoCJKjp-Regular.otf")                           format("opentype"),
+       url("https://cdn.jsdelivr.net/npm/@japanese-monospaced-fonts/noto-sans-mono-cjk-jp@1.0.1/NotoSansMonoCJKJP-Regular.otf") format("opentype"),
+       url("https://unpkg.com/@japanese-monospaced-fonts/noto-sans-mono-cjk-jp@1.0.1/NotoSansMonoCJKJP-Regular.otf")            format("opentype");
+}
+@font-face {
+  font-family: "Noto Sans Mono CJK JP";
+  font-weight: 700;
+  src: url("https://cdn.jsdelivr.net/npm/@neos21/japanese-monospaced-fonts@1.0.2/NotoSansMonoCJKjp-Bold.woff2")              format("woff2"),
+       url("https://unpkg.com/@neos21/japanese-monospaced-fonts@1.0.2/NotoSansMonoCJKjp-Bold.woff2")                         format("woff2"),
+       url("https://cdn.jsdelivr.net/npm/@neos21/japanese-monospaced-fonts@1.0.2/NotoSansMonoCJKjp-Bold.woff")               format("woff"),
+       url("https://unpkg.com/@neos21/japanese-monospaced-fonts@1.0.2/NotoSansMonoCJKjp-Bold.woff")                          format("woff"),
+       url("https://cdn.jsdelivr.net/npm/@neos21/japanese-monospaced-fonts@1.0.2/NotoSansMonoCJKjp-Bold.otf")                format("opentype"),
+       url("https://unpkg.com/@neos21/japanese-monospaced-fonts@1.0.2/NotoSansMonoCJKjp-Bold.otf")                           format("opentype"),
+       url("https://cdn.jsdelivr.net/npm/@japanese-monospaced-fonts/noto-sans-mono-cjk-jp@1.0.1/NotoSansMonoCJKJP-Bold.otf") format("opentype"),
+       url("https://unpkg.com/@japanese-monospaced-fonts/noto-sans-mono-cjk-jp@1.0.1/NotoSansMonoCJKJP-Bold.otf")            format("opentype");
+}
+@font-face {
+  font-family: "Noto Sans Mono CJK JP";
+  font-weight: 800;
+  src: url("https://cdn.jsdelivr.net/npm/@neos21/japanese-monospaced-fonts@1.0.2/NotoSansMonoCJKjp-Bold.woff2")              format("woff2"),
+       url("https://unpkg.com/@neos21/japanese-monospaced-fonts@1.0.2/NotoSansMonoCJKjp-Bold.woff2")                         format("woff2"),
+       url("https://cdn.jsdelivr.net/npm/@neos21/japanese-monospaced-fonts@1.0.2/NotoSansMonoCJKjp-Bold.woff")               format("woff"),
+       url("https://unpkg.com/@neos21/japanese-monospaced-fonts@1.0.2/NotoSansMonoCJKjp-Bold.woff")                          format("woff"),
+       url("https://cdn.jsdelivr.net/npm/@neos21/japanese-monospaced-fonts@1.0.2/NotoSansMonoCJKjp-Bold.otf")                format("opentype"),
+       url("https://unpkg.com/@neos21/japanese-monospaced-fonts@1.0.2/NotoSansMonoCJKjp-Bold.otf")                           format("opentype"),
+       url("https://cdn.jsdelivr.net/npm/@japanese-monospaced-fonts/noto-sans-mono-cjk-jp@1.0.1/NotoSansMonoCJKJP-Bold.otf") format("opentype"),
+       url("https://unpkg.com/@japanese-monospaced-fonts/noto-sans-mono-cjk-jp@1.0.1/NotoSansMonoCJKJP-Bold.otf")            format("opentype");
+}
+@font-face {
+  font-family: "Noto Sans Mono CJK JP";
+  font-weight: 900;
+  src: url("https://cdn.jsdelivr.net/npm/@neos21/japanese-monospaced-fonts@1.0.2/NotoSansMonoCJKjp-Bold.woff2")              format("woff2"),
+       url("https://unpkg.com/@neos21/japanese-monospaced-fonts@1.0.2/NotoSansMonoCJKjp-Bold.woff2")                         format("woff2"),
+       url("https://cdn.jsdelivr.net/npm/@neos21/japanese-monospaced-fonts@1.0.2/NotoSansMonoCJKjp-Bold.woff")               format("woff"),
+       url("https://unpkg.com/@neos21/japanese-monospaced-fonts@1.0.2/NotoSansMonoCJKjp-Bold.woff")                          format("woff"),
+       url("https://cdn.jsdelivr.net/npm/@neos21/japanese-monospaced-fonts@1.0.2/NotoSansMonoCJKjp-Bold.otf")                format("opentype"),
+       url("https://unpkg.com/@neos21/japanese-monospaced-fonts@1.0.2/NotoSansMonoCJKjp-Bold.otf")                           format("opentype"),
+       url("https://cdn.jsdelivr.net/npm/@japanese-monospaced-fonts/noto-sans-mono-cjk-jp@1.0.1/NotoSansMonoCJKJP-Bold.otf") format("opentype"),
+       url("https://unpkg.com/@japanese-monospaced-fonts/noto-sans-mono-cjk-jp@1.0.1/NotoSansMonoCJKJP-Bold.otf")            format("opentype");
+}
+.noto-sans-mono-cjk-jp {
+  font-family: "Noto Sans Mono CJK JP";
+}
+
+@font-face {
+  font-family: "Noto Sans Mono CJK JP Regular";
+  src: url("https://cdn.jsdelivr.net/npm/@neos21/japanese-monospaced-fonts@1.0.2/NotoSansMonoCJKjp-Regular.woff2")              format("woff2"),
+       url("https://unpkg.com/@neos21/japanese-monospaced-fonts@1.0.2/NotoSansMonoCJKjp-Regular.woff2")                         format("woff2"),
+       url("https://cdn.jsdelivr.net/npm/@neos21/japanese-monospaced-fonts@1.0.2/NotoSansMonoCJKjp-Regular.woff")               format("woff"),
+       url("https://unpkg.com/@neos21/japanese-monospaced-fonts@1.0.2/NotoSansMonoCJKjp-Regular.woff")                          format("woff"),
+       url("https://cdn.jsdelivr.net/npm/@neos21/japanese-monospaced-fonts@1.0.2/NotoSansMonoCJKjp-Regular.otf")                format("opentype"),
+       url("https://unpkg.com/@neos21/japanese-monospaced-fonts@1.0.2/NotoSansMonoCJKjp-Regular.otf")                           format("opentype"),
+       url("https://cdn.jsdelivr.net/npm/@japanese-monospaced-fonts/noto-sans-mono-cjk-jp@1.0.1/NotoSansMonoCJKJP-Regular.otf") format("opentype"),
+       url("https://unpkg.com/@japanese-monospaced-fonts/noto-sans-mono-cjk-jp@1.0.1/NotoSansMonoCJKJP-Regular.otf")            format("opentype");
+}
+.noto-sans-mono-cjk-jp-regular {
+  font-family: "Noto Sans Mono CJK JP Regular";
+}
+
+@font-face {
+  font-family: "Noto Sans Mono CJK JP Bold";
+  src: url("https://cdn.jsdelivr.net/npm/@neos21/japanese-monospaced-fonts@1.0.2/NotoSansMonoCJKjp-Bold.woff2")              format("woff2"),
+       url("https://unpkg.com/@neos21/japanese-monospaced-fonts@1.0.2/NotoSansMonoCJKjp-Bold.woff2")                         format("woff2"),
+       url("https://cdn.jsdelivr.net/npm/@neos21/japanese-monospaced-fonts@1.0.2/NotoSansMonoCJKjp-Bold.woff")               format("woff"),
+       url("https://unpkg.com/@neos21/japanese-monospaced-fonts@1.0.2/NotoSansMonoCJKjp-Bold.woff")                          format("woff"),
+       url("https://cdn.jsdelivr.net/npm/@neos21/japanese-monospaced-fonts@1.0.2/NotoSansMonoCJKjp-Bold.otf")                format("opentype"),
+       url("https://unpkg.com/@neos21/japanese-monospaced-fonts@1.0.2/NotoSansMonoCJKjp-Bold.otf")                           format("opentype"),
+       url("https://cdn.jsdelivr.net/npm/@japanese-monospaced-fonts/noto-sans-mono-cjk-jp@1.0.1/NotoSansMonoCJKJP-Bold.otf") format("opentype"),
+       url("https://unpkg.com/@japanese-monospaced-fonts/noto-sans-mono-cjk-jp@1.0.1/NotoSansMonoCJKJP-Bold.otf")            format("opentype");
+}
+.noto-sans-mono-cjk-jp-bold {
+  font-family: "Noto Sans Mono CJK JP Bold";
+}
+
+@font-face {
+  font-family: "MeiryoKe Gothic";
+  font-weight: 100;
+  src: url("https://cdn.jsdelivr.net/npm/@japanese-monospaced-fonts/meiryo-ke-gothic@1.0.0/MeiryoKeGothic.ttf") format("truetype"),
+       url("https://unpkg.com/@japanese-monospaced-fonts/meiryo-ke-gothic@1.0.0/MeiryoKeGothic.ttf")            format("truetype");
+}
+@font-face {
+  font-family: "MeiryoKe Gothic";
+  font-weight: 200;
+  src: url("https://cdn.jsdelivr.net/npm/@japanese-monospaced-fonts/meiryo-ke-gothic@1.0.0/MeiryoKeGothic.ttf") format("truetype"),
+       url("https://unpkg.com/@japanese-monospaced-fonts/meiryo-ke-gothic@1.0.0/MeiryoKeGothic.ttf")            format("truetype");
+}
+@font-face {
+  font-family: "MeiryoKe Gothic";
+  font-weight: 300;
+  src: url("https://cdn.jsdelivr.net/npm/@japanese-monospaced-fonts/meiryo-ke-gothic@1.0.0/MeiryoKeGothic.ttf") format("truetype"),
+       url("https://unpkg.com/@japanese-monospaced-fonts/meiryo-ke-gothic@1.0.0/MeiryoKeGothic.ttf")            format("truetype");
+}
+@font-face {
+  font-family: "MeiryoKe Gothic";
+  font-weight: 400;
+  src: url("https://cdn.jsdelivr.net/npm/@japanese-monospaced-fonts/meiryo-ke-gothic@1.0.0/MeiryoKeGothic.ttf") format("truetype"),
+       url("https://unpkg.com/@japanese-monospaced-fonts/meiryo-ke-gothic@1.0.0/MeiryoKeGothic.ttf")            format("truetype");
+}
+@font-face {
+  font-family: "MeiryoKe Gothic";
+  font-weight: 500;
+  src: url("https://cdn.jsdelivr.net/npm/@japanese-monospaced-fonts/meiryo-ke-gothic@1.0.0/MeiryoKeGothic.ttf") format("truetype"),
+       url("https://unpkg.com/@japanese-monospaced-fonts/meiryo-ke-gothic@1.0.0/MeiryoKeGothic.ttf")            format("truetype");
+}
+@font-face {
+  font-family: "MeiryoKe Gothic";
+  font-weight: 600;
+  src: url("https://cdn.jsdelivr.net/npm/@japanese-monospaced-fonts/meiryo-ke-gothic@1.0.0/MeiryoKeGothic.ttf") format("truetype"),
+       url("https://unpkg.com/@japanese-monospaced-fonts/meiryo-ke-gothic@1.0.0/MeiryoKeGothic.ttf")            format("truetype");
+}
+@font-face {
+  font-family: "MeiryoKe Gothic";
+  font-weight: 700;
+  src: url("https://cdn.jsdelivr.net/npm/@japanese-monospaced-fonts/meiryo-ke-gothic@1.0.0/MeiryoKeGothic-Bold.ttf") format("truetype"),
+       url("https://unpkg.com/@japanese-monospaced-fonts/meiryo-ke-gothic@1.0.0/MeiryoKeGothic-Bold.ttf")            format("truetype");
+}
+@font-face {
+  font-family: "MeiryoKe Gothic";
+  font-weight: 800;
+  src: url("https://cdn.jsdelivr.net/npm/@japanese-monospaced-fonts/meiryo-ke-gothic@1.0.0/MeiryoKeGothic-Bold.ttf") format("truetype"),
+       url("https://unpkg.com/@japanese-monospaced-fonts/meiryo-ke-gothic@1.0.0/MeiryoKeGothic-Bold.ttf")            format("truetype");
+}
+@font-face {
+  font-family: "MeiryoKe Gothic";
+  font-weight: 900;
+  src: url("https://cdn.jsdelivr.net/npm/@japanese-monospaced-fonts/meiryo-ke-gothic@1.0.0/MeiryoKeGothic-Bold.ttf") format("truetype"),
+       url("https://unpkg.com/@japanese-monospaced-fonts/meiryo-ke-gothic@1.0.0/MeiryoKeGothic-Bold.ttf")            format("truetype");
+}
+.meiryo-ke-gothic {
+  font-family: "MeiryoKe Gothic";
+}
+
+@font-face {
+  font-family: "MeiryoKe Gothic Regular";
+  src: url("https://cdn.jsdelivr.net/npm/@japanese-monospaced-fonts/meiryo-ke-gothic@1.0.0/MeiryoKeGothic.ttf") format("truetype"),
+       url("https://unpkg.com/@japanese-monospaced-fonts/meiryo-ke-gothic@1.0.0/MeiryoKeGothic.ttf")            format("truetype");
+}
+.meiryo-ke-gothic-regular {
+  font-family: "MeiryoKe Gothic Regular";
+}
+
+@font-face {
+  font-family: "MeiryoKe Gothic Bold";
+  src: url("https://cdn.jsdelivr.net/npm/@japanese-monospaced-fonts/meiryo-ke-gothic@1.0.0/MeiryoKeGothic-Bold.ttf") format("truetype"),
+       url("https://unpkg.com/@japanese-monospaced-fonts/meiryo-ke-gothic@1.0.0/MeiryoKeGothic-Bold.ttf")            format("truetype");
+}
+.meiryo-ke-gothic-bold {
+  font-family: "MeiryoKe Gothic Bold";
+}
+
+@font-face {
+  font-family: "Osaka Mono";
+  src: url("https://cdn.jsdelivr.net/npm/@japanese-monospaced-fonts/osaka-mono@1.0.0/OsakaMono.otf") format("opentype"),
+       url("https://unpkg.com/@japanese-monospaced-fonts/osaka-mono@1.0.0/OsakaMono.otf")            format("opentype");
+}
+.osaka-mono {
+  font-family: "Osaka Mono";
+}
+
+#fonts {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-gap: 1em;
+}
+
+    </style>
+  </head>
+  <body>
+
+<h1>Japanese Monospaced Fonts</h1>
+<div id="fonts">
+  <div class="noto-sans-mono-cjk-jp"        >Noto Sans Mono CJK JP        <br>あいうえお <b>あいうえお</b><br>ABCDEFGHIJ <b>ABCDEFGHIJ</b></div>
+  <div class="noto-sans-mono-cjk-jp-regular">Noto Sans Mono CJK JP Regular<br>あいうえお <b>あいうえお</b><br>ABCDEFGHIJ <b>ABCDEFGHIJ</b></div>
+  <div class="noto-sans-mono-cjk-jp-bold"   >Noto Sans Mono CJK JP Bold   <br>あいうえお <b>あいうえお</b><br>ABCDEFGHIJ <b>ABCDEFGHIJ</b></div>
+  <div class="meiryo-ke-gothic"             >MeiryoKe Gothic              <br>あいうえお <b>あいうえお</b><br>ABCDEFGHIJ <b>ABCDEFGHIJ</b></div>
+  <div class="meiryo-ke-gothic-regular"     >MeiryoKe Gothic Regular      <br>あいうえお <b>あいうえお</b><br>ABCDEFGHIJ <b>ABCDEFGHIJ</b></div>
+  <div class="meiryo-ke-gothic-bold"        >MeiryoKe Gothic Bold         <br>あいうえお <b>あいうえお</b><br>ABCDEFGHIJ <b>ABCDEFGHIJ</b></div>
+  <div class="osaka-mono"                   >Osaka Mono                   <br>あいうえお <b>あいうえお</b><br>ABCDEFGHIJ <b>ABCDEFGHIJ</b></div>
+</div>
+
+  </body>
+</html>

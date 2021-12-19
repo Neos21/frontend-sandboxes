@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Functions And this</title>
+    <style>
+
+*, ::before, ::after { box-sizing: border-box; }
+html { font-family: sans-serif; }
+
+    </style>
+    <script>
+
+const myFuncs1 = {
+  exec() {
+    console.log('myFuncs1 exec()', this);
+    return this.exec.name;
+  }
+};
+const myFuncs2 = {
+  exec: function() {
+    console.log('myFuncs2 exec: function()', this);
+    return this.exec.name;
+  }
+};
+const myFuncs3 = {
+  exec: function execs() {
+    console.log('myFuncs3 exec: function execs()', this);
+    return this.exec.name;  // execs はない
+  }
+};
+const myFuncs4 = {
+  exec: () => {
+    console.log('myFuncs4 exec: () =>', this);
+    return this;  // Window
+  }
+};
+
+document.addEventListener('DOMContentLoaded', () => {
+  document.body.innerHTML += myFuncs1.exec() + '<hr>'
+                          +  myFuncs2.exec() + '<hr>'
+                          +  myFuncs3.exec() + '<hr>'
+                          +  myFuncs4.exec();
+});
+
+    </script>
+  </head>
+  <body>
+
+<h1>関数定義と this の比較</h1>
+
+  </body>
+</html>

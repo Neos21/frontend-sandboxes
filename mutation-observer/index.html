@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>MutationObserver</title>
+    <style>
+
+*, ::before, ::after { box-sizing: border-box; }
+html { font-family: sans-serif; }
+
+#items {
+  border: 1px solid #ccc;
+  padding: 1rem;
+  height: 5rem;
+  overflow: auto;
+}
+
+#items > div {
+  border: 1px solid #999;
+  margin: .5rem 0;
+}
+
+    </style>
+    <script>
+
+document.addEventListener('DOMContentLoaded', () => {
+  const process = (mutations) => {
+    console.log('PROCESS', mutations);
+  };
+  
+  const observer = new MutationObserver(process);
+  observer.observe(document.body, {
+    childList    : true,  // 対象ノードの子ノード（テキストノードも含む）に対する追加・削除を監視する
+    attributes   : true,  // 対象ノードの属性に対する変更を監視する
+    characterData: true,  // 対象ノードのデータに対する変更を監視する
+    subtree      : true   // 対象ノードとその子孫ノードに対する変更を監視する
+  });
+  
+  // 監視を中止する場合は observer.disconnect();
+});
+
+// DOM 操作を行う適当な関数
+function append() {
+  const div = document.createElement('div');
+  div.innerText = 'TEXT';
+  document.getElementById('items').appendChild(div);
+}
+function remove() {
+  document.getElementById('items').innerHTML = '';
+}
+
+    </script>
+  </head>
+  <body>
+
+<p><button type="button" onclick="append()">Append</button> <button type="button" onclick="remove()">Remove</button></p>
+<div id="items"></div>
+
+  </body>
+</html>

@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Walk Nodes</title>
+    <style>
+
+*, ::before, ::after { box-sizing: border-box; }
+html { font-family: sans-serif; }
+
+ul, p, input, select, textarea {
+  margin: 0;
+  vertical-align: top;
+}
+
+    </style>
+    <script>
+
+// https://github.com/kotachang/Word-Replacer-Chrome-Extension/blob/master/src/inject/inject.js
+// https://gist.github.com/nkhil/befbaa8a9722e92db091f47a66fde7ca#file-brexit-js
+
+function walk(node, debugDepth) {
+  if(debugDepth == null) debugDepth = 0;
+  const debugDepthIndent = '.'.repeat(debugDepth);
+  switch(node.nodeType) {
+    case  1:  // Element
+    case  9:  // Document
+    case 11:  // Document Fragment
+      // 特殊系を先に処理する
+      if(['TEXTAREA', 'INPUT'].includes(node.tagName) && !isEmpty(node.value)) {
+        node.value = replaceValue(node.value);
+        break;  // 子要素なし
+      }
+      else if(node.tagName === 'IMG' && !isEmpty(node.getAttribute('alt'))) {
+        node.setAttribute('alt', replaceValue(node.getAttribute('alt')));
+        break;  // 子要素なし
+      }
+      else if(['OPTGROUP', 'OPTION'].includes(node.tagName) && !isEmpty(node.getAttribute('label'))) {
+        console.log('Opt', node.tagName);
+        node.setAttribute('label', replaceValue(node.getAttribute('label')));
+        // break しないことで optgroup 配下の option、および option 配下の TextNode も変換する
+      }
+      
+      let child = node.firstChild; // childNodes を for ループする場合よりも要素の増減でバグりにくいと思う
+      console.log(debugDepthIndent, node.nodeType, node.tagName, 'Start', child);
+      while(child) {
+        if(!['SCRIPT', 'STYLE', 'IFRAME', 'NOSCRIPT', 'FRAME'].includes(child.tagName)) {  // 必ず除外したいモノ
+          //console.log(debugDepthIndent, 'Call Child', child.nodeType, child.tagName);
+          walk(child, debugDepth + 1);
+        }
+        child = child.nextSibling;
+      }
+      console.log(debugDepthIndent, node.nodeType, node.tagName, 'End');
+      break;
+    case 3:  // Text node
+      if(node.nodeValue.trim() !== '') {
+        console.log(debugDepthIndent, 'Text Node', `[${node.nodeValue}]`);
+        node.nodeValue = replaceValue(node.nodeValue);
+      }
+      break;
+    default:
+      console.log(debugDepthIndent, node.nodeType, node.tagName, 'Unknown Node Type');
+  }
+}
+
+// 仮で変換処理
+function replaceValue(originalValue) {
+  return originalValue.replace((/[a-z]/gu), match => match.toUpperCase());
+}
+
+function isEmpty(value) {
+  return value === undefined || value === null || value === '';
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  //walk(document.body);
+  
+  document.getElementById('test').addEventListener('click', () => {
+    alert('Click!');
+  });
+});
+
+    </script>
+  </head>
+  <body>
+
+<button type="button" onclick="walk(document.querySelector('body'))">Walk</button>
+<hr>
+<div id="images">
+  <a href="#">
+    <img alt="Alt" src="">
+  </a>
+  <a href="#">
+    <img alt="Img Text" src="">
+    Text
+  </a>
+</div>
+<nav id="nav">
+  <ul>
+    <li><a href="#" title="About" id="test">About</a></li>
+  </ul>
+</nav>
+<div id="form">
+  <textarea rows="1"></textarea>
+  <input type="text">
+  <select>
+    <optgroup label="Food">
+      <option value="tomato">Tomato</option>
+      <option value="egg" label="Egg">Tameigou</option>
+    </optgroup>
+    <option>Etc</option>
+  </select>
+</div>
+
+  </body>
+</html>

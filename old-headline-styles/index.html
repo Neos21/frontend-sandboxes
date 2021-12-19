@@ -66,6 +66,30 @@ html { font-family: sans-serif; }
   padding: 0 1rem;
 }
 
+.headline-6 {
+  width: 10rem;
+  border: 1px solid #6cf;
+  border-right-color: #66f;
+  border-bottom-color: #66f;
+  margin: 1rem 0;
+  padding: .2rem .2rem .3rem;
+  color: #fff;
+  font-size: 10pt;
+  font-weight: bold;
+  text-align: center;
+  white-space: nowrap;
+  line-height: 1;
+  background: #69f;
+}
+  .headline-6::before {
+    content: "---";
+    padding-right: .4rem;
+  }
+  .headline-6::after {
+    content: "---";
+    padding-left: .4rem;
+  }
+
 body {
   padding: 1rem;
 }
@@ -101,6 +125,8 @@ p {
     <p>Text</p>
   </div>
 </div>
+
+<div class="headline-6">Contents</div>
 
   </body>
 </html>

@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Practice Open Meteo</title>
+    <!--★<link rel="stylesheet" href="styles.css">★-->
+    <style>
+
+*, ::before, ::after { box-sizing: border-box; }
+html { font-family: sans-serif; }
+
+@font-face {
+  font-family: "Yu Gothic";
+  src: local("Yu Gothic Medium"),local("YuGothic-Medium")
+}
+
+@font-face {
+  font-family: "Yu Gothic";
+  src: local("Yu Gothic Bold"),local("YuGothic-Bold");
+  font-weight: 700
+}
+
+:root {
+  --margin-large : .8rem;
+  --margin-normal: .4rem;
+  --border-radius: 6px;
+}
+
+*, ::before, ::after {
+  box-sizing: border-box;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  color: #303030;
+  text-align: center;
+  font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, YuGothic, "Yu Gothic", "Noto Sans JP", "Noto Sans CJK JP", "Hiragino Sans", "Hiragino Kaku Gothic ProN", Meiryo, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  line-height: 1;
+  white-space: nowrap;
+  background: #f9fcff;
+  cursor: default;
+}
+
+span[title] {
+  font-family: "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji", -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, YuGothic, "Yu Gothic", "Noto Sans JP", "Noto Sans CJK JP", "Hiragino Sans", "Hiragino Kaku Gothic ProN", Meiryo;
+}
+
+html {
+  overflow: auto scroll;
+}
+
+strong {
+  color: #f00;
+}
+
+b {
+  color: #fb0;
+}
+
+#contents {
+  padding: var(--margin-large);
+}
+
+#contents.loaded {
+  display: inline-grid;
+  grid-template-areas: "table  table"
+                       "reload reload";
+}
+
+#contents.loaded > table {
+  grid-area: table;
+}
+
+#contents.loaded > table + span {
+  grid-area: reload;
+}
+
+button {
+  cursor: pointer;
+}
+
+table {
+  margin: 0 auto var(--margin-large);
+  border-collapse: collapse;
+}
+
+caption {
+  margin: 0 0 var(--margin-large);
+  font-size: 1.1rem;
+}
+
+thead th {
+  padding: var(--margin-large) var(--margin-normal);
+  color: #fff;
+  background: #0bf;
+}
+
+thead th:first-child {
+  border-radius: var(--border-radius) 0 0 0;
+}
+
+thead th:last-child {
+  border-radius: 0 var(--border-radius) 0 0;
+}
+
+tbody td {
+  padding: var(--margin-normal);
+  background: #f0f9ff;
+}
+
+tbody tr:first-child td {
+  padding-top: var(--margin-large);
+}
+
+tbody tr:last-child td {
+  padding-bottom: var(--margin-large);
+}
+
+tbody tr:last-child td:first-child {
+  border-radius: 0 0 0 var(--border-radius);
+}
+
+tbody tr:last-child td:last-child {
+  border-radius: 0 0 var(--border-radius) 0;
+}
+
+    </style>
+    <script>
+
+(() => {
+  /**
+   * https://open-meteo.com/en/docs
+   * 
+   * - Location : Tokyo … Latitude : 35.6785 ・ Longitude : 139.6823
+   * - Hourly Weather Variables : Temperature (2 m) ・ Weathercode
+   * - Current Weather With Temperature, Windspeed And Weather Code
+   * - Temperature Unit : Celsius °C
+   * - Timeformat : ISO 8601 (ex. YYYY-MM-DDTHH:mm)
+   * - Timezone : Azia/Tokyo
+   * - Past Days : 2
+   */
+  const apiUrl = 'https://api.open-meteo.com/v1/forecast?latitude=35.6785&longitude=139.6823&hourly=temperature_2m,weathercode&current_weather=true&timezone=Asia%2FTokyo&past_days=2';
+  
+  const hoursOfDay = 24;
+  
+  const sliceArrays = (array, number) => [...Array(Math.ceil(array.length / number))].map((_, index) => array.slice(index * number, (index + 1) * number));
+  
+  const getDay = dateTimeStr => {
+    const jstDate = new Date(new Date(dateTimeStr) + ((new Date().getTimezoneOffset() + (9 * 60)) * 60 * 1000));
+    return ['日', '月', '火', '水', '木', '金', '土'][jstDate.getDay()];
+  };
+  
+  const generateWeatherIcon = weatherCode => {
+    // https://www.jodc.go.jp/data_format/weather-code_j.html
+    const iconText = (() => {
+      if(weatherCode === 0) return { text: '快晴'  , emoji: '☀' };  // 0 : Clear Sky
+      if(weatherCode === 1) return { text: '晴れ'  , emoji: '🌤' };  // 1 : Mainly Clear
+      if(weatherCode === 2) return { text: '一部曇', emoji: '⛅' };  // 2 : Partly Cloudy
+      if(weatherCode === 3) return { text: '曇り'  , emoji: '☁' };  // 3 : Overcast
+      if(weatherCode <= 49) return { text: '霧'    , emoji: '🌫' };  // 45, 48 : Fog And Depositing Rime Fog
+      if(weatherCode <= 59) return { text: '霧雨'  , emoji: '🌧' };  // 51, 53, 55 : Drizzle Light, Moderate And Dense Intensity ・ 56, 57 : Freezing Drizzle Light And Dense Intensity
+      if(weatherCode <= 69) return { text: '雨'    , emoji: '☔' };  // 61, 63, 65 : Rain Slight, Moderate And Heavy Intensity ・66, 67 : Freezing Rain Light And Heavy Intensity
+      if(weatherCode <= 79) return { text: '雪'    , emoji: '☃' };  // 71, 73, 75 : Snow Fall Slight, Moderate And Heavy Intensity ・ 77 : Snow Grains
+      if(weatherCode <= 84) return { text: '俄か雨', emoji: '🌧' };  // 80, 81, 82 : Rain Showers Slight, Moderate And Violent
+      if(weatherCode <= 94) return { text: '雪・雹', emoji: '☃' };  // 85, 86 : Snow Showers Slight And Heavy
+      if(weatherCode <= 99) return { text: '雷雨'  , emoji: '⛈' };  // 95 : Thunderstorm Slight Or Moderate ・ 96, 99 : Thunderstorm With Slight And Heavy Hail
+      return                       { text: '不明'  , emoji: '✨' };
+    })();
+    return `<span title="${iconText.text}">${iconText.emoji}</span>`;
+  };
+  
+  const generateHtml = (currentWeather, hourly) => {
+    const header = `
+      <table>
+        <caption>${currentWeather.time.replace('T', ` (${getDay(currentWeather.time)}) `)} … ${generateWeatherIcon(currentWeather.weathercode)} ${currentWeather.temperature} °C</caption>
+        <thead>
+          <tr>
+            <th>Date</th>`
+      + [...Array(hoursOfDay).keys()].map(hour => `<th>${String(hour).padStart(2, '0')}</th>`).join('')
+      + `
+          </tr>
+        </thead>
+        <tbody>
+    `;
+    const body = sliceArrays(hourly.weathercode, hoursOfDay)
+      .map(weatherCodes => {
+        while(weatherCodes.length < hoursOfDay) weatherCodes.push(100);  // 1日分に満たない配列がありうるので「不明」な値を差し込む
+        return weatherCodes;
+      })
+      .reduce((bodyHtml, weatherCodes, index) => {
+        const rawDateTime = hourly.time[index * hoursOfDay];
+        const date = rawDateTime.replace((/T.*/u), ` (${getDay(rawDateTime)})`);
+        const weathersHtml = weatherCodes.reduce((dateHtml, weatherCode) => `${dateHtml}<td>${generateWeatherIcon(weatherCode)}</td>`, '');
+        return `${bodyHtml}<tr><td>${date}</td>${weathersHtml}</tr>`;
+      }, '');
+    const footer = `
+        </tbody>
+      </table>
+      <span><button type="button" id="reload">Reload</button></span>
+    `;
+    return `${header}${body}${footer}`;
+  };
+  
+  
+  // Main
+  // ==========
+  
+  const main = async () => {
+    const contents = document.getElementById('contents');
+    if(!contents) return alert('The #contents Element Does Not Exist');
+    
+    try {
+      contents.classList.remove('loaded');
+      contents.innerHTML = '<div><b>Loading...</b></div>';
+      
+      const data = await window.fetch(apiUrl).then(response => response.json());
+      console.log('Fetch Open Meteo API', data);
+      contents.innerHTML = generateHtml(data.current_weather, data.hourly);
+      const reload = document.getElementById('reload');
+      if(reload) reload.addEventListener('click', main);
+      contents.classList.add('loaded');
+    }
+    catch(error) {
+      console.warn('Error', error);
+      contents.innerHTML = `<div><strong>Failed To Fetch Open Meteo API : ${error}</strong></div>`;
+    }
+  };
+  
+  document.addEventListener('DOMContentLoaded', main);
+})();
+
+    </script>
+  </head>
+  <body>
+
+<h1></h1>
+
+<div id="contents">
+  <div><b>Loading...</b></div>
+</div>
+
+  </body>
+</html>

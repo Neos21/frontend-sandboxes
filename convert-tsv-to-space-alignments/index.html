@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Convert TSV To Space Alignments</title>
+    <style>
+
+@font-face {
+  font-family: "Noto Sans Mono CJK JP";
+  src: local("NotoSansMonoCJKjp-Regular"),
+       local("Noto Sans Mono CJK JP Regular"),
+       local("Noto Sans Mono CJK JP"),
+       url("https://cdn.jsdelivr.net/npm/@neos21/japanese-monospaced-fonts@1.0.2/NotoSansMonoCJKjp-Regular.woff2")              format("woff2"),
+       url("https://unpkg.com/@neos21/japanese-monospaced-fonts@1.0.2/NotoSansMonoCJKjp-Regular.woff2")                         format("woff2"),
+       url("https://cdn.jsdelivr.net/npm/@neos21/japanese-monospaced-fonts@1.0.2/NotoSansMonoCJKjp-Regular.woff")               format("woff"),
+       url("https://unpkg.com/@neos21/japanese-monospaced-fonts@1.0.2/NotoSansMonoCJKjp-Regular.woff")                          format("woff"),
+       url("https://cdn.jsdelivr.net/npm/@neos21/japanese-monospaced-fonts@1.0.2/NotoSansMonoCJKjp-Regular.otf")                format("opentype"),
+       url("https://unpkg.com/@neos21/japanese-monospaced-fonts@1.0.2/NotoSansMonoCJKjp-Regular.otf")                           format("opentype"),
+       url("https://cdn.jsdelivr.net/npm/@japanese-monospaced-fonts/noto-sans-mono-cjk-jp@1.0.1/NotoSansMonoCJKJP-Regular.otf") format("opentype"),
+       url("https://unpkg.com/@japanese-monospaced-fonts/noto-sans-mono-cjk-jp@1.0.1/NotoSansMonoCJKJP-Regular.otf")            format("opentype");
+  font-display: swap;
+}
+*, ::before, ::after { box-sizing: border-box; }
+:root {
+  --column-width: 22rem;
+  --gap: .5rem;
+  --input-preview-height: 10rem;
+  --font-size-default: 16px;  /* iOS Safari でフォーム部品のズームを回避するための最小値 */
+  --font-size-small  : .75rem;
+  --colour-white       : #fff;
+  --colour-light-grey  : #f3f3f3;
+  --colour-lighter-grey: #e9e9e9;
+  --colour-grey        : #ccc;
+}
+html { height: 100%; font-size: var(--font-size-default); font-family: sans-serif; -webkit-text-size-adjust: 100%; background: var(--colour-white); cursor: default; }
+body { height: 100%; margin: 0; padding: var(--gap) calc(var(--gap) * 2) 0 var(--gap); }
+
+h1 { margin: 0 0 calc(var(--gap) / 5); font-size: var(--font-size-default); white-space: nowrap; }
+a { color: #00f; }
+a:hover, a:focus { color: #f00; }
+
+pre {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  border: 1px solid var(--colour-grey);
+  font-size: var(--font-size-small);
+  font-family: font-family: "Noto Sans Mono CJK JP", monospace;
+  background: var(--colour-white);
+  overflow: auto;
+}
+textarea {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  vertical-align: top;
+  border: 1px solid var(--colour-grey);
+  border-radius: 0;
+  font-size: var(--font-size-default);  /* For iOS Safari Prevent Zoom */
+  font-family: "Noto Sans Mono CJK JP", monospace;
+  background: var(--colour-white);
+  white-space: pre;
+  cursor: pointer;
+  resize: none;
+}
+textarea:hover, textarea:focus { background: var(--colour-light-grey); }
+
+input[type="text"], input[type="number"], select {
+  border: 1px solid var(--colour-grey);
+  border-radius: 0;
+  padding: 0 var(--gap);
+  color: inherit;  /* For iOS Safari Select */
+  font-size: var(--font-size-default);  /* For iOS Safari Prevent Zoom */
+  background: var(--colour-white);
+  cursor: pointer;
+}
+input[type="button"] {
+  -webkit-appearance: none;  /* For iOS Safari */
+  border: 1px solid var(--colour-grey);
+  border-radius: 0;
+  outline: 0;  /* For iOS Safari */
+  padding: 0 var(--gap);
+  color: inherit;  /* For iOS Safari */
+  font-size: var(--font-size-default);  /* input[type="text"] 類と合わせる */
+  background: var(--colour-light-grey);
+  cursor: pointer;
+}
+input[type="button"]:hover, input[type="button"]:focus,
+              select:hover,               select:focus {
+  background: var(--colour-lighter-grey);
+}
+option { background: var(--colour-white); }
+
+table { border-collapse: collapse; line-height: 1; }
+th, td { border: 1px solid var(--colour-grey); white-space: nowrap; }
+th { position: sticky; top: 0; padding: calc(var(--gap) / 5) calc(var(--gap) / 3); text-align: center; background: var(--colour-light-grey); }
+td { padding: calc(var(--gap) / 2) calc(var(--gap) / 5) calc(var(--gap) / 5); font-size: var(--font-size-small); text-align: left; }  /* 雰囲気 Vertical Align */
+
+.wrapper {
+  display: grid;
+  height: 100%;
+  grid-template-areas: "description    description  "
+                       "input-title    table-title  "
+                       "input-preview  table-preview"
+                       "output-title   table-preview"
+                       "output-preview table-preview";
+  grid-template-columns: minmax(calc(var(--column-width) / 2), var(--column-width)) minmax(var(--column-width), 1fr);
+  grid-template-rows: max-content max-content var(--input-preview-height) max-content minmax(var(--input-preview-height), 1fr);
+  column-gap: calc(var(--gap) * 2);
+}
+.wrapper > div { overflow: auto; }
+.description    { grid-area: description   ; margin-bottom: var(--gap); font-size: var(--font-size-small); white-space: nowrap; }
+.input-title    { grid-area: input-title   ; }
+.input-preview  { grid-area: input-preview ; }
+.table-title    { grid-area: table-title   ; }
+.table-preview  { grid-area: table-preview ; border-bottom: var(--gap) solid transparent; }  /* 画面下部の突っ張り棒 */
+.output-title   { grid-area: output-title  ; margin-top: var(--gap); }
+.output-preview { grid-area: output-preview; border-bottom: var(--gap) solid transparent; }  /* 画面下部の突っ張り棒 */
+
+#input-file { display: none; }
+#space-number { width: 5rem; text-align: right; }
+#error-message { color: #f00; font-weight: bold; }
+#copied { display: none; color: #090; font-size: var(--font-size-small); font-weight: bold; }
+
+    </style>
+    <script>
+
+/** タブ区切りの文字列を行列の二次元配列にする */
+const splitIntoRows = input => {
+  // 最終行の改行は全て除去する
+  while(input.endsWith('\n')) {
+    input = input.replace((/\n$/u), '');
+  }
+  return input.split('\n').map(row => row.split('\t'));
+};
+
+/** 行列の二次元配列から行数と列数の最大数を取得する */
+const getRowColumnNumber = rows => ({
+  rowNumber   : rows.length,
+  columnNumber: Math.max(...rows.map(columns => columns.length))
+});
+
+/** 二次元配列の行列を入れ替える・列数が不揃いでも対応できるようにする https://qiita.com/horinnu/items/fcb51c1326b14ae5e626 */
+const transpose = rows => {
+  const { rowNumber, columnNumber } = getRowColumnNumber(rows);  // 行数・列の最大数を取得する
+  const newColumns = [];
+  for(let columnIndex = 0; columnIndex < columnNumber; columnIndex++) {
+    const newRows = [];
+    for(let rowIndex = 0; rowIndex < rowNumber; rowIndex++) {
+      newRows[rowIndex] = rows[rowIndex][columnIndex];
+    }
+    newColumns[columnIndex] = newRows;
+  }
+  return newColumns;
+};
+
+/** 文字列でない値をテキトーに文字列化しトリムする */
+const formatColumnValue = rawColumnValue => {
+  let columnValue = rawColumnValue;
+  if(columnValue == null) columnValue = '';
+  if(typeof columnValue !== 'string') columnValue = String(columnValue);
+  columnValue = columnValue.trim();
+  return columnValue;
+};
+
+/** 半角英数字や記号のみを全て除去し、全角文字の文字数を取得する */
+const calcFullWidthTextLength = text => text.replace(/[ -~]/gu, '').length;
+
+/** 半角文字を1文字・それ以外 (全角文字) を2文字としてカウントする */
+const calcTextLength = text => text.length + calcFullWidthTextLength(text);
+
+/** 整形用の関数定義 : デフォルト関数など文字列で関数を指定したい時があるので連想配列で定義する */
+const alignmentFunctions = {
+  /** 列の値の配列より、整数部は右揃え・小数部は左揃えになるようにスペースパディングした文字列の配列を組み立てる */
+  padNumbers: rawColumnValues => {
+    // 整数・ピリオド・小数部分に別ける
+    const columnsMeta = rawColumnValues.map(rawColumnValue => {
+      const columnValue = formatColumnValue(rawColumnValue);
+      const match = columnValue.match((/^([-0-9]*)+(\.?)+([0-9]*)$/));
+      if(!match) return {
+        rawValue     : rawColumnValue,
+        value        : columnValue,
+        integerValue : columnValue,
+        periodValue  : '',
+        decimalValue : '',
+        integerLength: calcTextLength(columnValue),  // 不正値は整数部分に配置させる
+        periodLength : 0,
+        decimalLength: 0
+      };
+      return {
+        rawValue     : rawColumnValue,
+        value        : columnValue,
+        integerValue : match[1],
+        periodValue  : match[2],
+        decimalValue : match[3],
+        integerLength: calcTextLength(match[1]),
+        periodLength : calcTextLength(match[2]),
+        decimalLength: calcTextLength(match[3])
+      };
+    });
+    
+    // 整数部・ピリオド・小数部それぞれの最長桁数を取得する
+    const rawLongestIntegerLength = Math.max(...columnsMeta.map(columnMeta => columnMeta.integerLength));
+    const rawLongestPeriodLength  = Math.max(...columnsMeta.map(columnMeta => columnMeta.periodLength ));
+    const rawLongestDecimalLength = Math.max(...columnsMeta.map(columnMeta => columnMeta.decimalLength));
+    // 異常値は弾く
+    if(rawLongestPeriodLength > 1 || (rawLongestPeriodLength === 0 && rawLongestDecimalLength > 0)) throw new Error('Invalid Values');
+    // 変な状態になっていたら調整する : 小数がないのにピリオドだけ入っていた場合は、ピリオドと小数が出力されないようにする
+    const longestIntegerLength = rawLongestIntegerLength;
+    const longestPeriodLength  = rawLongestDecimalLength === 0 ? 0 : 1;  
+    const longestDecimalLength = rawLongestDecimalLength;
+    
+    // スペースパディングした文字列を組み立てる : 小数がないのにピリオドが書かれている場合は、ピリオドを出力しない
+    const paddedColumnValues = columnsMeta.map(meta => {
+      const integer =                                                   meta.integerValue      .padStart(longestIntegerLength - calcFullWidthTextLength(meta.integerValue), ' ');
+      const period  = !longestPeriodLength ? '' : (meta.decimalLength ? meta.periodValue : ' ').padStart(longestPeriodLength  - calcFullWidthTextLength(meta.periodValue ), ' ');
+      const decimal =                                                   meta.decimalValue      .padEnd  (longestDecimalLength - calcFullWidthTextLength(meta.decimalValue), ' ');
+      return `${integer}${period}${decimal}`;
+    });
+    return paddedColumnValues;
+  },
+  /** 列の値の配列より、左揃え (値の右側にスペースパディング) にした文字列の配列を組み立てる */
+  padEnds: rawColumnValues => {
+    const columnValues = rawColumnValues.map(rawColumnValue => formatColumnValue(rawColumnValue));
+    const longestLength = Math.max(...columnValues.map(columnValue => calcTextLength(columnValue)));
+    const paddedColumnValues = columnValues.map(columnValue => columnValue.padEnd(longestLength - calcFullWidthTextLength(columnValue)));
+    return paddedColumnValues;
+  },
+  /** 列の値の配列より、右揃え (値の左側にスペースパディング) にした文字列の配列を組み立てる */
+  padStarts: rawColumnValues => {
+    const columnValues = rawColumnValues.map(rawColumnValue => formatColumnValue(rawColumnValue));
+    const longestLength = Math.max(...columnValues.map(columnValue => calcTextLength(columnValue)));
+    const paddedColumnValues = columnValues.map(columnValue => columnValue.padStart(longestLength - calcFullWidthTextLength(columnValue)));
+    return paddedColumnValues;
+  }
+};
+
+/** 行列の二次元配列を結合する */
+const joinRows = (rows, spaceNumber) => {
+  if(spaceNumber == null || spaceNumber < 1) spaceNumber = 1;  // 未指定・不正値は1スペースとする
+  const spaces = ' '.repeat(spaceNumber);
+  const result = rows.map(columns => columns.join(spaces)).join('\n');
+  return result;
+};
+
+
+/** デフォルトの列間のスペース数・初期表示時と updateOutput() 内で呼ぶ getSpaceNumber() で参照する */
+const defaultSpaceNumber = 2;
+
+/** デフォルトの整形関数・createTableHtml() と updateOutput() で参照する */
+const defaultAlignmentFunction = alignmentFunctions.padNumbers;
+
+/** 列・行の二次元配列・updateOutput() で参照する */
+let transposedColumns = [];
+
+
+/** 行列の二次元配列からテーブル HTML を作る */
+const createTableHtml = rows => {
+  const { rowNumber, columnNumber } = getRowColumnNumber(rows);
+  let html = `
+    <table id="table">
+      <thead>
+        <tr>`;
+  for(let columnIndex = 0; columnIndex < columnNumber; columnIndex++) html += `
+    <th>
+      <select data-column-index="${columnIndex}" value="${defaultAlignmentFunction.name}" onchange="updateOutput()">
+        <option value="padEnds"    ${defaultAlignmentFunction.name === 'padEnds'    ? 'selected' : ''}>左揃え  </option>
+        <option value="padStarts"  ${defaultAlignmentFunction.name === 'padStarts'  ? 'selected' : ''}>右揃え  </option>
+        <option value="padNumbers" ${defaultAlignmentFunction.name === 'padNumbers' ? 'selected' : ''}>数値揃え</option>
+      </select>
+    </th>`;
+  html += `
+      </tr>
+    </thead>
+    <tbody>`;
+  for(let rowIndex = 0; rowIndex < rowNumber; rowIndex++) {
+    html += '<tr>';
+    for(let columnIndex = 0; columnIndex < columnNumber; columnIndex++) {
+      html += `<td>${rows[rowIndex][columnIndex] ?? ''}</td>`;
+    }
+    html += '</tr>';
+  }
+  html += `
+      </tbody>
+    </table>`;
+  return html;
+};
+
+/* スペース数を取得する・フォームの値が不正値だったらデフォルト値を返す */
+const getSpaceNumber = () => {
+  const inputSpaceNumber = document.getElementById('space-number').value;
+  if(inputSpaceNumber == null || !String(inputSpaceNumber).trim()) return defaultSpaceNumber;
+  const spaceNumber = Number(inputSpaceNumber);
+  if(Number.isNaN(spaceNumber)) return defaultSpaceNumber;
+  return spaceNumber;
+};
+
+/** Output を更新する */
+const updateOutput = () => {
+  // 列ごとに使用する整形関数を取得する・万が一 select 要素が足りない場合も考慮して forEach() で処理している
+  const alignmentFunctionNames = [];
+  document.querySelectorAll('#table select[data-column-index]').forEach(selectElement => {
+    const columnIndex = selectElement.dataset.columnIndex;
+    alignmentFunctionNames[columnIndex] = selectElement.value;
+  });
+  
+  // 整形した列行の二次元配列を生成する
+  const formattedColumns = transposedColumns.map((columnValues, columnIndex) => {
+    const alignmentFunction = alignmentFunctions[alignmentFunctionNames[columnIndex]] ?? defaultAlignmentFunction;
+    return alignmentFunction(columnValues);
+  });
+  
+  // 再び行列を戻し結合して出力する
+  const transposedFormattedRows = transpose(formattedColumns);
+  const output = joinRows(transposedFormattedRows, getSpaceNumber());
+  document.getElementById('output').value = output;
+};
+
+/** 入力文字列を描画し整形表示する */
+const updateInput = inputText => {
+  document.getElementById('input').innerHTML = inputText;
+  // タブ区切りの文字列を行列の二次元配列に変換する
+  const rows = splitIntoRows(inputText);
+  // 行列の二次元配列を入れ替え、グローバル変数で保持する
+  transposedColumns = transpose(rows);
+  // テーブルを描画する
+  document.getElementById('table-wrapper').innerHTML = createTableHtml(rows);
+  // 整形する
+  updateOutput();
+};
+
+/** input[type="file"] の代わりのボタンを押下した時 : 同じファイルを再アップできるようにリセットしてからアップロードボタンを押下する */
+const onClickUploadFile = () => {
+  document.getElementById('input-file').value = '';  // 先にリセットしておく
+  document.getElementById('input-file').click();
+}
+
+/** アップロードされたファイルを読み込んで更新する */
+const inputFile = async () => {
+  document.getElementById('error-message').innerText = '';
+  const file = document.getElementById('input-file').files?.[0];
+  if(!file) return console.log('File Is Not Selected');
+  
+  const readFile = file => new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = event => {
+      if(event?.target?.result && event.target.result.trim()) return resolve(event.target.result.trim());
+      console.error('On Load Failed : ', event);
+      reject('Invalid File');
+    };
+    reader.onerror = error => {
+      console.error('On Error : ', error);
+      reject('Failed To Read File');
+    }
+    reader.readAsText(file);
+  });
+  try {
+    const inputText = await readFile(file);
+    updateInput(inputText);
+  }
+  catch(error) {
+    console.warn('Error : ', error);
+    document.getElementById('error-message').innerText = error;
+  }
+};
+
+/** 初期化・兼・ダミー文字列で更新する */
+const resetInput = () => {
+  // 列間のスペース数 : デフォルト値を指定する
+  document.getElementById('space-number').value = defaultSpaceNumber;
+  // 初期化
+  document.getElementById('input-file').value = '';
+  document.getElementById('error-message').innerText = '';
+  
+  const dummyInput = (() => {
+    // 列ごとのダミー値を定義する
+    const numberColumnValues     = ['1'  , 11   , '1.1', 1.11     , '-1'  , '-1.1', 'Dummy'   , 'ダミー'   , '-9.'    , '-.1'  ];
+    const alignLeftColumnValues  = ['Foo', null , 'Baz', undefined, 'Fuga',       , 100       , true       , false    /*     */];
+    const alignRightColumnValues = ['Foo', 'Bar', 'Baz', 'Hoge'   , 'Fuga', 'Piyo', 'ほげふが', '0ほげふが', '1aAア亜', 'Dummy'];
+    const columns = [numberColumnValues, alignLeftColumnValues, alignRightColumnValues];
+    
+    // 行列の最大数を取得する
+    const rowLength    = Math.max(...columns.map(columnValues => columnValues.length));
+    const columnLength = columns.length;
+    
+    // タブ区切りの文字列に組み立てる
+    let input = '';
+    for(let rowIndex = 0; rowIndex < rowLength; rowIndex++) {
+      for(let columnIndex = 0; columnIndex < columnLength; columnIndex++) {
+        input += `${columns[columnIndex][rowIndex] ?? ''}${columnIndex !== columnLength - 1 ? '\t' : '\n'}`;
+      }
+    }
+    return input;
+  })();
+  updateInput(dummyInput);
+};
+
+/** Output をコピーする */
+const copyOutput = () => {
+  document.getElementById('output').select();
+  document.execCommand('copy');
+  document.getElementById('copied').style.display = 'inline';
+  setTimeout(() => {
+    document.getElementById('copied').style.display = 'none';
+  }, 2000);
+};
+
+/** 初期表示 */
+document.addEventListener('DOMContentLoaded', () => {
+  // 初期化・兼・ダミーデータを初期表示する
+  resetInput();
+  // 各種イベント定義
+  document.getElementById('reset-input' ).addEventListener('click' , resetInput       );
+  document.getElementById('upload-file' ).addEventListener('click' , onClickUploadFile);
+  document.getElementById('input-file'  ).addEventListener('change', inputFile        );
+  document.getElementById('space-number').addEventListener('input' , updateOutput     );
+  document.getElementById('space-number').addEventListener('blur'  , updateOutput     );
+  document.getElementById('copy-output' ).addEventListener('click' , copyOutput       );
+  document.getElementById('output'      ).addEventListener('focus' , copyOutput       );
+  document.getElementById('output'      ).addEventListener('click' , copyOutput       );
+});
+
+    </script>
+  </head>
+  <body>
+
+<div class="wrapper">
+  <div class="description">
+    <input id="reset-input" type="button" value="Reset">
+    TSV (タブ区切り) ファイルを 列ごとにスペース文字で整形出力します
+  </div>
+  
+  <div class="input-title">
+    <h1>
+      Input
+      <input id="upload-file" type="button" value="Upload File">
+      <input id="input-file" type="file">
+    </h1>
+  </div>
+  <div class="input-preview">
+    <pre id="input"></pre>
+  </div>
+  
+  <div class="table-title">
+    <h1>
+      Table
+      <input id="space-number" type="number" pattern="^[0-9]*$" placeholder="Space Number">
+      <span id="error-message"></span>
+    </h1>
+  </div>
+  <div class="table-preview">
+    <div id="table-wrapper"></div>
+  </div>
+  
+  <div class="output-title">
+    <h1>
+      Output
+      <input id="copy-output" type="button" value="Copy">
+      <span id="copied">Copied!</span>
+    </h1>
+  </div>
+  <div class="output-preview">
+    <textarea id="output" readonly></textarea>
+  </div>
+</div>
+
+  </body>
+</html>

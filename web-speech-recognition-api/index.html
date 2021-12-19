@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Web Speech Recognition API</title>
+    <style>
+
+*, ::before, ::after { box-sizing: border-box; }
+html, input { font-family: sans-serif; }
+h1, div, ul { margin: .5rem 0; }
+hr { margin: 2rem 0 1rem; }
+ul {
+  overflow-y: auto;
+  height: 5rem;
+  border: 1px solid #888;
+  border-radius: 4px;
+}
+ul:empty { border-color: #ccc; }
+
+    </style>
+    <script>
+
+document.addEventListener('DOMContentLoaded', () => {
+  const status = document.getElementById('status');
+  const transcriptElem = document.getElementById('transcript');
+  const outputEvent = (eventName, statusText, event) => {
+    console.log(`${eventName} (${statusText}): `, event);
+    status.innerHTML = `${eventName} : ${statusText}`;
+  };
+  
+  const rec = new webkitSpeechRecognition();
+  rec.continuous = false;  // `true` にすると連続して音声認識するが、各種イベントが発火しなくなる
+  rec.interimResults = false;  // `true` にすると認識途中の結果も返す
+  rec.lang = 'ja-JP';  // 言語指定
+  rec.maxAlternatives = 1;  // 結果候補の最大数 (デフォルト 1)
+  
+  // 音声認識開始処理
+  const startRec = () => {
+    try {
+      rec.start();
+    }
+    catch(error) {
+      outputEvent('Start Error', '音声認識は既に開始されています', error);
+    }
+  };
+  // デフォルトの End イベント
+  const defaultOnEnd = event => {
+    outputEvent('End', '終了', event);
+    startRec();  // continuous 相当の処理のため
+  };
+  
+  rec.onstart       = event => outputEvent('Start'       , '開始・何か喋ってください'        , event);
+  rec.onaudiostart  = event => outputEvent('Audio Start' , '録音開始・何か喋ってください'    , event);
+  rec.onsoundstart  = event => outputEvent('Sound Start' , '音声検出開始・何か喋ってください', event);
+  rec.onspeechstart = event => outputEvent('Speech Start', '音声認識開始 … 聞き取っています', event);
+  rec.onspeechend   = event => outputEvent('Speech End'  , '音声認識終了'                    , event);
+  rec.onsoundend    = event => outputEvent('Sound End'   , '音声検出終了'                    , event);
+  rec.onaudioend    = event => outputEvent('Audio End'   , '録音終了'                        , event);
+  rec.onresult      = event => {
+    outputEvent('Result', '音声認識完了', event);
+    rec.stop();  // continuous 相当の処理のため
+    // 最後に認識した言葉を表示する
+    const transcript = event.results[event.results.length - 1][0].transcript;
+    transcriptElem.insertAdjacentHTML('afterbegin', `<li>${transcript}</li>`);
+    console.log('Result (音声認識完了) … Transcript : ', transcript);
+  };
+  rec.onend   = event => defaultOnEnd(event);
+  rec.onerror = event => {
+    outputEvent('Error', 'エラーが発生しました', event);
+    if(event.error === 'not-allowed') {
+      outputEvent('Error [not-allowed]', 'マイクが許可されていません', event);
+      // `onerror` 後に `onend` が発火するため `start()` で再開させないようにする
+      return rec.onend = onEndEvent => outputEvent('End', 'マイクが許可されていません', onEndEvent);
+    }
+    if(event.error === 'no-speech') {
+      outputEvent('Error [no-speech]', '無音状態・音声が聞き取れません・再開します…', event);
+      rec.onend = onEndEvent => defaultOnEnd(onEndEvent);  // 念のためイベントを初期化する
+      return rec.stop();
+    };
+    if(event.error === 'aborted') {
+      outputEvent('Error [aborted]', '音声認識が中止されました・再開します…', event);
+      rec.onend = onEndEvent => defaultOnEnd(onEndEvent);
+      return rec.stop();
+    }
+    // その他のエラー : 再開させないようにする https://wicg.github.io/speech-api/#speechreco-error
+    rec.onend = onEndEvent => outputEvent('End', `その他のエラーが発生したため終了しました [${event.error}]`, onEndEvent);
+  };
+  rec.onnomatch = event => outputEvent('No Match', '音声認識できませんでした', event);
+  
+  document.getElementById('start').addEventListener('click', () => {
+    transcriptElem.innerHTML = '';
+    startRec();
+  });
+  document.getElementById('abort').addEventListener('click', () => {
+    transcriptElem.innerHTML = '';
+    rec.abort();
+  });
+  document.getElementById('stop' ).addEventListener('click', () => {
+    transcriptElem.innerHTML = '';
+    rec.stop();
+  });
+  
+  startRec();  // 初回音声認識開始
+});
+
+    </script>
+  </head>
+  <body>
+
+<h1>Web Speech Recognition API</h1>
+
+<div>
+  <input type="button" id="start" value="Start">
+  <input type="button" id="abort" value="Abort">
+  <input type="button" id="stop"  value="Stop" >
+</div>
+<div><strong>ステータス :</strong> <span id="status">-</span></div>
+<div><strong>認識結果 : </strong></dt>
+<ul id="transcript"></ul>
+
+  </body>
+</html>

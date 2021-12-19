@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Tagged Template Function</title>
+    <style>
+
+*, ::before, ::after { box-sizing: border-box; }
+html { font-family: sans-serif; }
+
+    </style>
+    <script>
+
+function normalFunction(text) {
+  console.log('Normal Function', text);
+  document.body.insertAdjacentHTML('beforeend', `<p>Normal : [${text}]</p>`);
+}
+
+function taggedFunction(strings, ...values) {
+  console.log('Tagged Function', strings, values);
+  document.body.insertAdjacentHTML('beforeend', `<p>Tagged : [${strings}] [${values}]</p>`);
+}
+
+// 変数の前後にカッコを付けて返す
+function exampleTagged(strings, ...values) {
+  const exampleResult = strings.reduce((result, str, index) => {
+    const value = '【' + values[index - 1] + '】';
+    return result + value + str;
+  });
+  console.log('Example', strings, values, exampleResult);
+  document.body.insertAdjacentHTML('beforeend', `<p>Tagged : [${strings}] [${values}] → [${exampleResult}]</p>`);
+}
+
+normalFunction(`This is ${'template'} literal. ${0}`);
+taggedFunction`This is ${'template'} literal. ${0}`;
+exampleTagged`This is ${'template'} literal. ${0}`;
+
+    </script>
+  </head>
+  <body>
+
+<h1>Tagged Template Function</h1>
+
+  </body>
+</html>

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Web Audio Beep Morse Code</title>
+    <style>
+
+*, ::before, ::after { box-sizing: border-box; }
+html { font-family: sans-serif; }
+
+    </style>
+    <script>
+
+const beep = options => new Promise(resolve => {
+  // Options
+  options         = options           || {};
+  const type      = options.type      == null ? 'sine' : options.type;
+  const frequency = options.frequency == null ? 440    : options.frequency;
+  const time      = options.time      == null ? 0.1    : options.time;
+  const volume    = options.volume    == null ? 0.1    : options.volume;
+  // Create
+  const audioContext = new window.AudioContext();
+  const oscillator = audioContext.createOscillator();
+  const gain = audioContext.createGain();
+  oscillator.connect(gain);
+  gain.connect(audioContext.destination);
+  // Set Options
+  oscillator.type = type;
+  oscillator.frequency.value = frequency;
+  gain.gain.value = volume;
+  // Start
+  oscillator.onended = () => {
+    gain.disconnect(audioContext.destination);
+    oscillator.disconnect(gain);
+    resolve();
+  };
+  oscillator.start(audioContext.currentTime);
+  oscillator.stop(audioContext.currentTime + time);  // Stop Timing
+});
+
+const dit = () => beep({ time: .1 });  // Short Mark・Dot・1 Units Long
+const dah = () => beep({ time: .3 });  // Long Mark・Dash・3 Units Long
+const interGap  = () => beep({ volume: 0, time: .1 });  // Between Characters・1 Units Long
+const shortGap  = () => beep({ volume: 0, time: .3 });  // Between Letters・3 Units Long
+const mediumGap = () => beep({ volume: 0, time: .7 });  // Between Words・7 Units Long
+
+const sos = () => Promise.resolve(console.log('SOS : Start'))
+  .then(dit).then(interGap).then(dit).then(interGap).then(dit)
+  .then(shortGap)
+  .then(dah).then(interGap).then(dah).then(interGap).then(dah)
+  .then(shortGap)
+  .then(dit).then(interGap).then(dit).then(interGap).then(dit)
+  .then(mediumGap)
+  .then(() => console.log('SOS : End'));
+
+    </script>
+  </head>
+  <body>
+
+<h1>Web Audio Beep Morse Code</h1>
+
+<p>
+  <input type="button" value="Dit" onclick="dit();" accesskey="t">
+  <input type="button" value="Dah" onclick="dah();" accesskey="h">
+  <input type="button" value="SOS" onclick="sos();">
+</p>
+
+  </body>
+</html>

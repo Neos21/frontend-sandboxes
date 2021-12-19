@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Scrollbar Colours</title>
+    <style>
+
+*, ::before, ::after { box-sizing: border-box; }
+html { font-family: sans-serif; }
+
+body {
+  color: #000;
+  background: #fff;
+}
+
+div {
+  display: inline-grid;
+  gap: 1rem;
+  grid-template-columns: auto auto;
+}
+
+pre,
+textarea {
+  box-sizing: border-box;
+  overflow: scroll;
+  width: 350px;
+  height: 250px;
+  margin: 0;
+  outline: none;
+  border: 1px solid #000;
+  color: inherit;
+  font-size: 1rem;
+  font-family: monospace, monospace;
+  white-space: pre;
+  word-wrap: normal;  /* For Safari */
+  background: inherit;
+  cursor: default;
+}
+
+#webkit > ::-webkit-scrollbar {
+  width: 12px;   /* 縦スクロールバーの幅 */
+  height: 24px;  /* 横スクロールバーの高さ */
+}
+
+/* 
+ * Windows だとスクロールバーの上下に出るクリックすることで少しだけスクロールできるボタン
+ * Mac の場合は表示されない 
+ */
+#webkit > ::-webkit-scrollbar-button {
+  background: rgba(255, 0, 0, .5);
+}
+
+/* スクロールバー領域全体の背景色 (piece と thumb まとめて) */
+#webkit > ::-webkit-scrollbar-track {
+  background: rgba(0, 255, 0, .5);
+}
+
+/* スクロールバー領域の背景色 */
+#webkit > ::-webkit-scrollbar-track-piece {
+  background: rgba(0, 0, 255, .5);
+}
+
+/* スクロールバーの色 */
+#webkit > ::-webkit-scrollbar-thumb {
+  border: 3px solid rgba(255, 255, 255, .5);
+  border-radius: 10px;
+  background: rgba(0, 255, 255, .5);
+}
+
+/* 縦横スクロールバーの間 (角) に表示される領域 */
+#webkit > ::-webkit-scrollbar-corner {
+  background: rgba(255, 0, 255, .5);
+}
+
+/* リサイズ可能な場合の角の色 */
+#webkit > ::-webkit-resizer {
+  background: rgba(255, 255, 0, .5);
+}
+
+/* 現状 Firefox でのみ有効 */
+#scrollbar > * {
+  /* スクロールバーの色・背景領域を同時指定する */
+  scrollbar-color: rgba(255, 0, 0, .5) rgba(0, 0, 255, .5);
+  /* スクロールバーの太さ */
+  scrollbar-width: thin;
+}
+
+    </style>
+  </head>
+  <body>
+
+<h1>Scrollbar Colours</h1>
+
+<h2>Webkit : <code>::-webkit-scrollbar</code></h2>
+<div id="webkit">
+  <pre>Pre
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+
+Lorem ipsum
+Lorem ipsum
+Lorem ipsum
+Lorem ipsum
+Lorem ipsum
+Lorem ipsum
+Lorem ipsum
+Lorem ipsum
+Lorem ipsum
+Lorem ipsum
+
+Lorem ipsum
+Lorem ipsum
+Lorem ipsum
+Lorem ipsum
+Lorem ipsum
+Lorem ipsum
+Lorem ipsum
+Lorem ipsum
+Lorem ipsum
+Lorem ipsum
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</pre>
+  <textarea>Textarea
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+
+Lorem ipsum
+Lorem ipsum
+Lorem ipsum
+Lorem ipsum
+Lorem ipsum
+Lorem ipsum
+Lorem ipsum
+Lorem ipsum
+Lorem ipsum
+Lorem ipsum
+
+Lorem ipsum
+Lorem ipsum
+Lorem ipsum
+Lorem ipsum
+Lorem ipsum
+Lorem ipsum
+Lorem ipsum
+Lorem ipsum
+Lorem ipsum
+Lorem ipsum
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</textarea>
+</div>
+
+<h2>Firefox : <code>scrollbar-color</code></h2>
+<div id="scrollbar">
+  <pre>Pre
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+
+Lorem ipsum
+Lorem ipsum
+Lorem ipsum
+Lorem ipsum
+Lorem ipsum
+Lorem ipsum
+Lorem ipsum
+Lorem ipsum
+Lorem ipsum
+Lorem ipsum
+
+Lorem ipsum
+Lorem ipsum
+Lorem ipsum
+Lorem ipsum
+Lorem ipsum
+Lorem ipsum
+Lorem ipsum
+Lorem ipsum
+Lorem ipsum
+Lorem ipsum
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</pre>
+  <textarea>Textarea
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+
+Lorem ipsum
+Lorem ipsum
+Lorem ipsum
+Lorem ipsum
+Lorem ipsum
+Lorem ipsum
+Lorem ipsum
+Lorem ipsum
+Lorem ipsum
+Lorem ipsum
+
+Lorem ipsum
+Lorem ipsum
+Lorem ipsum
+Lorem ipsum
+Lorem ipsum
+Lorem ipsum
+Lorem ipsum
+Lorem ipsum
+Lorem ipsum
+Lorem ipsum
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</textarea>
+</div>
+
+  </body>
+</html>

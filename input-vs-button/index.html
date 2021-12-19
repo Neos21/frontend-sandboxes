@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Input Vs Button</title>
+    <style>
+
+*, ::before, ::after { box-sizing: border-box; }
+html { font-family: sans-serif; }
+
+table {
+  border-collapse: collapse;
+}
+
+th, td {
+  border: 1px solid #ccc;
+  padding: 0;
+  background: #f6ffff;
+}
+
+.button-image {
+  margin: 0;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+    </style>
+  </head>
+  <body>
+
+<h1>Input Vs Button</h1>
+<table>
+  <thead>
+    <tr>
+      <th>Type</th>
+      <th>Input</th>
+      <th>Button</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Button</th>
+      <td><input  type="button" value="Button"></td>
+      <td><button type="button" value="Button">Button</button></td>
+    </tr>
+    <tr>
+      <th>Reset</th>
+      <td><input  type="reset" value="Reset"></td>
+      <td><button type="reset" value="Reset">Reset</button></td>
+    </tr>
+    <tr>
+      <th>Submit</th>
+      <td><input  type="submit" value="Submit"></td>
+      <td><button type="submit" value="Submit">Submit</button></td>
+    </tr>
+    <tr>
+      <th>(Image)</th>
+      <td><input  type="image" src="https://img.icons8.com/color/48/000000/plus--v1.png" alt="Image" value="Image"></td>
+      <td><button type="submit" value="Image Like" class="button-image"><img src="https://img.icons8.com/color/48/000000/plus--v1.png"></button></td>
+    </tr>
+  </tbody>
+</table>
+
+  </body>
+</html>

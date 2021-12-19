@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Monospaced Fonts</title>
+    <style>
+
+*, ::before, ::after { box-sizing: border-box; }
+
+:root {
+  font-family: serif;
+  line-height: 1.05;
+}
+
+/* 
+ * - https://www.client9.com/css-system-font-stack-monospace-v2/
+ * - https://www.client9.com/css-system-font-stack-monospace-v1/
+ * 
+ * - MacOS :              Menlo Monaco Courier 'Courier New' Osaka-mono 'Noto Sans Mono CJK JP'(Custom) monospace
+ * - iOS   : ui-monospace Menlo Monaco Courier 'Courier New'                                            monospace
+ */
+
+    </style>
+  </head>
+  <body>
+
+<h1>Monospaced Fonts</h1>
+
+<div                                              >ああAA | Default               </div>
+<div style="font-family: ui-monospace;"           >ああAA | ui-monospace          </div>
+<div style="font-family: 'SF Mono';"              >ああAA | SF Mono               </div>
+<div style="font-family: SFMono-Regular;"         >ああAA | SFMono-Regular        </div>
+<div style="font-family: 'DejaVu Sans Mono';"     >ああAA | DejaVu Sans Mono      </div>  <!-- Linux 向け？ -->
+<div style="font-family: 'Droid Sans Mono';"      >ああAA | Droid Sans Mono       </div>  <!-- Android 向け？ -->
+<div style="font-family: 'Roboto Mono';"          >ああAA | Roboto Mono           </div>  <!-- Android 向け？ -->
+<div style="font-family: Menlo;"                  >2020-01-01 ああAA | Menlo      </div>
+<div style="font-family: Monaco;"                 >2020-01-01 ああAA | Monaco     </div>  <!-- 古い・要らないか -->
+<div style="font-family: Consolas;"               >2020-01-01 ああAA | Consolas   </div>
+<div style="font-family: Courier;"                >2020-01-01 ああAA | Courier    </div>
+<div style="font-family: 'Courier New';"          >2020-01-01 ああAA | Courier New</div>
+<div style="font-family: Osaka-mono;"             >2020-01-01 ああAA | Osaka-mono </div>
+<div style="font-family: 'Liberation Mono';"      >ああAA | Liberation Mono       </div>  <!-- Linux 向けだが不要か -->
+<div style="font-family: 'Noto Sans Mono';"       >ああAA | Noto Sans Mono        </div>
+<div style="font-family: 'Noto Sans Mono CJK JP';">ああAA | Noto Sans Mono CJK JP </div>
+<div style="font-family: monospace, monospace;"   >ああAA | monospace, monospace  </div>
+
+  </body>
+</html>

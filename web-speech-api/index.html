@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Web Speech API</title>
+    <style>
+
+*, ::before, ::after { box-sizing: border-box; }
+html { font-family: sans-serif; }
+
+#text {
+  width: 30rem;
+  max-width: 100%;
+}
+
+#main {
+  display: none;
+}
+
+li {
+  font-family: monospace;
+  white-space: pre-wrap;
+}
+
+select, [type="button"] {
+  cursor: pointer;
+}
+
+:disabled {
+  cursor: not-allowed;
+}
+
+    </style>
+    <script>
+
+window.addEventListener('load', () => {
+  const selectedVoice = document.getElementById('selected-voice');
+  const text          = document.getElementById('text');
+  const speak         = document.getElementById('speak');
+  const pause         = document.getElementById('pause');
+  const resume        = document.getElementById('resume');
+  const cancel        = document.getElementById('cancel');
+  const boundary      = document.getElementById('boundary');
+  
+  let voices = [];
+  const getVoices = () => {
+    if(voices.length) { return console.log('getVoices : Already Changed'); }
+    voices = window.speechSynthesis.getVoices();
+    if(!voices.length) { return console.log('getVoices : Cannot Get Voices'); }
+    console.log(`getVoices : ${voices.length}`);
+    let isSelected = false;
+    voices.forEach((voice, index) => {
+      const option = document.createElement('option');
+      option.textContent = `[${voice.lang}] ${voice.name}`;
+      option.value = index;
+      if(!isSelected && voice.lang === 'ja-JP') { option.selected = isSelected = true; }
+      selectedVoice.appendChild(option);
+    });
+  };
+  getVoices();  // Chrome は恐らく初回は取得できない
+  window.speechSynthesis.onvoiceschanged = getVoices;
+  
+  const updateStates = () => {
+    document.getElementById('speaking').textContent = window.speechSynthesis.speaking;
+    document.getElementById('paused').textContent   = window.speechSynthesis.paused;
+    document.getElementById('pending').textContent  = window.speechSynthesis.pending;
+  };
+  updateStates();
+  
+  document.getElementById('speak').addEventListener('click', () => {
+    if(window.speechSynthesis.speaking) { return console.log('Already Speaking'); }
+    if(!text.value.trim()) { return alert('Please Input Text'); }
+    
+    const speechSynthesisUtterance = new SpeechSynthesisUtterance(text.value);
+    speechSynthesisUtterance.volume = 1;  // 音量 : 0 〜 1
+    speechSynthesisUtterance.rate   = 1;  // 速度 : 0.1 〜 10
+    speechSynthesisUtterance.pitch  = 1;  // 音程 : 0 〜 2
+    if(voices.length && selectedVoice.value !== '') {
+      speechSynthesisUtterance.voice = voices[selectedVoice.value];
+      speechSynthesisUtterance.lang  = speechSynthesisUtterance.voice.lang;  // ja-JP
+      console.log(`Selected Voice : [${speechSynthesisUtterance.voice.lang}] ${speechSynthesisUtterance.voice.name}`);
+    }
+    else {
+      console.log('Default Voice');
+    }
+    
+    speechSynthesisUtterance.onstart = (event) => {
+      console.log('onstart', event);
+      updateStates();
+    };
+    speechSynthesisUtterance.onend = (event) => {
+      console.log('onend', event);
+      updateStates();
+      boundary.textContent = '';
+      pause.disabled = resume.disabled = cancel.disabled = true;
+      speak.disabled = false;
+    };
+    speechSynthesisUtterance.onerror = (event) => {
+      console.log('onerror', event);
+      updateStates();
+      boundary.textContent = '';
+      pause.disabled = resume.disabled = cancel.disabled = true;
+      speak.disabled = false;
+    };
+    speechSynthesisUtterance.onpause = (event) => {
+      console.log('onpause', event);
+      updateStates();
+    };
+    speechSynthesisUtterance.onresume = (event) => {
+      console.log('onresume', event);
+      updateStates();
+    };
+    speechSynthesisUtterance.onboundary = (event) => {
+      const showText = event.currentTarget.text.slice(event.charIndex, event.charIndex + event.charLength);
+      console.log('onboundary', showText, event);
+      updateStates();
+      boundary.textContent = showText;
+    };
+    
+    speak.disabled = resume.disabled = true;
+    pause.disabled = cancel.disabled = false;
+    window.speechSynthesis.speak(speechSynthesisUtterance);
+    updateStates();
+  });
+  document.getElementById('pause').addEventListener('click', () => {
+    window.speechSynthesis.pause();
+    updateStates();
+    speak.disabled = pause.disabled = true;
+    resume.disabled = cancel.disabled = false;
+  });
+  document.getElementById('resume').addEventListener('click', () => {
+    window.speechSynthesis.resume();
+    updateStates();
+    speak.disabled = resume.disabled = true;
+    pause.disabled = cancel.disabled = false;
+  });
+  document.getElementById('cancel').addEventListener('click', () => {
+    window.speechSynthesis.cancel();
+    updateStates();
+    pause.disabled = resume.disabled = cancel.disabled = true;
+    speak.disabled = false;
+  });
+  
+  pause.disabled = resume.disabled = cancel.disabled = true;
+  speak.disabled = false;
+  document.getElementById('loading').style.display = 'none';
+  document.getElementById('main').style.display = 'block';
+});
+
+    </script>
+  </head>
+  <body>
+
+<h1>Web Speech API</h1>
+<div id="loading">
+  <p>Loading...</p>
+</div>
+<div id="main">
+  <p>
+    <select id="selected-voice">
+      <option value="">Select Voice</option>
+    </select>
+  </p>
+  <p>
+    <input type="text" id="text" value="これは、音声読み上げのテストです。" placeholder="Text To Speech">
+  </p>
+  <p>
+    <input type="button" id="speak"  value="Speak">
+    <input type="button" id="pause"  value="Pause">
+    <input type="button" id="resume" value="Resume">
+    <input type="button" id="cancel" value="Cancel">
+  </p>
+  <ul>
+    <li>speechSynthesis.speaking : <span id="speaking"></span></li>
+    <li>speechSynthesis.paused   : <span id="paused"></span></li>
+    <li>speechSynthesis.pending  : <span id="pending"></span></li>
+    <li>boundary : <span id="boundary"></span></li>
+  </ul>
+</div>
+
+  </body>
+</html>

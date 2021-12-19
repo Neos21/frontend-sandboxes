@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Cloud Storage Prices</title>
+    <style>
+
+*, ::before, ::after { box-sizing: border-box; }
+html { font-family: sans-serif; }
+
+#table-wrapper {
+  overflow-x: auto;
+}
+
+table, th, td, .border {
+  border: 1px solid #ccc;
+}
+
+table {
+  border-collapse: collapse;
+}
+
+th, td {
+  padding: .1rem .5rem;
+  white-space: nowrap;
+}
+
+th {
+  background: #eef9ff;
+  font-weight: bold;
+  text-align: center;
+}
+
+.tb, .yen, .usd {
+  padding-left: .2rem;
+  text-align: right;
+}
+
+.tb::after {
+  content: "\00a0TB";
+  float: right;
+}
+
+.yen::before {
+  content: "￥\00a0";
+  float: left;
+}
+
+.usd::before {
+  content: "＄\00a0";
+  float: left;
+}
+
+.raw {
+  background: #ffffe6;
+}
+
+.calc {
+  background: #f6fff6;
+}
+
+.border-double-left {
+  border-left-width: 2px;
+}
+
+    </style>
+    <script>
+
+/** 価格情報 */
+const prices = [
+  {  name: 'TeraCloud'              ,  capacityTb:   3,  price: 13200,  unit: 'yen',  term: 'year' ,  description: '-'                                                },
+  {  name: 'TeraCloud'              ,  capacityTb:  10,  price: 44000,  unit: 'yen',  term: 'year' ,  description: '-'                                                },
+  {  name: 'AOSBOX Home PC'         ,  capacityTb: 999,  price:   500,  unit: 'yen',  term: 'month',  description: 'Cold Storage・容量無制限のため仮で 999TB とした'  },
+  {  name: 'AWS Glacier'            ,  capacityTb:   4,  price:    60,  unit: 'usd',  term: 'month',  description: 'Cold Storage・別途取出料金がかかる'               },
+  {  name: 'AWS Glacier Deep'       ,  capacityTb:   4,  price:     4,  unit: 'usd',  term: 'month',  description: 'Cold Storage・別途取出料金がかかる'               },
+  {  name: 'OCI Archive'            ,  capacityTb:   4,  price:    10,  unit: 'usd',  term: 'month',  description: 'Cold Storage・取出無料'                           },
+  {  name: 'GCP Archive'            ,  capacityTb:   4,  price:     4,  unit: 'usd',  term: 'month',  description: 'Cold Storage・別途取出料金がかかる'               },
+  {  name: 'DropBox Business Pro'   ,  capacityTb:   3,  price:  2000,  unit: 'yen',  term: 'month',  description: '1人で契約可'                                      },
+  {  name: 'Google One'             ,  capacityTb:   2,  price:  1300,  unit: 'yen',  term: 'month',  description: '-'                                                },
+  {  name: 'Google One'             ,  capacityTb:   2,  price: 13000,  unit: 'yen',  term: 'year' ,  description: '-'                                                },
+  {  name: 'Google One'             ,  capacityTb:   5,  price:  3250,  unit: 'yen',  term: 'month',  description: '2021年9月より・2TB からアップデートする'          },
+  {  name: 'Google One'             ,  capacityTb:   5,  price: 32500,  unit: 'yen',  term: 'year' ,  description: '2021年9月より・2TB からアップデートする'          },
+  {  name: 'iCloud+'                ,  capacityTb:   2,  price:  1300,  unit: 'yen',  term: 'month',  description: '-'                                                },
+  {  name: 'OneDrive MS365 Personal',  capacityTb:   1,  price: 12984,  unit: 'yen',  term: 'year' ,  description: '-'                                                },
+  {  name: 'OneDrive Business Plan2',  capacityTb: 999,  price:  1090,  unit: 'yen',  term: 'month',  description: '5人で借りれば容量無制限になる'                    },
+  {  name: 'MEGA'                   ,  capacityTb:   2,  price:  1297,  unit: 'yen',  term: 'month',  description: '-'                                                },
+  {  name: 'MEGA'                   ,  capacityTb:   2,  price: 12978,  unit: 'yen',  term: 'year' ,  description: '-'                                                },
+  {  name: 'MEGA'                   ,  capacityTb:   8,  price:  2595,  unit: 'yen',  term: 'month',  description: '-'                                                },
+  {  name: 'MEGA'                   ,  capacityTb:   8,  price: 25958,  unit: 'yen',  term: 'year' ,  description: '-'                                                },
+];
+
+/** 1ドル → 円 為替レート */
+const rateUsdToYen = 113.71;
+/** 1円 → ドル 為替レート */
+const rateYenToUsd = 0.0088;
+
+/** カンマを付与する */
+const addComma = num => String(num).replace((/(\d)(?=(\d\d\d)+(?!\d))/gu), '$1,');
+
+/** 月額・年額を計算する */
+const fullPrices = prices
+  .map(item => {
+    // 元の金額を元に月額・年額・円・ドルを算出する
+    if(item.unit === 'yen' && item.term === 'month') {
+      item.monthYen = item.price               ;
+      item.monthUsd = item.price * rateYenToUsd;
+      item.yearYen  = item.monthYen * 12       ;
+      item.yearUsd  = item.monthUsd * 12       ;
+    }
+    else if(item.unit === 'usd' && item.term === 'month') {
+      item.monthYen = item.price * rateUsdToYen;
+      item.monthUsd = item.price               ;
+      item.yearYen  = item.monthYen * 12       ;
+      item.yearUsd  = item.monthUsd * 12       ;
+    }
+    else if(item.unit === 'yen' && item.term === 'year') {
+      item.yearYen  = item.price               ;
+      item.yearUsd  = item.price * rateYenToUsd;
+      item.monthYen = item.yearYen / 12        ;
+      item.monthUsd = item.yearUsd / 12        ;
+    }
+    else if(item.unit === 'usd' && item.term === 'year') {
+      item.yearYen  = item.price * rateUsdToYen;
+      item.yearUsd  = item.price               ;
+      item.monthYen = item.yearYen / 12        ;
+      item.monthUsd = item.yearUsd / 12        ;
+    }
+    else {
+      throw new Error('Invalid Item');
+    }
+    return item;
+  })
+  .map(item => {
+    // 1TB あたりの金額を算出する
+    item.perTbMonthYen = item.monthYen / item.capacityTb;
+    item.perTbMonthUsd = item.monthUsd / item.capacityTb;
+    item.perTbYearYen  = item.yearYen  / item.capacityTb;
+    item.perTbYearUsd  = item.yearUsd  / item.capacityTb;
+    return item;
+  })
+  .map(item => {
+    // 表示用に整形する
+    item.monthYen = addComma(Number.parseFloat(item.monthYen).toFixed(0));
+    item.monthUsd = addComma(Number.parseFloat(item.monthUsd).toFixed(2));
+    item.yearYen  = addComma(Number.parseFloat(item.yearYen ).toFixed(0));
+    item.yearUsd  = addComma(Number.parseFloat(item.yearUsd ).toFixed(2));
+    item.perTbMonthYen = addComma(Number.parseFloat(item.perTbMonthYen).toFixed(0));
+    item.perTbMonthUsd = addComma(Number.parseFloat(item.perTbMonthUsd).toFixed(2));
+    item.perTbYearYen  = addComma(Number.parseFloat(item.perTbYearYen ).toFixed(0));
+    item.perTbYearUsd  = addComma(Number.parseFloat(item.perTbYearUsd ).toFixed(2));
+    return item;
+  });
+
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('table-wrapper').innerHTML
+    = `
+      <table>
+        <thead>
+          <tr>
+            <th>サービス名</th>
+            <th>容量 (TB)</th>
+            <th>月額・円</th>
+            <th>月額・ドル</th>
+            <th>年額・円</th>
+            <th>年額・ドル</th>
+            <th class="border-double-left">月額・円/TB</th>
+            <th>月額・ドル/TB</th>
+            <th>年額・円/TB</th>
+            <th>年額・ドル/TB</th>
+            <th class="border-double-left">説明</th>
+          </tr>
+        </thead>
+        <tbody>
+      `
+    + fullPrices.reduce((html, item) => html + `
+        <tr>
+          <td>${item.name}</td>
+          <td class="tb">${item.capacityTb}</td>
+          <td class="yen ${item.unit === 'yen' && item.term === 'month' ? 'raw' : 'calc'}">${item.monthYen}</td>
+          <td class="usd ${item.unit === 'usd' && item.term === 'month' ? 'raw' : 'calc'}">${item.monthUsd}</td>
+          <td class="yen ${item.unit === 'yen' && item.term === 'year'  ? 'raw' : 'calc'}">${item.yearYen}</td>
+          <td class="usd ${item.unit === 'usd' && item.term === 'year'  ? 'raw' : 'calc'}">${item.yearUsd}</td>
+          <td class="yen border-double-left">${item.perTbMonthYen}</td>
+          <td class="usd">${item.perTbMonthUsd}</td>
+          <td class="yen">${item.perTbYearYen}</td>
+          <td class="usd">${item.perTbYearUsd}</td>
+          <td class="border-double-left">${item.description}</td>
+        </tr>
+      `, '')
+    + `
+        </tbody>
+      </table>
+    `;
+  
+  document.getElementById('rate-usd-to-yen').innerHTML = `￥ ${rateUsdToYen} / ＄`;
+  document.getElementById('rate-yen-to-usd').innerHTML = `＄ ${rateYenToUsd} / ￥`;
+});
+
+    </script>
+  </head>
+  <body>
+
+<h1>Cloud Storage の金額比較</h1>
+<p>少なくとも 2TB、できれば 4TB 以上持ちたいので金額を調査し比較。</p>
+<div id="table-wrapper"></div>
+<ul>
+  <li>ドル → 円 換算レート：<span id="rate-usd-to-yen">-</span></li>
+  <li>円 → ドル 換算レート：<span id="rate-yen-to-usd">-</span></li>
+  <li><span class="raw  border">実際の金額</span></li>
+  <li><span class="calc border">計算で算出した金額</span></li>
+</ul>
+
+  </body>
+</html>

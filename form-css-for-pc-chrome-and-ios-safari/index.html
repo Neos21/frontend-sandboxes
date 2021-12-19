@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>フォーム部品のオレオレ決定版を作りたい</title>
+    <script src="https://cdn.jsdelivr.net/npm/@neos21/in-browser-sass@1.0.10/dist/in-browser-sass.bundle.min.js"></script>
+    <style type="text/scss">
+
+@font-face { font-family: "Yu Gothic"; src: local("Yu Gothic Medium"), local("YuGothic-Medium"); }
+@font-face { font-family: "Yu Gothic"; src: local("Yu Gothic Bold")  , local("YuGothic-Bold")  ; font-weight: bold; }
+*, ::before, ::after { box-sizing: border-box; }
+:root {
+  --colour-base: #000;
+  --colour-background: #fff;
+  --font-family-sans-serif: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, YuGothic, "Yu Gothic", "Hiragino Sans", "Hiragino Kaku Gothic ProN", Meiryo, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --font-family-monospace: "Noto Sans Mono CJK JP", Osaka-mono, "MS Gothic", Menlo, Consolas, Courier, "Courier New", monospace, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --font-size-base: 16px;
+}
+html {
+  overflow-y: scroll;
+  font-family: var(--font-family-sans-serif);
+  text-decoration-skip-ink: none;
+  -webkit-text-decoration-skip: objects;
+  color: var(--colour-base);
+  font-size: var(--font-size-base);
+  background: var(--colour-background);
+  cursor: default;
+}
+body {
+  margin: 1rem;
+  line-height: 1.2;
+  word-break: break-all;
+  background: #fffff6;
+}
+h1, h2 { font-size: 1rem; }
+
+#styled {
+  margin-top: 1rem;
+  
+  
+  /* Text   */  [type="text"], [type="password"], textarea,
+  /* Button */  [type="button"], [type="submit"], [type="reset"], button, ::-webkit-file-upload-button,
+  /* File   */  [type="file"] {
+            appearance: none;
+    -webkit-appearance: none;
+    margin: 0;
+    border: 1px solid #999;
+    border-radius: 2px;
+    padding: .1rem .25rem;
+    color: inherit;
+    font-size: inherit;
+    font-family: inherit;
+    background: transparent;
+    outline: 0;
+    /* NOTE : line-height を変更すると Button にのみ効いて Text と合わなくなる */
+  }
+  
+  /* Text */  [type="text"], [type="password"], textarea {
+    background: var(--colour-background);
+  }
+  
+  /* Button */  [type="button"], [type="submit"], [type="reset"], button, ::-webkit-file-upload-button {
+    background: #f6f6f6;
+    cursor: pointer;
+  }
+  
+  /* File */  [type="file"] {
+    border: 0;
+    padding: 0;
+    cursor: pointer;
+  }
+  
+  /* Text   : Hover */  [type="text"]:hover, [type="password"]:hover, textarea:hover,
+  /* Text   : Focus */  [type="text"]:focus, [type="password"]:focus, textarea:focus,
+  /* Button : Hover */  [type="button"]:hover, [type="submit"]:hover, [type="reset"]:hover, button:hover, ::-webkit-file-upload-button:hover,
+  /* Button : Focus */  [type="button"]:focus, [type="submit"]:focus, [type="reset"]:focus, button:focus, ::-webkit-file-upload-button:focus {
+    border-color: #666;
+  }
+  
+  /* Button : Hover */  [type="button"]:hover, [type="submit"]:hover, [type="reset"]:hover, button:hover, ::-webkit-file-upload-button:hover,
+  /* Button : Focus */  [type="button"]:focus, [type="submit"]:focus, [type="reset"]:focus, button:focus, ::-webkit-file-upload-button:focus {
+    background: #f0f0f0;
+  }
+  
+  /* Textarea */  textarea {
+    overflow-y: scroll;
+    -webkit-overflow-scrolling: touch;
+    font-family: var(--font-family-monospace);
+    word-break: normal;  /* No Wrap */
+    word-wrap: normal;
+    white-space: pre;
+    resize: vertical;
+  }
+}
+
+    </style>
+  </head>
+  <body>
+
+<h1>フォーム部品のオレオレ決定版を作りたい</h1>
+
+<div id="normal">
+  <h2>Normal</h2>
+  <div><input type="text"     placeholder="Placeholder Text" value=""    ><input type="button" value="Button"><input type="submit" value="Submit"><input type="reset" value="Reset"><button type="button">Button</button><button type="submit">Submit</button><button type="reset">Reset</button></div>
+  <div><input type="text"     placeholder="Placeholder Text" value="Text"><input type="button" value="Button"><input type="submit" value="Submit"><input type="reset" value="Reset"><button type="button">Button</button><button type="submit">Submit</button><button type="reset">Reset</button></div>
+  <div><input type="password" placeholder="Placeholder Pass" value=""    ><input type="button" value="Button"><input type="submit" value="Submit"><input type="reset" value="Reset"><button type="button">Button</button><button type="submit">Submit</button><button type="reset">Reset</button></div>
+  <div><input type="password" placeholder="Placeholder Pass" value="Pass"><input type="button" value="Button"><input type="submit" value="Submit"><input type="reset" value="Reset"><button type="button">Button</button><button type="submit">Submit</button><button type="reset">Reset</button></div>
+  <div><input type="file"                                                ><input type="button" value="Button"><input type="submit" value="Submit"><input type="reset" value="Reset"><button type="button">Button</button><button type="submit">Submit</button><button type="reset">Reset</button></div>
+  <div><textarea placeholder="Textarea"></textarea></div>
+  <div><input type="checkbox"><input type="radio"><input type="button" value="Button"><input type="submit" value="Submit"><input type="reset" value="Reset"><button type="button">Button</button><button type="submit">Submit</button><button type="reset">Reset</button></div>
+</div>
+
+<div id="styled">
+  <h2>Styled</h2>
+  <div><input type="text"     placeholder="Placeholder Text" value=""    ><input type="button" value="Button"><input type="submit" value="Submit"><input type="reset" value="Reset"><button type="button">Button</button><button type="submit">Submit</button><button type="reset">Reset</button></div>
+  <div><input type="text"     placeholder="Placeholder Text" value="Text"><input type="button" value="Button"><input type="submit" value="Submit"><input type="reset" value="Reset"><button type="button">Button</button><button type="submit">Submit</button><button type="reset">Reset</button></div>
+  <div><input type="password" placeholder="Placeholder Pass" value=""    ><input type="button" value="Button"><input type="submit" value="Submit"><input type="reset" value="Reset"><button type="button">Button</button><button type="submit">Submit</button><button type="reset">Reset</button></div>
+  <div><input type="password" placeholder="Placeholder Pass" value="Pass"><input type="button" value="Button"><input type="submit" value="Submit"><input type="reset" value="Reset"><button type="button">Button</button><button type="submit">Submit</button><button type="reset">Reset</button></div>
+  <div style="white-space: nowrap;"><input type="button" value="Button"><input type="file"></div>
+  <div><textarea placeholder="Textarea"></textarea></div>
+  <div><input type="checkbox"><input type="radio"><input type="button" value="Button"></div>
+  <div><select><option>Test</option></select><input type="button" value="Button"></div>
+</div>
+
+  </body>
+</html>

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Practice Bootstrap 3 Affix 2</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <style>
+
+*, ::before, ::after { box-sizing: border-box; }
+html { font-family: sans-serif; }
+
+/* 子要素 .affix-target が position: fixed になった時、その下にあるコンテンツの表示位置がズレないよう指定しておく */
+.affix-target-wrapper {
+  height: 60px;
+}
+
+/* Affix を適用する対象の要素 */
+.affix-target {
+  width: 500px;    /* position: fixed になった時、幅が狂わないよう指定しておく */
+  z-index: 99999;  /* position: fixed になった時、他の要素の下に重ならないようにしておく */
+}
+
+/* Affix を適用する対象の要素が position: fixed になった時の指定 */
+.affix-target.affix {
+  position: fixed !important;  /* .affix 自体に position: fixed 指定はあるものの、.affix-bottom が style 属性に position: relative を埋め込むので、それに勝るよう !important を指定しておく */
+  top: 0;  /* 画面上部からの位置を指定する。data-offset-top との辻褄が合う数値にしておくこと */
+}
+
+/* ページの高さを稼ぐためのコード */
+.dummy-contents p {
+  line-height: 3;
+  margin-bottom: 3rem;
+}
+
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script>
+
+$(() => {
+  $('.affix-target').affix({
+    offset: {
+      top: $('header').outerHeight(true),  // true にすると margin を含めた値を得られる
+      bottom: 600
+    }
+  })
+    // Affix の適用状態に応じて文字色やフォント設定を変える
+    .on('affixed-top.bs.affix'   , () => { console.log('affixed-top.bs.affix'   ); $('.affix-target *').css({ 'color': 'blue'  }); })
+    .on('affixed.bs.affix'       , () => { console.log('affixed.bs.affix'       ); $('.affix-target *').css({ 'color': 'red'   }); })
+    .on('affixed-bottom.bs.affix', () => { console.log('affixed-bottom.bs.affix'); $('.affix-target *').css({ 'color': 'green' }); })
+    .on('affix-top.bs.affix'     , () => { console.log('affix-top.bs.affix'     ); $('.affix-target *').css({ 'font-weight': 'bold'  , 'font-style': 'normal' }); })
+    .on('affix.bs.affix'         , () => { console.log('affix.bs.affix'         ); $('.affix-target *').css({ 'font-weight': 'normal', 'font-style': 'italic' }); })
+    .on('affix-bottom.bs.affix'  , () => { console.log('affix-bottom.bs.affix'  ); $('.affix-target *').css({ 'font-weight': 'bold'  , 'font-style': 'italic' }); });
+});
+
+    </script>
+  </head>
+  <body>
+
+<header style="height: 250px; margin-bottom: 30px; color: #fff; background: #08f;">HEADER</header>
+
+<div class="affix-target-wrapper">
+  <div class="affix-target btn-group btn-group-justified">
+    <a href="#" class="btn btn-default">Menu 1</a>
+    <a href="#" class="btn btn-default">Menu 2</a>
+    <a href="#" class="btn btn-default">Menu 3</a>
+  </div>
+</div>
+
+<div class="dummy-contents" style="max-width: 800px;">
+  <h1>Practice Bootstrap 3 Affix 2</h1>
+  <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+  <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+  <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+  <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+  <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+</div>
+
+<footer style="height: 500px; color: #fff; background: #444;">FOOTER</footer>
+
+  </body>
+</html>

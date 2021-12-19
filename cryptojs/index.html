@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>CryptoJS</title>
+    <style>
+
+*, ::before, ::after { box-sizing: border-box; }
+html { font-family: sans-serif; }
+
+input[type="text"] { width: 80%; }
+
+    </style>
+    <script>
+
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('gen-exec').addEventListener('click', onGenExec);
+  document.getElementById('dec-exec').addEventListener('click', onDecExec);
+});
+
+function onGenExec() {
+  const input = document.getElementById('gen-input').value;
+  const password = document.getElementById('gen-password').value;
+  if(input == '' || password == '') {
+    document.getElementById('gen-result').value = '';
+    return alert('Please Input Form');
+  }
+  const encrypted = CryptoJS.AES.encrypt(input, password);
+  document.getElementById('gen-result').value = encrypted;
+}
+
+function onDecExec() {
+  const input = document.getElementById('dec-input').value;
+  const password = document.getElementById('dec-password').value;
+  if(input == '' || password == '') {
+    document.getElementById('dec-result').value = '';
+    return alert('Please Input Form');
+  }
+  const decrypted = CryptoJS.AES.decrypt(input, password).toString(CryptoJS.enc.Utf8);
+  document.getElementById('dec-result').value = decrypted;
+}
+
+    </script>
+  </head>
+  <body>
+
+<h1>CryptoJS</h1>
+
+<h1>Generate Encrypted String</h1>
+<ul>
+  <li><input type="text" id="gen-input" value="" placeholder="Input"></li>
+  <li><input type="text" id="gen-password" value="" placeholder="Password"></li>
+  <li><button type="button" id="gen-exec">Generate</button></li>
+  <li><input type="text" id="gen-result" value="" placeholder="Result" readonly></li>
+</ul>
+
+<h1>Decrypt Test</h1>
+<ul>
+  <li><input type="text" id="dec-input" value="" placeholder="Input"></li>
+  <li><input type="text" id="dec-password" value="" placeholder="Password"></li>
+  <li><button type="button" id="dec-exec">Decrypt</button></li>
+  <li><input type="text" id="dec-result" value="" placeholder="Result" readonly></li>
+</ul>
+
+  </body>
+</html>

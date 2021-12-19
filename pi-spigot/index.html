@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Pi Spigot</title>
+    <style>
+
+*, ::before, ::after { box-sizing: border-box; }
+html { font-family: monospace; }
+
+    </style>
+    <script>
+
+document.addEventListener('DOMContentLoaded', () => {
+  let f = Math.floor,
+      p = document.getElementById('pi'),
+      a = [],
+      b,
+      c,
+      d = 0,
+      e = 100000,
+      i = 0,
+      j,
+      k,
+      l;
+  
+  function g() {
+    b = 0; 
+    for(j = i + 17; j > i; --j) {
+      b = (20 * e + b) * j;
+      a[j] = b % (j + j + 1);
+      b = f(b / (j + j + 1));
+    }
+    for(j = i; j > 0; j -= 17) {
+      a[j] += b * j;
+      b = 0; 
+      for(k = j; k > j - 17; --k) {
+        l = k + k + 1;
+        c = f(a[k] / l) * e + f(b / l) * k;
+        b = b % l * k + a[k] % l * e;
+        a[k] = b % l;
+        b = c +f(b / l);
+      }
+    }
+    d = d * e + b; 
+    if(i) {
+      p.innerHTML += ('00000' + d).slice(-11, -6) + (i % 20 ? '' : '<br>\n');
+      d %= 10 * e
+    }
+    i += 17;
+    setTimeout(g, 0);
+  }
+  
+  g();
+});
+
+// https://jp.quora.com/%E3%81%9F%E3%81%A3%E3%81%9F%E6%95%B0%E8%A1%8C%E3%81%AA%E3%81%AE%E3%81%AB-%E3%81%99%E3%81%94%E3%81%84-%E3%81%A8%E6%80%9D%E3%81%86%E3%82%88%E3%81%86%E3%81%AA%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%9F%E3%83%B3
+// http://3.141592653589793238462643383279502884197169399375105820974944592.jp/
+// https://www.zakkisou.com/PI.html
+// https://xn--w6q13e505b.jp/program/spigot.html
+
+    </script>
+  </head>
+  <body>
+
+<h1>Pi Spigot : 3.</h1>
+<p id="pi"></p>
+
+  </body>
+</html>

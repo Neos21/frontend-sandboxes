@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Clock Calendar</title>
+    <style>
+
+*, ::before, ::after { box-sizing: border-box; }
+html, body, #container {
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  user-select: none;
+}
+html {
+  border-top: 50px solid #000;  /* Android Bottom Bar Height */
+  font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Roboto, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  cursor: default;
+  text-decoration-skip-ink: none;
+  -webkit-text-size-adjust: 100%;
+  -webkit-text-decoration-skip: objects;
+  line-height: 1;
+  -webkit-overflow-scrolling: auto;
+}
+
+[type="button"] {
+  position: absolute;
+  z-index: 99999;
+  width: 50px;
+  height: 50px;
+  border: 0;
+  outline: 0;
+  background: rgba(128, 128, 128, 0);
+  cursor: pointer;
+  transition: background .2s;
+}
+[type="button"]:hover {
+  background: rgba(128, 128, 128, .25);
+}
+#toggle-fullscreen { top   : 50px; left : 0; }
+#toggle-calendar   { top   : 50px; right: 0; }
+#toggle-blank      { bottom: 0   ; left : 0; }
+#toggle-theme      { bottom: 0   ; right: 0; }
+
+#container {
+  position: relative;
+  display: grid;
+  place-items: center;
+}
+#container > div {
+  position: absolute;
+  opacity: 0;
+  transition: opacity .2s;
+}
+
+#clock {
+  font-size: 0;
+  font-weight: bold;
+  text-align: center;
+  white-space: nowrap;
+}
+#clock-date {
+  margin-bottom: .5em;
+  font-size: 7vw;
+  letter-spacing: .5vw;
+}
+#clock-time > span {
+  display: inline-block;
+  font-size: 14vw;
+}
+#clock-time > span:not(.clock-colon) {
+  width: .8em;
+}
+.clock-colon {
+  position: relative;
+  top: -.075em;
+  width: .4em;
+  opacity: 0;
+  transition: opacity .2s;
+}
+
+table {
+  border-collapse: collapse;
+  font-size: 7vh;
+}
+caption, th {
+  padding: .25em;
+  font-weight: bold;
+  text-align: center;
+}
+caption {
+  padding-bottom: .5em;
+  letter-spacing: .75em;
+}
+th, td {
+  width: 3.5em;
+  letter-spacing: .1em;
+}
+td {
+  padding: .25em 1.1em .25em 0;
+  text-align: right;
+}
+body.portrait table {
+  font-size: 4vw;
+}
+.calendar-sun { color: #f06; }
+.calendar-sat { color: #09f; }
+.calendar-out-date { opacity: .6; }
+.calendar-today { font-weight: bold; }
+
+body {
+  color: #fff;
+  background: #000;
+  transition: color .2s, background .2s;
+}
+body.light {
+  color: #000;
+  background: #fff;
+}
+
+    </style>
+    <script>
+
+document.addEventListener('DOMContentLoaded', () => {
+  const win   = window,
+        doc   = document,
+        root  = doc.documentElement,
+        body  = doc.body,
+        getId = (id) => doc.getElementById(id),
+        clock           = getId('clock'            ),
+        calendar        = getId('calendar'         ),
+        clockDate       = getId('clock-date'       ),
+        clockHoursTen   = getId('clock-hours-ten'  ),
+        clockHoursOne   = getId('clock-hours-one'  ),
+        clockMinutesTen = getId('clock-minutes-ten'),
+        clockMinutesOne = getId('clock-minutes-one'),
+        clockSecondsTen = getId('clock-seconds-ten'),
+        clockSecondsOne = getId('clock-seconds-one'),
+        clockColons     = doc.querySelectorAll('.clock-colon'),
+        applyVisibility = () => {
+          clock   .style.opacity = isShownCalendar ? 0 : 1;
+          calendar.style.opacity = isShownCalendar ? 1 : 0;
+        };
+  let isPortrait      = false;
+      isShownCalendar = false,
+      isBlank         = false;
+  
+  root.addEventListener('fullscreenchange', event => console.log ('fullscreenchange', event));
+  root.addEventListener('fullscreenerror' , error => console.error('fullscreenerror', error));
+  
+  const detectAngle = () => {
+    isPortrait = win.innerWidth < win.innerHeight;
+    body.classList[isPortrait ? 'add' : 'remove']('portrait');
+  };
+  detectAngle();
+  win.addEventListener('resize', detectAngle);
+  
+  getId('toggle-fullscreen').addEventListener('click', () => {
+    if(!doc.fullscreenEnabled) return alert('Your browser does not supports Fullscreen API');
+    doc.fullscreenElement ? doc.exitFullscreen() : root.requestFullscreen();
+  });
+  getId('toggle-calendar').addEventListener('click', () => {
+    isShownCalendar = !isShownCalendar;
+    isBlank = false;
+    applyVisibility();
+  });
+  getId('toggle-blank').addEventListener('click', () => {
+    isBlank = !isBlank;
+    if(isBlank) {
+      clock.style.opacity = calendar.style.opacity = 0;
+    } else {
+      applyVisibility();
+    }
+  });
+  getId('toggle-theme').addEventListener('click', () => {
+    body.classList.toggle('light');
+  });
+  
+  const dates = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Sat'];
+  const updateClock = () => {
+    const now     = new Date(),
+          hours   = `0${now.getHours()  }`.slice(-2),
+          minutes = `0${now.getMinutes()}`.slice(-2),
+          seconds = `0${now.getSeconds()}`.slice(-2),
+          opacity = now.getSeconds() % 2 === 0 ? 1 : 0;
+    clockDate      .innerText = `${now.getFullYear()}-${`0${now.getMonth() + 1}`.slice(-2)}-${`0${now.getDate()}`.slice(-2)} ${dates[now.getDay()]}`;
+    clockHoursTen  .innerText = hours  .slice(0, 1);
+    clockHoursOne  .innerText = hours  .slice(-1  );
+    clockMinutesTen.innerText = minutes.slice(0, 1);
+    clockMinutesOne.innerText = minutes.slice(-1  );
+    clockSecondsTen.innerText = seconds.slice(0, 1);
+    clockSecondsOne.innerText = seconds.slice(-1  );
+    clockColons.forEach(clockColon => clockColon.style.opacity = opacity);
+  };
+  updateClock();
+  setInterval(updateClock, 1000);
+  clock.style.opacity = 1;
+  
+  const createMonthCalendarData = (year, month) => {
+    const begin      = new Date(year, month, 1);
+    const beginYear  = begin.getFullYear();
+    const beginMonth = begin.getMonth();
+    const beginDay   = begin.getDay();
+    const end     = new Date(year, month + 1, 0);
+    const endDate = end.getDate();
+    const endDay  = end.getDay();
+    const calendar = [];
+    let date = 1;
+    for(let row = 0; row < 6; row++) {
+      if(date > endDate) continue;
+      const week = [];
+      for(let col = 0; col < 7; col++) {
+        if(row === 0 && col < beginDay) {
+          const beforeMonthDate = new Date(beginYear, beginMonth, -(beginDay - 1 - col)).getDate();
+          week.push(beforeMonthDate);
+        } else if(date > endDate) {
+          const afterMonthDate = new Date(beginYear, beginMonth, (endDate + col - endDay)).getDate();
+          week.push(afterMonthDate);
+        } else {
+          week.push(date);
+          date++;
+        }
+      }
+      calendar.push(week);
+    }
+    return calendar;
+  };
+  const createMonthCalendarHtml = (year, month, currentDate, calendar) => {
+    let table = `
+      <table>
+        <caption>${year}-${`0${month + 1}`.slice(-2)}</caption>
+        <thead><tr><th class="calendar-sun">Sun</th><th class="calendar-mon">Mon</th><th class="calendar-tue">Tue</th><th class="calendar-wed">Wed</th><th class="calendar-thu">Thu</th><th class="calendar-fri">Fri</th><th class="calendar-sat">Sat</th></tr></thead>
+        <tbody>
+    `;
+    const dates = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
+    calendar.forEach((week, rowIndex) => {
+      let row = '<tr>';
+      week.forEach((date, colIndex) => {
+        const isBeforeMonthDate = rowIndex === 0 && date > 7;
+        const isAfterMonthDate  = rowIndex >   1 && date < 7;
+        row += `<td class="calendar-${dates[colIndex]}${isBeforeMonthDate || isAfterMonthDate ? ' calendar-out-date' : ''}${date === currentDate ? ' calendar-today' : ''}">${date}</td>`;
+      });
+      table += row + '</tr>';
+    });
+    table += '</tbody></table>';
+    return table;
+  };
+  const current      = new Date(),
+        currentYear  = current.getFullYear(),
+        currentMonth = current.getMonth(),
+        currentCalendarData = createMonthCalendarData(currentYear, currentMonth),
+        currentCalendarHtml = createMonthCalendarHtml(currentYear, currentMonth, current.getDate(), currentCalendarData);
+  calendar.innerHTML = currentCalendarHtml;
+});
+
+    </script>
+  </head>
+  <body>
+
+<input type="button" id="toggle-fullscreen">
+<input type="button" id="toggle-calendar">
+<input type="button" id="toggle-blank">
+<input type="button" id="toggle-theme">
+
+<div id="container">
+  <div id="clock">
+    <div id="clock-date"></div>
+    <div id="clock-time">
+      <span    id="clock-hours-ten"  > </span>
+      <span    id="clock-hours-one"  > </span>
+      <span class="clock-colon"      >:</span>
+      <span    id="clock-minutes-ten"> </span>
+      <span    id="clock-minutes-one"> </span>
+      <span class="clock-colon"      >:</span>
+      <span    id="clock-seconds-ten"> </span>
+      <span    id="clock-seconds-one"> </span>
+    </div>
+  </div>
+  <div id="calendar"></div>
+</div>
+
+  </body>
+</html>

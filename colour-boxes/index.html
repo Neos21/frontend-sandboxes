@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Colour Boxes</title>
+    <script src="https://cdn.jsdelivr.net/npm/@neos21/in-browser-sass@1.0.10/dist/in-browser-sass.bundle.min.js"></script>
+    <style type="text/scss">
+
+*, ::before, ::after { box-sizing: border-box; }
+html { font-family: sans-serif; }
+
+@mixin box($colour, $background-colour) {
+  $margin-padding: 1rem;
+  
+  margin: $margin-padding 0;
+  border: 1px solid $colour;
+  border-radius: 4px;
+  padding: 0 $margin-padding;
+  background: $background-colour;
+  
+  .box-title {
+    margin: 0 #{-$margin-padding} $margin-padding;
+    padding: calc( #{$margin-padding} / 2);
+    font-size: 1rem;
+    color: #fff;
+    background: $colour;
+  }
+  
+  > * {
+    margin: $margin-padding 0;
+  }
+}
+
+.box {
+  &.red {
+    @include box(#f44336, #ffebee);
+  }
+  &.yellow {
+    @include box(#ffc107, #fffde7);
+  }
+  &.blue {
+    @include box(#03a9f4, #e1f5fe);
+  }
+}
+
+    </style>
+  </head>
+  <body>
+
+<h1>Colour Boxes</h1>
+
+<div class="box red">
+  <h2 class="box-title">Red Box</h2>
+  <p>Red Box</p>
+</div>
+<div class="box yellow">
+  <h2 class="box-title">Yellow Box</h2>
+  <p>Yellow Box</p>
+</div>
+<div class="box blue">
+  <h2 class="box-title">Blue Box</h2>
+  <p>Blue Box</p>
+</div>
+
+  </body>
+</html>

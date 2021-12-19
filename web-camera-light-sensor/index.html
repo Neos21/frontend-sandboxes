@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Web Camera Light Sensor</title>
+    <style>
+
+*, ::before, ::after { box-sizing: border-box; }
+
+:root,
+input {
+  font: 16px/1 sans-serif;
+}
+
+body, input {
+  color: #999;
+  background: #000;
+}
+
+h1, p, summary, ul {
+  margin: 0 0 .5rem;
+}
+
+h1 {
+  font-size: 1.2rem;
+}
+
+#error {
+  display: none;
+}
+
+input {
+  width: 100%;
+  border: 1px solid #999;
+}
+
+    </style>
+    <script>
+
+// 明るさのしきい値。この値未満になったら電気が消えていると判定する
+const darkThreshold = 50;
+// 監視するインターバルのミリ秒
+const intervalMs = 1/*分*/ * 60/*秒*/ * 1000/*ms*/;
+// 電気をつけっぱなしだと判断する秒数。この秒数を超えて明るい状態が続いたら通知する
+const leavingLightOnSecondsThreshold = 10/*分*/ * 60/*秒*/;
+
+let width  = 120;  // 初期サイズ指定 : 縦長想定。大抵は 480x640 なのでそれをベースにする
+let height = 160;  // デバイスの向きが変わった時に長辺が変わったら値を入れ替える
+
+let previousIsDark = null;   // 直前の計測が暗かったかどうか (Boolean)
+let lightStartTime = null;   // 明るくなり始めた日時 (Date 型)・暗い間は null を入れる
+let isReported     = false;  // 通知したかどうかのフラグ
+
+window.addEventListener('load', () => {
+  printDebug('interval-seconds', `${Math.floor(intervalMs / 1000)}秒 (${Math.floor(intervalMs / 1000 / 60)} 分)`);
+  printDebug('leaving-seconds' , `${leavingLightOnSecondsThreshold}秒 (${Math.floor(leavingLightOnSecondsThreshold / 60)}分)`);
+  const video  = document.getElementById('video');
+  const canvas = document.getElementById('canvas');
+  video.width  = canvas.width  = width;
+  video.height = canvas.height = height;
+  
+  navigator.mediaDevices.getUserMedia({
+    video: { facingMode: 'user' },  // インカメラ。背面は 'environment'・指定がなければ video: true で良い
+    audio: false
+  })
+  .then((stream) => {
+    video.srcObject = stream;
+    
+    updatePreviewSize(stream.getVideoTracks()[0].getSettings(), video, canvas);
+    window.addEventListener('orientationchange', () => {
+      updatePreviewSize(stream.getVideoTracks()[0].getSettings(), video, canvas);
+    });
+    
+    const execCapture = () => {
+      const brightness = captureBrightness(video, canvas);
+      printDebug('last-executed-time', formatDate(new Date()));
+      // 明るさがしきい値未満なら暗い = 電気が消えていると判定する
+      const currentIsDark = (brightness < darkThreshold);
+      printDebug('current-is-dark', currentIsDark ? '暗い' : '明るい');
+      // 判定結果に応じた処理を実行する
+      currentIsDark ? darkFunc() : lightFunc();
+      // 処理終了後、「最終測定結果」を「前回の測定結果」として控え直す
+      printDebug('previous-is-dark', previousIsDark === null ? '(初回・データなし)' : previousIsDark ? '暗い' : '明るい');
+      previousIsDark = currentIsDark;
+    };
+    setTimeout(execCapture, 500);
+    setInterval(execCapture, intervalMs);
+  })
+  .catch((error) => {
+    console.error('Media Capture Error', error);
+    const errorElem = document.getElementById('error');
+    errorElem.style.display = 'block';
+    errorElem.innerHTML = '<strong>Media Capture Error : </string>' + error;
+  });
+});
+
+// ストリームのサイズを見て、長辺が切り替わったようなら値を入れ替える
+function updatePreviewSize(settings, video, canvas) {
+  if((settings.width >= settings.height && width <= height) ||
+     (settings.width <= settings.height && width >= height)) {
+    const oldWidth  = width;
+    const oldHeight = height;
+    width  = video.width  = canvas.width  = oldHeight;
+    height = video.height = canvas.height = oldWidth ;
+  }
+}
+
+// カメラで捉えた映像からおおよその明るさを求める
+function captureBrightness(video, canvas) {
+  const context = canvas.getContext('2d');
+  context.drawImage(video, 0, 0, canvas.width, canvas.height);
+  const imageData = context.getImageData(0, 0, canvas.width, canvas.height).data;  // RGBA の配列データを取得する
+  // RGBA の値をそれぞれ加算し、RGB ごとの平均値 → 3色の平均値 = 明るさを求める
+  const rgba = imageData.reduce((accRgba, currentData, index) => {
+    accRgba[index % 4] += currentData;
+    return accRgba;
+  }, [0, 0, 0, 0]);
+  const averageRgb = rgba.slice(0, 3).map((colour) => Math.floor(colour / (width * height)));
+  const averageBrightness = Math.floor(averageRgb.reduce((accumulator, current) => accumulator + current) / averageRgb.length);
+  return averageBrightness;
+}
+
+// デバッグ出力
+function printDebug(id, message) {
+  document.getElementById(id).innerHTML = message;
+}
+
+// Date を YYYY-MM-DD HH:mm:ss 形式にする
+function formatDate(date) {
+  return date.getFullYear()
+    + '-' + ('0' + (date.getMonth() + 1)).slice(-2)
+    + '-' + ('0' + date.getDate()).slice(-2)
+    + ' ' + ('0' + date.getHours()).slice(-2)
+    + ':' + ('0' + date.getMinutes()).slice(-2)
+    + ':' + ('0' + date.getSeconds()).slice(-2);
+}
+
+// 暗いと判断された時の処理
+function darkFunc() {
+  if(previousIsDark === null || !previousIsDark) {
+    // 前回が明るく、今回暗くなった場合は、「明るい期間」の計測を終了し、通知フラグを戻す
+    lightStartTime = null;
+    isReported     = false;
+    printDebug('light-start-time', '-');
+    printDebug('light-elapsed-seconds', '-');
+    printDebug('is-reported', '-')
+  }
+  // 前回の計測から引き続き暗い場合は何もしない
+}
+
+// 明るいと判断された時の処理
+function lightFunc() {
+  if(previousIsDark === null || previousIsDark) {
+    // 前回が暗く、今回明るくなった場合は、「明るくなり始めた日時」を控え、「明るい期間」の計測を開始する
+    lightStartTime = new Date();  // getTime() で UNIX ミリ秒が取得できる
+    printDebug('light-start-time', formatDate(lightStartTime));
+  }
+  else {
+    // 前回から引き続き明るい場合は、「明るい期間」を確認し、一定期間明るいままだったら Slack 通知を行う
+    const lightElapsedSeconds = Math.floor((new Date().getTime() - lightStartTime) / 1000);
+    printDebug('light-elapsed-seconds', lightElapsedSeconds + '秒');
+    
+    // しきい値を超えて明るいままだったら Slack 通知を行う
+    if(lightElapsedSeconds > leavingLightOnSecondsThreshold) {
+      if(!isReported) {
+        const isSucceeded = postToSlack('電気が付けっぱなしだよ');
+        if(isSucceeded) {
+          isReported = true;
+          printDebug('is-reported', '通知した … ' + formatDate(new Date()));
+        }
+        else {
+          printDebug('is-reported', '通知しようとしたが失敗 … ' + formatDate(new Date()));
+        }
+      }
+      // 通知済なら何もしない
+    }
+  }
+}
+
+// Slack 通知する
+function postToSlack(message) {
+  const url = document.getElementById('url').value;
+  if(!url.trim()) {
+    console.error('Post To Slack Error', 'URL 未入力');
+    return false;
+  }
+  try {
+    const xml = new XMLHttpRequest();
+    xml.open('POST', url, false);  // false 指定により同期処理になる
+    xml.setRequestHeader('content-type', 'application/x-www-form-urlencoded;charset=UTF-8');
+    xml.send(`payload=${JSON.stringify({ text: message })}`);
+    return true;
+  }
+  catch(error) {
+    console.error('Post To Slack Error', error);
+    return false;
+  }
+}
+
+    </script>
+  </head>
+  <body>
+
+<h1>Web Camera Light Sensor</h1>
+<p id="error"></p>
+<p><input id="url" type="text" placeholder="通知先の Slack Webhook URL を入力してください" value=""></p>
+<details open>
+  <summary>Debug</summary>
+  <ul>
+    <li>監視間隔 : <span id="interval-seconds"></span></li>
+    <li>監視閾値 : <span id="leaving-seconds"></span></li>
+    <li>最終計測日時 : <span id="last-executed-time"></span></li>
+    <li>最終計測結果 : <span id="current-is-dark"></span></li>
+    <li>前回計測結果 : <span id="previous-is-dark"></span></li>
+    <li>明るくなり始めた日時 : <span id="light-start-time"></span></li>
+    <li>明るい期間 : <span id="light-elapsed-seconds"></span></li>
+    <li>通知したかどうか : <span id="is-reported"></span></li>
+  </ul>
+</details>
+<details open>
+  <summary>Previews</summary>
+  <video id="video" autoplay playsinline></video>
+  <canvas id="canvas"></canvas>
+</details>
+
+  </body>
+</html>

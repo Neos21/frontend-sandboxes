@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Pre Increment Vs. Post Increment</title>
+    <style>
+
+*, ::before, ::after { box-sizing: border-box; }
+html { font-family: sans-serif; }
+
+    </style>
+    <script>
+
+const max = 5;
+
+function output(text) {
+  console.log(text);
+  const result = document.getElementById('result');
+  result.innerHTML += (result.innerHTML ? '\n' : '') + text;
+}
+
+function preIncrement() {
+  document.getElementById('result').innerHTML = '';
+  let num = 0;
+  while(num < max) {
+    output(`Pre Increment  : Before [${num}]`);
+    output(`Pre Increment  : Exec   [${++num}]`);  // 0 は出力されない
+    output(`Pre Increment  : After  [${num}]`);
+  }
+}
+
+function postIncrement() {
+  document.getElementById('result').innerHTML = '';
+  let num = 0;
+  while(num < max) {
+    output(`Post Increment : Before [${num}]`);
+    output(`Post Increment : Exec   [${num++}]`);  // 最初は 0 が出力される
+    output(`Post Increment : After  [${num}]`);
+  }
+}
+
+function preDecrement() {
+  document.getElementById('result').innerHTML = '';
+  let num = max;
+  while(num > 0) {
+    output(`Pre Decrement  : Before [${num}]`);
+    output(`Pre Decrement  : Exec   [${--num}]`);  // 初期値は出力されず、最後に 0 が出力される
+    output(`Pre Decrement  : After  [${num}]`);
+  }
+}
+
+function postDecrement() {
+  document.getElementById('result').innerHTML = '';
+  let num = max;
+  while(num > 0) {
+    output(`Post Decrement : Before [${num}]`);
+    output(`Post Decrement : Exec   [${num--}]`);  // 最後に 0 が出力されない
+    output(`Post Decrement : After  [${num}]`);
+  }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('pre-increment' ).addEventListener('click', preIncrement );
+  document.getElementById('post-increment').addEventListener('click', postIncrement);
+  document.getElementById('pre-decrement' ).addEventListener('click', preDecrement );
+  document.getElementById('post-decrement').addEventListener('click', postDecrement);
+});
+
+    </script>
+  </head>
+  <body>
+
+<h1>Pre Increment Vs. Post Increment</h1>
+<p>
+  <input type="button" id="pre-increment"  value="前置インクリメント">
+  <input type="button" id="post-increment" value="後置インクリメント">
+  <input type="button" id="pre-decrement"  value="前置デクリメント">
+  <input type="button" id="post-decrement" value="後置デクリメント">
+</p>
+<pre id="result"></pre>
+
+  </body>
+</html>

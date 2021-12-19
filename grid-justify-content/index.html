@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Grid Justify Content</title>
+    <style>
+
+*, ::before, ::after { box-sizing: border-box; }
+html { font-family: sans-serif; }
+
+.grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, auto);
+  justify-content: space-between;
+}
+
+.grid-3 {
+  display: grid;
+  grid-template-columns: auto auto auto;
+  justify-content: space-between;
+}
+
+    </style>
+  </head>
+  <body>
+
+<h1>Grid Justify Content</h1>
+
+<div class="grid-2">
+  <button>Button 1</button>
+  <button>Button 2</button>
+</div>
+
+<div class="grid-3">
+  <button>Button 1</button>
+  <button>Button 2</button>
+  <button>Button 3</button>
+</div>
+
+  </body>
+</html>

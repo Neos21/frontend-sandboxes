@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Background Center Gradient</title>
+    <style>
+
+*, ::before, ::after { box-sizing: border-box; }
+html { font-family: sans-serif; background: #333; -webkit-text-size-adjust: 100%; }
+body { margin: 0; }
+
+:root {
+  --max-width: 30rem;
+}
+
+#header { color: #fff; text-align: center; background: #08f; }
+#path { padding: 1rem 0; }
+#path-inner { max-width: var(--max-width); margin: 0 auto; }
+footer { background: #cff; padding: 2rem 0; text-align: center; }
+
+#container {
+  --background-width: calc(var(--max-width) + 4rem);
+  --background-colour-center: #fff;
+  --background-colour-side  : #f0f0f0;
+  background:
+    linear-gradient(to right, var(--background-colour-side), var(--background-colour-center) 1rem, var(--background-colour-center) calc(var(--background-width) - 1rem), var(--background-colour-side)) repeat-y center / var(--background-width),
+    var(--background-colour-side);
+  /*
+  background-size: var(--background-width);
+  background-position: center;
+  background-repeat: no-repeat;
+  background-image: linear-gradient(to right, var(--background-colour-side), var(--background-colour-center) 1rem, var(--background-colour-center) calc(var(--background-width) - 1rem), var(--background-colour-side));
+  background-color: var(--background-colour-side);
+  */
+}
+main {
+  max-width: var(--max-width); margin: 0 auto;
+}
+
+    </style>
+  </head>
+  <body>
+
+<div id="container">
+  <header>
+    <div id="header">Header</div>
+    <div id="path">
+      <div id="path-inner">Hoge / Fuga</div>
+    </div>
+  </header>
+  <main>
+    <h1>Main</h1>
+    <h1>Background Center Gradient</h1>
+    <p>Paragraph</p><p>Paragraph</p><p>Paragraph</p><p>Paragraph</p><p>Paragraph</p><p>Paragraph</p><p>Paragraph</p><p>Paragraph</p><p>Paragraph</p><p>Paragraph</p>
+    <p>Paragraph</p><p>Paragraph</p><p>Paragraph</p><p>Paragraph</p><p>Paragraph</p><p>Paragraph</p><p>Paragraph</p><p>Paragraph</p><p>Paragraph</p><p>Paragraph</p>
+    <p>Paragraph</p><p>Paragraph</p><p>Paragraph</p><p>Paragraph</p><p>Paragraph</p><p>Paragraph</p><p>Paragraph</p><p>Paragraph</p><p>Paragraph</p><p>Paragraph</p>
+    <p>Paragraph</p><p>Paragraph</p><p>Paragraph</p><p>Paragraph</p><p>Paragraph</p><p>Paragraph</p><p>Paragraph</p><p>Paragraph</p><p>Paragraph</p><p>Paragraph</p>
+  </main>
+  <footer>Footer</footer>
+</div>
+
+  </body>
+</html>

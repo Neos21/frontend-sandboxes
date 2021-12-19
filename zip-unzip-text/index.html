@@ -30,10 +30,10 @@ textarea {
 
 body {
   display: grid;
-  grid-template: "title    meta"     2rem
-                 "inflated inflated" 1fr
-                 "deflated deflated" 1fr
-               / 1fr       1fr;
+  grid-template: "title   " 2rem
+                 "inflated" 1fr
+                 "deflated" 1fr
+               / 1fr;
 }
 
 #title    { grid-area: title   ; padding-left : .7rem; }
@@ -42,10 +42,11 @@ body {
 #deflated { grid-area: deflated; }
 
     </style>
-    <!-- https://github.com/dankogai/js-deflate -->
     <script src="./rawdeflate.js"></script>
     <script src="./rawinflate.js"></script>
     <script>
+
+// https://github.com/dankogai/js-deflate
 
 document.addEventListener('DOMContentLoaded', () => {
   const deflate = value => {
@@ -88,7 +89,6 @@ document.addEventListener('DOMContentLoaded', () => {
   <body>
 
 <h1 id="title">Zip Unzip Text</h1>
-<div id="meta">Author : <a href="https://neos21.net/">Neo</a></div>
 <textarea id="inflated" placeholder="Inflated (Original)"  ></textarea>
 <textarea id="deflated" placeholder="Deflated (Compressed)"></textarea>
 

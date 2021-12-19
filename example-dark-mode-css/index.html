@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Example Dark Mode CSS</title>
+    <style>
+
+*, ::before, ::after { box-sizing: border-box; }
+html { font-family: sans-serif; }
+
+/* prefers-color-scheme が有効にならない場合はこの設定が効く */
+body {
+  color: #ccc;
+  background: #999;
+}
+
+/* 通常は Light テーマと判断される */
+@media (prefers-color-scheme: light) {
+  body {
+    color: #113;
+    background: #ffe;
+  }
+}
+
+/* OS でダークテーマを選択している場合 */
+@media (prefers-color-scheme: dark) {
+  body {
+    color: #f0f0f0;
+    background: #161616;
+  }
+}
+
+    </style>
+  </head>
+  <body>
+
+<h1>Example Dark Mode CSS</h1>
+
+  </body>
+</html>

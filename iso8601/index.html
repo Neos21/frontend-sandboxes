@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>ISO8601</title>
+    <style>
+
+*, ::before, ::after { box-sizing: border-box; }
+html { font-family: monospace; }
+
+dt {
+  margin-top: .5em;
+  font-weight: bold;
+}
+
+    </style>
+    <script>
+
+function iso8601(date) {
+  return date.getFullYear()
+         + '-' + ('0' + (date.getMonth() + 1)).slice(-2)
+         + '-' + ('0' +  date.getDate()      ).slice(-2)
+         + 'T' + ('0' +  date.getHours()     ).slice(-2)
+         + ':' + ('0' +  date.getMinutes()   ).slice(-2)
+         + ':' + ('0' +  date.getSeconds()   ).slice(-2);
+}
+
+function iso8601WithMilliseconds(date) {
+  return date.getFullYear()
+         + '-' + ('0'  + (date.getMonth() + 1)  ).slice(-2)
+         + '-' + ('0'  +  date.getDate()        ).slice(-2)
+         + 'T' + ('0'  +  date.getHours()       ).slice(-2)
+         + ':' + ('0'  +  date.getMinutes()     ).slice(-2)
+         + ':' + ('0'  +  date.getSeconds()     ).slice(-2)
+         + '.' + ('00' +  date.getMilliseconds()).slice(-3);
+}
+
+function iso8601UTC(date) {
+  return date.getUTCFullYear()
+         + '-' + ('0' + (date.getUTCMonth() + 1)).slice(-2)
+         + '-' + ('0' + date.getUTCDate()       ).slice(-2)
+         + 'T' + ('0' + date.getUTCHours()      ).slice(-2)
+         + ':' + ('0' + date.getUTCMinutes()    ).slice(-2)
+         + ':' + ('0' + date.getUTCSeconds()    ).slice(-2)
+         + 'Z';
+}
+
+function iso8601WithMillisecondsUTC(date) {
+  return date.getUTCFullYear()
+         + '-' + ('0'  + (date.getUTCMonth() + 1) ).slice(-2)
+         + '-' + ('0'  +  date.getUTCDate()       ).slice(-2)
+         + 'T' + ('0'  +  date.getUTCHours()      ).slice(-2)
+         + ':' + ('0'  +  date.getUTCMinutes()    ).slice(-2)
+         + ':' + ('0'  +  date.getUTCSeconds()    ).slice(-2)
+         + '.' + ('00' + date.getUTCMilliseconds()).slice(-3)
+         + 'Z';
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const date = new Date();
+  document.getElementById('to-iso-string' ).innerText = date.toISOString();
+  document.getElementById('iso8601'       ).innerText = iso8601(date) + '+09:00 (maybe JTC)';
+  document.getElementById('iso8601-utc'   ).innerText = iso8601UTC(date);
+  document.getElementById('iso8601-ms'    ).innerText = iso8601WithMilliseconds(date) + '+09:00 (maybe JTC)';
+  document.getElementById('iso8601-ms-utc').innerText = iso8601WithMillisecondsUTC(date);
+});
+
+    </script>
+  </head>
+  <body>
+
+<h1>ISO8601</h1>
+<dl>
+  <dt>toISOString() (UTC)</dt>
+  <dd id="to-iso-string">-</dd>
+  <dt>ISO 8601</dt>
+  <dd id="iso8601">-</dd>
+  <dt>ISO 8601 UTC</dt>
+  <dd id="iso8601-utc">-</dd>
+  <dt>ISO 8601 With Milliseconds</dt>
+  <dd id="iso8601-ms">-</dd>
+  <dt>ISO 8601 With Milliseconds UTC (toISOString() Fallback)</dt>
+  <dd id="iso8601-ms-utc">-</dd>
+</dl>
+
+  </body>
+</html>

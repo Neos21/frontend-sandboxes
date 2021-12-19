@@ -12,6 +12,7 @@ html { font-family: sans-serif; }
     </style>
     <script>
 
+// https://stackoverflow.com/questions/4253367/how-to-escape-a-json-string-containing-newline-characters-using-javascript
 document.addEventListener('DOMContentLoaded', () => {
   const plain = JSON.stringify({
     testKey: `This is "Test" & 'Example' Value`,
@@ -39,8 +40,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
 <pre id="plain"></pre>
 <pre id="formatted"></pre>
-
-<!-- https://stackoverflow.com/questions/4253367/how-to-escape-a-json-string-containing-newline-characters-using-javascript -->
 
   </body>
 </html>

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Replace Text Nodes</title>
+    <style>
+
+*, ::before, ::after { box-sizing: border-box; }
+html { font-family: sans-serif; }
+
+    </style>
+    <script>
+
+const excludes = ['HTML', 'HEAD', 'META', 'LINK', 'SCRIPT', 'STYLE', 'IFRAME'];
+
+function getTextNodes(parentElement) {
+  const nodes = [];
+  Array.from(parentElement.childNodes).forEach((node) => {
+    if(excludes.includes(node.nodeName)) {
+      console.log('無視', node.nodeName);
+    }
+    else if(node.childNodes.length) {
+      console.log('子要素', node.nodeName);
+      nodes.push(...getTextNodes(node));
+    }
+    else if(node.nodeType === 3) {
+      console.log('本要素', node.nodeName, node.textContent);
+      nodes.push(node);
+    }
+  });
+  return nodes;
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const nodes = getTextNodes(document.body);
+  console.log('FINISHED', nodes);
+  // 必要に応じて空要素やスペースのみの要素を除外する
+  nodes.forEach((node, index) => {
+    // 適当な置換処理
+    node.textContent = `${index}:${node.textContent}:${index}`;
+  });
+});
+
+    </script>
+  </head>
+  <body>
+
+<h1>Replace Text Nodes</h1>
+
+<div id="test">
+  <p>Hoge<strong>Fuga</strong>Foo</p>
+  Bar
+</div>
+
+  </body>
+</html>

@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Sticky Fluid Height Side Menu</title>
+    <style>
+
+*, ::before, ::after { box-sizing: border-box; }
+html { font-family: sans-serif; }
+
+/* 適当にヘッダ・フッタの高さを決めておく (ピクセル固定である必要はない) */
+:root {
+  --header-height:  60px;
+  --footer-height: 500px;
+}
+
+body {
+  margin: 0;
+  overflow-y: scroll;
+}
+
+h1, h2, p, ul {
+  margin: 0 0 1rem;
+}
+
+.header {
+  position: sticky;
+  top: 0;
+  height: var(--header-height);
+  z-index: 99999;  /* コンテンツが上に被らないようにする */
+  background: #ccc;
+}
+
+/* 適当に2カラム設定 */
+.body {
+  display: grid;
+  grid-template: auto / 1fr 12rem;
+  margin: 0 auto;
+  width: 85%;
+}
+
+/* 適当にサイドメニューとの余白を開ける */
+.main {
+  padding: 2rem 2rem 2rem 0;
+}
+
+.side {
+  /* 以下必須 */
+  position: sticky;
+  top: var(--header-height);
+  /* 以下任意 */
+  padding: 2rem 0;
+}
+  /* スクロールバー表示用に必須 */
+  .side .side-scroll-wrapper {
+    max-height: 100%;
+    overflow-y: auto;
+  }
+
+.footer {
+  height: var(--footer-height);
+  background: #fee;
+}
+
+    </style>
+    <script>
+
+/** サイドメニューの高さを調整する */
+function adjustHeight() {
+  const pageOffset = window.pageYOffset;  // スクロール量
+  const pageHeight = window.innerHeight;  // 描画領域の高さ
+  const headerHeight = document.querySelector('.header').offsetHeight;  // ヘッダの高さ
+  const footerOffset = document.querySelector('.footer').offsetTop;     // ページ上部からのフッタの登場位置
+  
+  // 描画領域の高さ - ヘッダの高さ - フッタが見えているピクセル数 = サイドメニューの高さ
+  // 高さ 0px 以下にならないようにする
+  const height = Math.max(0, pageHeight - headerHeight - Math.max(0, pageOffset + pageHeight - footerOffset));
+  
+  const side = document.querySelector('.side');
+  if(height !== side.offsetHeight) {
+    side.style.height = `${height}px`;
+  }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  adjustHeight();
+  document.addEventListener('scroll', adjustHeight);
+  window.addEventListener('resize', adjustHeight);
+  
+  // デバッグ用
+  document.getElementById('toggle').addEventListener('click', () => {
+    const isChecked = document.getElementById('toggle').checked;
+    document.querySelector('.side').style.background = isChecked ? '#ff0' : 'transparent';
+  });
+});
+
+    </script>
+  </head>
+  <body>
+
+<header class="header">HEADER</header>
+
+<div class="body">
+  <main class="main">
+    <p>START</p>
+    <h1>Sticky Fluid Height Side Menu</h1>
+    <ul><li><a href="https://squidfunk.github.io/mkdocs-material/">Reference : Material for MkDocs</a></li></ul>
+    <p>Lorem Ipsum</p><p>Lorem Ipsum</p><p>Lorem Ipsum</p><p>Lorem Ipsum</p><p>Lorem Ipsum</p><p>Lorem Ipsum</p><p>Lorem Ipsum</p><p>Lorem Ipsum</p><p>Lorem Ipsum</p><p>Lorem Ipsum</p><p>Lorem Ipsum</p><p>Lorem Ipsum</p><p>Lorem Ipsum</p><p>Lorem Ipsum</p><p>Lorem Ipsum</p><p>Lorem Ipsum</p>
+    <p>END</p>
+  </main>
+  
+  <aside class="side">
+    <div class="side-scroll-wrapper">
+      <h2>START <input type="checkbox" id="toggle"></h2>
+      <ul><li>Item</li><li>Item</li><li>Item</li><li>Item</li><li>Item</li></ul>
+      <details>
+        <summary><h2>Collapse</h2></summary>
+        <ul><li>Item</li><li>Item</li><li>Item</li><li>Item</li><li>Item</li></ul>
+      </details>
+      <h2>Menu</h2>
+      <ul><li>Item</li><li>Item</li><li>Item</li><li>Item</li><li>END</li></ul>
+    </div>
+  </aside>
+</div>
+
+<footer class="footer">FOOTER</footer>
+
+  </body>
+</html>

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Fullscreen API</title>
+    <style>
+
+*, ::before, ::after { box-sizing: border-box; }
+html { font-family: sans-serif; }
+
+#log {
+  height: 10rem;
+  overflow-y: scroll;
+  margin: 1rem 0;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: .5rem .75rem;
+  font-family: monospace;
+  background: #f0f6f9;
+}
+
+    </style>
+    <script>
+
+document.addEventListener('DOMContentLoaded', () => {
+  log('Init : fullscreenEnabled : ', document.fullscreenEnabled);
+  
+  document.addEventListener('fullscreenchange', (event) => {
+    log('document fullscreenchange', event);
+  });
+  document.addEventListener('fullscreenerror', (error) => {
+    log('document fullscreenerror', error);
+  });
+  document.documentElement.addEventListener('fullscreenchange', (event) => {
+    log('document.documentElement fullscreenchange', event);
+  });
+  document.documentElement.addEventListener('fullscreenerror', (error) => {
+    log('document.documentElement fullscreenerror', error);
+  });
+  
+  document.getElementById('toggle').addEventListener('click', () => {
+    if(!document.fullscreenEnabled) {
+      return log('fullscreenEnabled falsy', document.fullscreenEnabled);
+    }
+    
+    if(!document.fullscreenElement) {
+      log('requestFullscreen Start');
+      document.documentElement.requestFullscreen()
+        .then(() => { log('requestFullscreen then'); })
+        .catch((error) => { log('requestFullscreen catch', error); });
+    }
+    else {
+      log('exitFullscreen Start');
+      document.exitFullscreen()
+        .then(() => { log('exitFullscreen then'); })
+        .catch((error) => { log('exitFullscreen catch', error); });
+    }
+  });
+});
+
+function log(...logs) {
+  console.log(...logs);
+  const text = logs.reduce((accumulator, currentLog) => {
+    if(currentLog instanceof Error) {
+      return accumulator + ' ' + currentLog.toString();
+    }
+    else if(['object', 'function'].includes(typeof currentLog)) {
+      try {
+        const currentText = JSON.stringify(currentLog);
+        return accumulator + ' ' + currentText;
+      }
+      catch(error) {
+        console.warn('Failed to stringify', error);
+      }
+    }
+    return accumulator + ' ' + currentLog;
+  }, '');
+  document.getElementById('log').insertAdjacentHTML('afterbegin', `<div>${new Date().toISOString()} - ${text}</div>`);
+}
+
+    </script>
+  </head>
+  <body>
+
+<h1>Fullscreen API</h1>
+<button type="button" id="toggle">Toggle</button>
+<div id="log"></div>
+
+  </body>
+</html>

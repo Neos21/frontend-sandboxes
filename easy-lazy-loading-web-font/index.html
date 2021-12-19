@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Easy Lazy Loading Web Font</title>
+    <!--★<link rel="stylesheet" href="styles.css">★-->
+    <style>
+
+*, ::before, ::after { box-sizing: border-box; }
+
+/* 
+ * `html.loaded` に Web フォントを指定しておく
+ * 
+ * CSS 変数を使って
+ * `font-family: "Noto Sans Mono CJK JP Web", var(--base-fonts);`
+ * のように書きたかったが出来ないので、以下のように並べて表現しておく
+ */
+html        { font-family:                              YuGothic, "Yu Gothic", sans-serif; }
+html.loaded { font-family: "Noto Sans Mono CJK JP Web", YuGothic, "Yu Gothic", sans-serif; }
+
+            pre { font-family:                              "Courier New", monospace; }
+html.loaded pre { font-family: "Noto Sans Mono CJK JP Web", "Courier New", monospace; }
+
+/* `window.onload` イベントが正常に発火したことの確認用 */
+            span#loaded { display: none  ; }
+html.loaded span#loaded { display: inline; color: #f00; font-weight: bold; }
+
+/* 
+ * `@font-face` で指定した Web フォントは、それを使用した要素が画面に登場しない限り読み込みが始まらない
+ * この場合 `<html class="loaded">` にならなければ Web フォントはロードされない
+ */
+@font-face {
+  font-family: "Noto Sans Mono CJK JP Web";
+  src: /* ローカルにフォントがあればそれを優先的に使用する・ココでは遅延読み込みのサンプルのためコメントアウトしておく
+       local("NotoSansMonoCJKjp-Regular"),
+       local("Noto Sans Mono CJK JP Regular"),
+       local("Noto Sans Mono CJK JP"),
+        */
+       url("https://cdn.jsdelivr.net/npm/@neos21/japanese-monospaced-fonts@1.0.2/NotoSansMonoCJKjp-Regular.woff2")              format("woff2"),
+       url("https://unpkg.com/@neos21/japanese-monospaced-fonts@1.0.2/NotoSansMonoCJKjp-Regular.woff2")                         format("woff2"),
+       url("https://cdn.jsdelivr.net/npm/@neos21/japanese-monospaced-fonts@1.0.2/NotoSansMonoCJKjp-Regular.woff")               format("woff"),
+       url("https://unpkg.com/@neos21/japanese-monospaced-fonts@1.0.2/NotoSansMonoCJKjp-Regular.woff")                          format("woff"),
+       url("https://cdn.jsdelivr.net/npm/@neos21/japanese-monospaced-fonts@1.0.2/NotoSansMonoCJKjp-Regular.otf")                format("opentype"),
+       url("https://unpkg.com/@neos21/japanese-monospaced-fonts@1.0.2/NotoSansMonoCJKjp-Regular.otf")                           format("opentype"),
+       url("https://cdn.jsdelivr.net/npm/@japanese-monospaced-fonts/noto-sans-mono-cjk-jp@1.0.1/NotoSansMonoCJKJP-Regular.otf") format("opentype"),
+       url("https://unpkg.com/@japanese-monospaced-fonts/noto-sans-mono-cjk-jp@1.0.1/NotoSansMonoCJKJP-Regular.otf")            format("opentype");
+  font-display: swap;
+}
+
+    </style>
+    <script>
+
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    document.querySelector('html').classList.add('loaded');
+  }, 3000);  // 実際は `1` など短くしておく
+});
+
+// テスト用・削除済の時に実行しても例外などは発生しない
+function removeClass() {
+  document.querySelector('html').classList.remove('loaded');
+}
+// テスト用・追加済の時に実行しても例外などは発生しない
+function addClass() {
+  document.querySelector('html').classList.add('loaded');
+}
+
+    </script>
+  </head>
+  <body>
+
+<h1>Easy Lazy Loading Web Font</h1>
+<p>ページ読み込み後にウェブフォント (Noto Sans Mono CJK JP) を遅延読み込みして適用します。</p>
+
+<p>p<br>|等幅？|<br>|Mono？|</p>
+<pre>pre<br>|等幅？|<br>|Mono？|</pre>
+<p>Is Loaded? : [<span id="loaded">Loaded!</span>]</p>
+
+<p>
+  <button type="button" onclick="removeClass()">Remove</button>
+  <button type="button" onclick="addClass()">Add</button>
+</p>
+
+  </body>
+</html>

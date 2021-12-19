@@ -67,6 +67,12 @@ html { font-family: sans-serif; }
   }
 }
 
+#another-table td {
+  min-width: 1.4rem;
+  white-space: nowrap;
+  border: 1px solid #ddd;
+}
+
     </style>
     <script>
 
@@ -105,6 +111,56 @@ function createTable(colourName) {
 <p>CSS の <code>hsl()</code> プロパティを使ってみた。</p>
 
 <div id="wrapper"></div>
+
+<table id="another-table">
+  <tbody>
+    <tr>
+      <td style="background: hsl(208, 10%, 100%);"></td>
+      <td style="background: hsl(208, 10%,  90%);"></td>
+      <td style="background: hsl(208, 10%,  80%);"></td>
+      <td style="background: hsl(208, 10%,  70%);"></td>
+      <td style="background: hsl(208, 10%,  60%);"></td>
+      <td style="background: hsl(208, 10%,  50%);"></td>
+      <td style="background: hsl(208, 10%,  40%);"></td>
+      <td style="background: hsl(208, 10%,  30%);"></td>
+      <td style="background: hsl(208, 10%,  20%);"></td>
+      <td style="background: hsl(208, 10%,  10%);"></td>
+      <td style="background: hsl(208, 10%,   0%);"></td>
+      <td style="background: hsl(208, 100%, 50%); color: #fff;">H 208</td>
+      <td style="background: #0088ff; color: #fff;">#0088ff</td>
+    </tr>
+    <tr>
+      <td style="background: hsl(328, 10%, 100%);"></td>
+      <td style="background: hsl(328, 10%,  90%);"></td>
+      <td style="background: hsl(328, 10%,  80%);"></td>
+      <td style="background: hsl(328, 10%,  70%);"></td>
+      <td style="background: hsl(328, 10%,  60%);"></td>
+      <td style="background: hsl(328, 10%,  50%);"></td>
+      <td style="background: hsl(328, 10%,  40%);"></td>
+      <td style="background: hsl(328, 10%,  30%);"></td>
+      <td style="background: hsl(328, 10%,  20%);"></td>
+      <td style="background: hsl(328, 10%,  10%);"></td>
+      <td style="background: hsl(328, 10%,   0%);"></td>
+      <td style="background: hsl(328, 100%, 50%); color: #fff;">H 328</td>
+      <td style="background: #ff0088; color: #fff;">#ff0088</td>
+    </tr>
+    <tr>
+      <td style="background: hsl(88, 10%, 100%);"></td>
+      <td style="background: hsl(88, 10%,  90%);"></td>
+      <td style="background: hsl(88, 10%,  80%);"></td>
+      <td style="background: hsl(88, 10%,  70%);"></td>
+      <td style="background: hsl(88, 10%,  60%);"></td>
+      <td style="background: hsl(88, 10%,  50%);"></td>
+      <td style="background: hsl(88, 10%,  40%);"></td>
+      <td style="background: hsl(88, 10%,  30%);"></td>
+      <td style="background: hsl(88, 10%,  20%);"></td>
+      <td style="background: hsl(88, 10%,  10%);"></td>
+      <td style="background: hsl(88, 10%,   0%);"></td>
+      <td style="background: hsl(88, 100%, 50%); color: #000;">H 88</td>
+      <td style="background: #88ff00; color: #000;">#88ff00</td>
+    </tr>
+  </tbody>
+</table>
 
   </body>
 </html>

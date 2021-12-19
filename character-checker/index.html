@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Character Checker</title>
+    <style>
+
+*, ::before, ::after { box-sizing: border-box; }
+
+@font-face {
+  font-family: "Noto Sans Mono CJK JP";
+  src: local("NotoSansMonoCJKjp-Regular"),
+       local("Noto Sans Mono CJK JP Regular"),
+       local("Noto Sans Mono CJK JP");
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Noto Sans Mono CJK JP Web";
+  src: url("https://cdn.jsdelivr.net/npm/@neos21/japanese-monospaced-fonts@1.0.2/NotoSansMonoCJKjp-Regular.woff2")              format("woff2"),
+       url("https://unpkg.com/@neos21/japanese-monospaced-fonts@1.0.2/NotoSansMonoCJKjp-Regular.woff2")                         format("woff2"),
+       url("https://cdn.jsdelivr.net/npm/@neos21/japanese-monospaced-fonts@1.0.2/NotoSansMonoCJKjp-Regular.woff")               format("woff"),
+       url("https://unpkg.com/@neos21/japanese-monospaced-fonts@1.0.2/NotoSansMonoCJKjp-Regular.woff")                          format("woff"),
+       url("https://cdn.jsdelivr.net/npm/@neos21/japanese-monospaced-fonts@1.0.2/NotoSansMonoCJKjp-Regular.otf")                format("opentype"),
+       url("https://unpkg.com/@neos21/japanese-monospaced-fonts@1.0.2/NotoSansMonoCJKjp-Regular.otf")                           format("opentype"),
+       url("https://cdn.jsdelivr.net/npm/@japanese-monospaced-fonts/noto-sans-mono-cjk-jp@1.0.1/NotoSansMonoCJKJP-Regular.otf") format("opentype"),
+       url("https://unpkg.com/@japanese-monospaced-fonts/noto-sans-mono-cjk-jp@1.0.1/NotoSansMonoCJKJP-Regular.otf")            format("opentype");
+  font-display: swap;
+}
+
+html,
+body,
+#text {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  outline: 0;
+  border: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  color: #000;
+  font-size: 16px;
+  font-family: "Noto Sans Mono CJK JP", "Noto Sans Mono CJK JP Web", Osaka-mono, "MS Gothic", Menlo, Consolas, Courier, "Courier New", monospace, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji" !important;
+  text-align: center;
+  line-height: 1;
+  background: #fff;
+  caret-color: #069;
+}
+
+    </style>
+    <script>
+
+document.addEventListener('DOMContentLoaded', () => {
+  const calcCharacterLength = text => text.split('').reduce((length, character) => {
+    const charCode = character.charCodeAt();
+    if(Number.isNaN(charCode)) return length;
+    const isHalfWidthCharacter = (charCode >= 0x0 && charCode <= 0x7f);  // 半角文字 … 判定これで十分なのかな
+    return length + (isHalfWidthCharacter ? 0.5 : 1);
+  }, 0);
+  const element = document.getElementById('text');
+  const calcFontSize = () => {
+    const windowWidth  = window.innerWidth;
+    const windowHeight = window.innerHeight;
+    // 入力された文字列から「文字の長さ」を算出する・半角1文字は 0.5・全角1文字は 1 で返す
+    const textLength = calcCharacterLength(element.value);
+    // 最低 16px・ウィンドウの高さまで文字サイズを広げるか、1行に収まる範囲でウィンドウ幅から文字サイズを算出する
+    const fontSize = Math.max(Math.min(Math.floor(windowWidth / textLength), windowHeight), 16);
+    element.style.fontSize = `${fontSize}px`;
+  };
+  calcFontSize();
+  window.addEventListener('resize', calcFontSize);
+  element.addEventListener('input', calcFontSize);
+  element.focus();
+});
+
+    </script>
+  </head>
+  <body>
+
+<input type="text" id="text" value="">
+
+  </body>
+</html>
