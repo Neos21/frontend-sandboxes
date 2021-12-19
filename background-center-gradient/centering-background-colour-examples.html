@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Centering Background Colour Examples</title>
+    <style>
+
+*, ::before, ::after { box-sizing: border-box; }
+html { font-family: sans-serif; }
+
+:root {
+  --example-height: 3rem;
+  --inner-width: 30rem;
+  --gradation-width: .5rem;
+}
+body {
+  margin: 0;
+  background: #666;
+}
+body > div {
+  margin: 1rem 0;
+}
+
+.example-1 {
+  padding: var(--example-height) 0;
+  background:
+    linear-gradient(to right, #cff, #cff)
+    repeat-y
+    center / var(--inner-width),
+    #fff;
+}
+.example-1 .outer {
+  background: #ccc;
+}
+.example-1 .outer .inner {
+  margin: 0 auto;
+  width: var(--inner-width);
+  background: #9cc;
+}
+
+.example-2 {
+  height: var(--example-height);
+  background:
+    linear-gradient(
+      to right,
+      #fff,
+      #cff var(--gradation-width),
+      #cff calc(var(--inner-width) - var(--gradation-width)),
+      #fff
+    )
+    repeat-y
+    center / var(--inner-width),
+    #fff;
+}
+
+.example-3 {
+  overflow-y: hidden;
+  background: #fff;
+}
+.example-3 .inner {
+  margin: 0 auto;
+  width: calc(var(--inner-width) - var(--gradation-width) - var(--gradation-width));
+  height: var(--example-height);
+  box-shadow: 0 0 var(--gradation-width) var(--gradation-width) #cff;
+  background: #cff;
+}
+
+    </style>
+  </head>
+  <body>
+
+<div class="example-1">
+  <div class="outer">
+    <div class="inner">
+      <h1>Centering Background Colour Examples</h1>
+    </div>
+  </div>
+</div>
+
+<div class="example-2"></div>
+
+<div class="example-3">
+  <div class="inner"></div>
+</div>
+
+  </body>
+</html>
