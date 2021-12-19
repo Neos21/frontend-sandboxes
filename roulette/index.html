@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Roulette</title>
+    <style>
+
+*, ::before, ::after { box-sizing: border-box; }
+html { font-family: sans-serif; }
+
+#list:empty::before {
+  display: block;
+  content: "Loading...";
+}
+
+strong {
+  color: #f00;
+}
+
+    </style>
+     <script>
+
+document.addEventListener('DOMContentLoaded', () => {
+  const minTextBoxes = 2;
+  if(minTextBoxes < 1 /* Magic Number */) throw new Error('Invalid Constant Value');
+  
+  const addTextBox = () => document.getElementById('list').insertAdjacentHTML('beforeend', '<li><input type="text" value=""></li>');
+  while(document.querySelectorAll('#list > li').length < minTextBoxes) addTextBox();
+  
+  const hasMinimumTextBoxes = () => document.querySelectorAll('#list > li').length <= minTextBoxes;
+  const updateRemoveButton = () => document.getElementById('remove').disabled = hasMinimumTextBoxes();
+  updateRemoveButton();
+  
+  document.getElementById('add').addEventListener('click', () => {
+    addTextBox();
+    updateRemoveButton();
+  });
+  
+  document.getElementById('remove').addEventListener('click', () => {
+    if(hasMinimumTextBoxes()) return;
+    document.querySelector('#list > li:last-child').remove();
+    updateRemoveButton();
+  });
+  
+  document.getElementById('exec').addEventListener('click', () => {
+    const showMessage = html => document.getElementById('message').innerHTML = html;
+    
+    const textBoxes = [...document.querySelectorAll('#list > li > input[type="text"]')];
+    if(textBoxes.some(textBox => textBox.value.trim() === '')) return showMessage('<strong>Please Input Text Boxes</strong>');
+    
+    document.getElementById('exec').disabled = document.getElementById('add').disabled = document.getElementById('remove').disabled = true;
+    showMessage('Roulette...!');
+    setTimeout(() => {
+      const randomRange = (min, max) => Math.floor(Math.random() * (max - min + 1) + min);
+      const randomIndex = randomRange(1, textBoxes.length) - 1;
+      showMessage(textBoxes[randomIndex].value);
+      document.getElementById('exec').disabled = document.getElementById('add').disabled = false;
+      updateRemoveButton();
+    }, 1000);
+  });
+});
+
+    </script>
+  </head>
+  <body>
+
+<h1 id="message">Roulette</h1>
+<p>
+  <button type="button" id="exec">Exec</button>
+  <button type="button" id="add">Add</button>
+  <button type="button" id="remove">Remove</button>
+</p>
+<ol id="list"></ol>
+
+  </body>
+</html>
