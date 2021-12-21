@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Phone Number Push Message API 2018-01-12</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@neos21/neos-normalize@2.1.0/neos-normalize.min.css">
+    <style>
+
+body {
+  margin: 1rem;
+}
+
+#markdown {
+  display: none;
+}
+
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script>
+
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('html').innerHTML = marked.parse(document.getElementById('markdown').innerText);
+});
+
+    </script>
+  </head>
+  <body>
+
+<h1>Phone Number Push Message API 2018-01-12</h1>
+<div id="html"></div>
+
+<pre id="markdown">
+- Request
+    - Request Headers
+        - HTTP Request : `/bot/pnp/push/verified`
+        - Method : POST
+    - Request Header
+        - Content-Type : `application/json`
+        - Authorization : `Bearer {Channel Access Token}`
+        - X-Line-Delivery-Tag : Delivery Tag (Optional)
+            - フォーマット : EPOCH Time (10桁秒まで) + SHA256 によりハッシュ化した電話番号 (64桁) + ユーザ領域 (26桁)
+            - 例 : `15034552939884E28681A7D668CEA94C147C716C0EC9DFE8B80B44EF3B57F6BD0602366BC3menu01`
+    - Request Body
+        - Field : `to`       ・ Required : Yes ・ Type : String                   ・ Description : E.164 フォーマットに則り、SHA256 によりハッシュ化した電話番号 (例 : `+81-90-0000-0000`)
+        - Field : `messages` ・ Required : Yes ・ Type : Array of message objects ・ Description : 最大5個
+- Response
+    - Success Response
+        - HTTP status : 200
+        - Error Response のケースに当てはまらないエラーで、送信できなかった場合でも 200 を返します
+    - Error Response
+        - HTTP status : 400 ・ Reason : リクエスト内に無効なパラメータが含まれている
+        - HTTP status : 401 ・ Reason : リクエスト内に認証された情報が含まれていない
+        - HTTP status : 403 ・ Reason : 権限が与えられていない
+        - HTTP status : 422 ・ Reason : 宛先の電話番号に送信できない
+            - LINE にて宛先の電話番号が登録されていない
+            - 宛先の電話番号の所属国において、本機能がサービス対象外となっている
+            - ユーザの PNP 受信同意ステータスが Off になっている
+- 注意事項
+    - Push message に対応するプランでのみ使用できます
+    - グループや複数ユーザが所属するトークルームには、メッセージを送信することはできません
+    - 1つの request に対して1つの電話番号のみ設定可能です
+    - 日本、タイ、台湾の電話番号のみ設定が可能です。国外の電話番号が設定された場合、エラーは発生しませんが、メッセージは送信されません
+    - 分間 request の送信制限は Messaging API の rate limits に準拠しております
+        - Messaging API の rate limits は API Reference をご参照ください <https://devdocs.line.me/ja/#common-specifications>
+        - Messaging API における push message の request は含まれません
+- リクエストサンプル (Header に X-Line-Delivery-Tag なし)
+
+```sh
+curl -X POST \
+-H 'Authorization: Bearer {CHANNEL_ACCESS_TOKEN}' \
+-H 'Content-Type:application/json' \
+-d '{
+  "to": "hashed phone number",
+  "messages":[
+    {
+      "type":"text",
+      "text":"Hello, world1"
+    }
+  ]
+}' https://api.line/me/bot/pnp/push/verified
+```
+
+- リクエストサンプル (Header に X-Line-Delivery-Tag あり)
+
+```sh
+curl -X POST \
+-H 'Authorization: Bearer {CHANNEL_ACCESS_TOKEN}' \
+-H 'Content-Type:application/json' \
+-H 'X-Line-Delivery-Tag:delivery tag' \
+-d '{
+  "to": "hashed phone number",
+  "messages":[
+    {
+      "type":"text",
+      "text":"Hello, world1"
+    }
+  ]
+}' https://api.line/me/bot/pnp/push/verified
+```
+
+- 配信通知を受信
+    - ユーザに対してメッセージ送信が完了した後、イベントとして Messaging API の使用に則った webhook が通知されます
+    - `userId` : Messaging API における送信されたユーザの識別子
+    - `delivery.data` :
+        - Request の Header に X-Line-Delivery-Tag がない場合 : リクエスト時の「to」にて指定したハッシュ化された電話番号
+        - Request の Header に X-Line-Delivery-Tag がある場合 : リクエスト時の「X-Line-Delivery-Tag」にて指定した delivery tag
+    - 本イベントはユーザへの送信成功を示しており、ユーザによる既読を示したものではございません
+- Webhook サンプル (Request の Header に X-Line-Delivery-Tag なし)
+
+```json
+{
+  "events": [
+    {
+      "type": "delivery",
+      "timestamp": 1477546293712,
+      "source": {
+        "type": "user",
+        "userId": "U65df85847b58e2e88deb993bf30f0230"
+      },
+      "delivery": {
+        "data": "hashed phone number"
+      }
+    }
+  ]
+}
+```
+
+- Webhook サンプル (Request の Header に X-Line-Delivery-Tag あり)
+
+```json
+{
+  "events": [
+    {
+      "type": "delivery",
+      "timestamp": 1477546293712,
+      "source": {
+        "type": "user",
+        "userId": "U65df85847b58e2e88deb993bf30f0230"
+      },
+      "delivery": {
+        "data": "delivery tag"
+      }
+    }
+  ]
+}
+```
+</pre>
+
+  </body>
+</html>

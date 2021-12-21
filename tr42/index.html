@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>TR42</title>
+    <style>
+
+*, ::before, ::after { box-sizing: border-box; }
+html { font-family: monospace; }
+
+    </style>
+  </head>
+  <body>
+
+<h1>TR42.ts For Obniz.js</h1>
+<pre>
+import Obniz from 'obniz';
+import ObnizPartsBleInterface, { ObnizPartsBleInfo } from 'obniz/dist/src/obniz/ObnizPartsBleInterface';
+import BleRemotePeripheral from 'obniz/dist/src/obniz/libs/embeds/bleHci/bleRemotePeripheral';
+
+/** TR42 のデータ */
+export interface TR42_Data {
+  /** バッテリー残量 (1:少 〜 5:多 の5段階) */
+  battery: number;
+  /** 摂氏 */
+  temperature: number;
+}
+
+/**
+ * T & D Corporation Bluetooth Thermo Reorder TR42
+ * 
+ * ```typescript
+ * Obniz.PartsRegistrate(TR42);
+ * const tr42 = Obniz.getPartsClass('TR42');
+ * ```
+ */
+export default class TR42 implements ObnizPartsBleInterface {
+  /**
+   * アドバタイジングデータの対応表
+   * 
+   * 0x 始まりの16進数が書かれている場所は固定値。受信したアドバタイジングデータと一致することを確認する
+   * -1 の場所は変動する値。コメントに内容を記している
+   */
+  private static advertisingData: number[] = [
+    0x02,  // Length
+    0x01,  // AD Type : 0x01 = Flags
+    0x06,  // AD Data : 0x06 = iBeacon maybe
+    0x1b,  // Length
+    0xff,  // AD Type : 0xff = Manifacturer Specific Data
+    0x92,  // Company ID : 0x0392
+    0x03,  // Company ID : 0x0392
+    -1  ,  // Serial Number : ex. 0xba → 582E1EBA
+    -1  ,  // Serial Number : ex. 0x1e
+    -1  ,  // Serial Number : ex. 0x2e
+    -1  ,  // Serial Number : ex. 0x58
+    -1  ,  // Security : 0x00 = None, 0x01 = On
+    0x01,  // Format Number : 0x01 only
+    -1  ,  // Measured Value : ex. 0xeb, 0x04 … 0x04eb = 1259 → (1259 - 1000) / 10 = 25.9 (℃)
+    -1  ,  // Measured Value
+    -1  ,  // Reserved : 0xee
+    -1  ,  // Reserved : 0xee
+    -1     // Battery Level : 0x01 (Low) 〜 0x05 (High)
+    // Reserved : (13 or) 14 Data
+    // AD Type 0x08 = Local Name (UTF-8)
+  ];
+  
+  /**
+   * パーツ情報
+   * 
+   * @return パーツ情報
+   */
+  public static info(): ObnizPartsBleInfo {
+    return {
+      name: 'TR42'
+    };
+  }
+  
+  /**
+   * 指定のペリフェラルが TR42 かどうか
+   * 
+   * @param peripheral ペリフェラル
+   * @return TR42 なら true
+   */
+  public static isDevice(peripheral: BleRemotePeripheral): boolean {
+    // localName の接頭辞が 'TR42_' で始まるのが一般的だが、スキャンのタイミングによっては null の瞬間もあるので、アドバタイジングデータの固定値部分が一致するかどうかで判定する
+    
+    // ペリフェラルのアドバタイジングデータ長が想定より短い場合は NG
+    if(this.advertisingData.length &gt; peripheral.adv_data.length) {
+      return false;
+    }
+    
+    // ペリフェラルのアドバタイジングデータ長は想定の配列以上であることが確定したので、想定の配列を基にループする
+    for(let index = 0; index &lt; this.advertisingData.length; index++) {
+      if(this.advertisingData[index] === -1) {
+        continue;  // 値が変動する部分は無視する
+      }
+      if(this.advertisingData[index] === peripheral.adv_data[index]) {
+        continue;  // 固定値部分が一致していれば続ける
+      }
+      return false;  // 固定値部分が想定と異なる場合は NG とする
+    }
+    return true;  // 全ての固定値部分が想定どおりであれば TR42 とみなす
+  }
+  
+  /**
+   * 対象のペリフェラルが TR42 の場合、アドバタイジングデータから取得できる情報を整形して返す
+   * 
+   * @param peripheral ペリフェラル
+   * @return TR42 のデータ
+   */
+  public static getData(peripheral: BleRemotePeripheral): TR42_Data | null {
+    if(!TR42.isDevice(peripheral)) {
+      return null;
+    }
+    
+    const data: TR42_Data = {
+      battery: peripheral.adv_data[17],
+      temperature: (ObnizPartsBleInterface.signed16FromBinary(peripheral.adv_data[14], peripheral.adv_data[13]) - 1000) / 10
+    };
+    return data;
+  }
+  
+  /** 未使用。ペリフェラル。ObnizPartsBleInterface 仕様を守るため実装 */
+  public _peripheral: BleRemotePeripheral | null = null;
+  
+  /** 未使用。ObnizPartsInterface 仕様を守るため実装 */
+  public params: any;
+  
+  /** 未使用。ObnizPartsInterface 仕様を守るため、実機から取得した情報をそのまま実装 */
+  public keys: string[] = [
+    'device_type',
+    'address_type',
+    'ble_event_type',
+    'rssi',
+    'adv_data',
+    'scan_resp'
+  ];
+  
+  /** 未使用。ObnizPartsInterface 仕様を守るため、必須キーなしでひとまず実装 */
+  public requiredKeys: string[] = [];
+  
+  /**
+   * 未使用。ObnizPartsInterface 仕様を守るため、空で実装
+   * 
+   * @param _obniz Obniz
+   */
+  public wired(_obniz: Obniz): void {
+    return;
+  }
+}
+</pre>
+
+  </body>
+</html>
