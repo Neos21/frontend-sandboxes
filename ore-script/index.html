@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Ore-Script</title>
+    <style>
+
+*, ::before, ::after { box-sizing: border-box; }
+html { font-family: sans-serif; }
+
+pre {
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 1rem;
+}
+
+    </style>
+    <script type="text/yaml">
+
+- Hoge
+- Fuga
+- Foo:
+  - Bar
+  - Baz
+
+    </script>
+    <script>
+
+document.addEventListener('DOMContentLoaded', async () => {
+  try {
+    // js-yaml を取得・実行する
+    const response = await window.fetch('https://cdn.jsdelivr.net/gh/nodeca/js-yaml/dist/js-yaml.min.js');
+    const responseText = await response.text();
+    eval(responseText);
+    
+    // YAML を記述した要素を取得する
+    const yamlElement = document.querySelector('script[type="text/yaml"]');
+    if(!yamlElement) {
+      const message = 'script[type="text/yaml"] 要素がありませんでした';
+      document.getElementById('raw').innerText = document.getElementById('result').innerText = message;
+      return console.warn(message);
+    }
+    
+    // JSON (連想配列) に変換して表示する
+    const yamlSourceCode = yamlElement.innerText.trim();  // innerHTML でも innerText でも同じ改行込みで取得できる
+    const parsed = window.jsyaml.load(yamlSourceCode);
+    document.getElementById('raw').innerText = yamlSourceCode;
+    document.getElementById('result').innerText = JSON.stringify(parsed, null, '  ');
+  }
+  catch(error) {
+    const message = 'Error';
+    console.error(message, error);
+    document.getElementById('raw').innerText = document.getElementById('result').innerText = message;
+  }
+});
+
+    </script>
+  </head>
+  <body>
+
+<h1>Ore-Script</h1>
+<p><code>script</code> 要素に <code>text/javascript</code> 以外の <code>type</code> 属性値を付与すると、要素内のテキストが無視される。コレを利用して DSL を記載しておき、JS でパースしてやるというアイデア。このページでは YAML データを用意し、<a href="https://www.npmjs.com/package/js-yaml">js-yaml</a> でパースしている。</p>
+
+<dl>
+  <dt>Raw</dt>
+  <dd>
+    <pre id="raw"></pre>
+  </dd>
+  <dt>Result</dt>
+  <dd>
+    <pre id="result"></pre>
+  </dd>
+</dl>
+
+  </body>
+</html>
