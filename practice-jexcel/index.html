@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Practice jExcel</title>
+    <link rel="stylesheet" href="https://bossanova.uk/jspreadsheet/v4/jexcel.css">
+    <link rel="stylesheet" href="https://jsuites.net/v4/jsuites.css">
+    <script src="https://bossanova.uk/jspreadsheet/v4/jexcel.js"></script>
+    <script src="https://jsuites.net/v4/jsuites.js"></script>
+    <script>
+
+document.addEventListener('DOMContentLoaded', () => {
+  const data = [
+    ['Jazz' , 'Honda', '2019-02-12', true , '$ 2.000,00', '#777700'],
+    ['Civic', 'Honda', '2018-07-11', false, '$ 4.000,01', '#007777']
+  ];
+  
+  jspreadsheet(document.getElementById('spreadsheet'), {
+    data: data,
+    columns: [
+      { type: 'text'    , title: 'Car'      , width: 120 },
+      { type: 'dropdown', title: 'Make'     , width: 200, source: [ 'Honda', 'Alfa Romeo', 'Audi', 'Bmw' ] },
+      { type: 'calendar', title: 'Available', width: 200, options: { format: 'YYYY-MM-DD' } },
+      { type: 'checkbox', title: 'Stock'    , width:  80 },
+      { type: 'numeric' , title: 'Price'    , width: 100, mask: '$ #.##,00', decimal: ',' },
+      { type: 'color'   , title: 'Colour'   , width: 100, render: 'square' }
+    ]
+  });
+});
+
+    </script>
+  </head>
+  <body>
+
+<h1>Practice jExcel</h1>
+
+<div id="spreadsheet"></div>
+
+<ul>
+  <li><a href="https://github.com/jspreadsheet/ce">jspreadsheet/ce</a></li>
+</ul>
+
+  </body>
+</html>

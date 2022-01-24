@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>text-underline-offset</title>
+    <style>
+
+*, ::before, ::after { box-sizing: border-box; }
+html { font-family: sans-serif; }
+
+a {
+  color: #00f;
+  text-decoration: underline;
+}
+a:hover, a:focus {
+  color: #f00;
+}
+
+body.skip-ink {
+  text-decoration-skip-ink: none;
+}
+body.overline a {
+  text-decoration: underline overline;
+}
+body.colour a {
+  text-decoration-color: #f00;
+}
+body.colour a:hover, a:focus {
+  text-decoration-color: #00f;
+}
+
+.default-offset {
+  text-underline-offset: .25em;
+}
+
+#value {
+  width: 4rem;
+  text-align: right;
+}
+
+    </style>
+    <script>
+
+document.addEventListener('DOMContentLoaded', () => {
+  const applyValue = value => document.querySelectorAll('.dynamic-offset').forEach(element => { element.style.textUnderlineOffset = `${value}em`; });
+  const defaultValue = .25;
+  applyValue(defaultValue);
+  document.getElementById('value').addEventListener('input', event => {
+    const rawValue = event.target.value;  // srcElement は IE で策定された
+    const value = Number(rawValue);  // 空白の場合は 0 になる
+    if(Number.isNaN(value)) return console.log('NaN', rawValue);  // 万が一の場合
+    applyValue(value);
+  });
+  
+  document.getElementById('is-overline').addEventListener('click', () => { document.body.classList.toggle('overline'); });
+  document.getElementById('is-colour'  ).addEventListener('click', () => { document.body.classList.toggle('colour'  ); });
+  document.getElementById('is-skip-ink').addEventListener('click', () => { document.body.classList.toggle('skip-ink'); });
+});
+
+    </script>
+  </head>
+  <body>
+
+<h1>text-underline-offset</h1>
+
+<ul>
+  <li><label><input id="is-overline" type="checkbox"> text-decoration: underline overline;</label></li>
+  <li><label><input id="is-colour"   type="checkbox"> text-decoration-color: #f00;</label></li>
+  <li><label><input id="is-skip-ink" type="checkbox"> text-decoration-skip-ink: none;</label></li>
+  <li><label>text-underline-offset: <input id="value" type="number" value="0.25" step="0.01">em;</label></li>
+</ul>
+
+<h2><a href="#">Normal Link [gpqy]</a>. <a href="#" class="default-offset">Default Offset [gpqy]</a>. <a href="#" class="dynamic-offset">Dynamic Offset [gpqy]</a>.</h2>
+<p ><a href="#">Normal Link [gpqy]</a>. <a href="#" class="default-offset">Default Offset [gpqy]</a>. <a href="#" class="dynamic-offset">Dynamic Offset [gpqy]</a>.</p >
+<hr>
+
+  </body>
+</html>
