@@ -9,6 +9,8 @@
 *, ::before, ::after { box-sizing: border-box; }
 html { font-family: sans-serif; }
 
+h2, p { white-space: nowrap; }
+
 a {
   color: #00f;
   text-decoration: underline;
@@ -37,6 +39,13 @@ body.colour a:hover, a:focus {
 #value {
   width: 4rem;
   text-align: right;
+}
+
+.position-auto {
+  text-underline-position: auto;
+}
+.position-under {
+  text-underline-position: under;
 }
 
     </style>
@@ -71,9 +80,15 @@ document.addEventListener('DOMContentLoaded', () => {
   <li><label>text-underline-offset: <input id="value" type="number" value="0.25" step="0.01">em;</label></li>
 </ul>
 
-<h2><a href="#">Normal Link [gpqy]</a>. <a href="#" class="default-offset">Default Offset [gpqy]</a>. <a href="#" class="dynamic-offset">Dynamic Offset [gpqy]</a>.</h2>
-<p ><a href="#">Normal Link [gpqy]</a>. <a href="#" class="default-offset">Default Offset [gpqy]</a>. <a href="#" class="dynamic-offset">Dynamic Offset [gpqy]</a>.</p >
+<h2><a href="#">Normal [gpqy]</a>. <a href="#" class="position-auto">Position auto [gpqy]</a>. <a href="#" class="position-under">Position under [gpqy]</a>. <a href="#" class="default-offset">Default Offset [gpqy]</a>. <a href="#" class="dynamic-offset">Dynamic Offset [gpqy]</a>.</h2>
+<p ><a href="#">Normal [gpqy]</a>. <a href="#" class="position-auto">Position auto [gpqy]</a>. <a href="#" class="position-under">Position under [gpqy]</a>. <a href="#" class="default-offset">Default Offset [gpqy]</a>. <a href="#" class="dynamic-offset">Dynamic Offset [gpqy]</a>.</p >
 <hr>
+
+<ul>
+  <li>「Default Offset」は text-underline-offset: .25em を指定</li>
+  <li>text-underline-position もついでに検証</li>
+  <li>position と offset は併用可能で、position の位置からの offset 値として指定できる</li>
+</ul>
 
   </body>
 </html>
