@@ -24,7 +24,7 @@
 
 <script defer         src="./scripts/head-defer.js" ></script>
 <script async         src="./scripts/head-async.js" ></script>
-<script type="module" src="./scripts/head-module.js"></script>  <!-- CSS Module Scripts -->
+<script type="module" src="./scripts/head-module.js" crossorigin="use-credentials"></script>  <!-- CSS Module Scripts -->
 <script               src="./scripts/head.js"       ></script>
 
 <script>
@@ -33,7 +33,7 @@
     console.log(new Date().toISOString(), document.readyState, !!document.getElementById('test'), 'DOMContentLoaded : head 要素内の <script> 要素');
   });
 </script>
-<script type="module">  // CSS Module Scripts
+<script type="module" crossorigin="use-credentials">  // CSS Module Scripts
   console.log(new Date().toISOString(), document.readyState, !!document.getElementById('test'), 'head 要素内の <script type="module"> 要素');
   document.addEventListener('DOMContentLoaded', () => {
     console.log(new Date().toISOString(), document.readyState, !!document.getElementById('test'), 'DOMContentLoaded : head 要素内の <script type="module"> 要素');
@@ -69,12 +69,12 @@
   <li id="from-css-module-scripts-body-src"></li>
 </ul>
 
-<script type="module" src="./scripts/body-module.js"></script>  <!-- CSS Module Scripts -->
+<script type="module" src="./scripts/body-module.js" crossorigin="use-credentials"></script>  <!-- CSS Module Scripts -->
 <script defer         src="./scripts/body-defer.js" ></script>
 <script async         src="./scripts/body-async.js" ></script>
 <script               src="./scripts/body.js"       ></script>
 
-<script type="module">  // CSS Module Scripts
+<script type="module" crossorigin="use-credentials">  // CSS Module Scripts
   console.log(new Date().toISOString(), document.readyState, !!document.getElementById('test'), 'body 要素内の <script type="module"> 要素');
   document.addEventListener('DOMContentLoaded', () => {
     console.log(new Date().toISOString(), document.readyState, !!document.getElementById('test'), 'DOMContentLoaded : body 要素内の <script type="module"> 要素');
