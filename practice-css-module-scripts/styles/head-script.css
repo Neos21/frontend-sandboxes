@@ -1,0 +1,7 @@
+#from-css-module-scripts-head-script {
+  display: list-item;
+  color: #f00;
+}
+#from-css-module-scripts-head-script::before {
+  content: "head 要素内の script 要素から CSS Module Scripts として読み込み反映されています";
+}

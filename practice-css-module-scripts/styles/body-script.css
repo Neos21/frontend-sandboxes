@@ -1,0 +1,7 @@
+#from-css-module-scripts-body-script {
+  display: list-item;
+  color: #f0f;
+}
+#from-css-module-scripts-body-script::before {
+  content: "body 要素内の script 要素から CSS Module Scripts として読み込み反映されています";
+}

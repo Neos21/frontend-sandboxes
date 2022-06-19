@@ -1,0 +1,7 @@
+#from-css-module-scripts-head-src {
+  display: list-item;
+  color: #099;
+}
+#from-css-module-scripts-head-src::before {
+  content: "head 要素から読み込んだ別 JS より CSS Module Scripts として読み込み反映されています";
+}

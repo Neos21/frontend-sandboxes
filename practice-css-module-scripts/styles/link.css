@@ -1,0 +1,7 @@
+#from-link {
+  display: list-item;
+  color: #00f;
+}
+#from-link::before {
+  content: "link 要素から読み込んだ CSS が反映されています";
+}

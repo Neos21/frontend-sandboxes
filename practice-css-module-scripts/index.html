@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Practice CSS Module Scripts</title>
+    <style>
+
+/* それぞれ読み込めたらスタイルを上書きする */
+[id^="from-"] {
+  display: none;
+}
+
+#from-head-style {
+  display: list-item;
+  color: #090;
+}
+#from-head-style::before {
+  content: "head 要素内の style 要素が反映されています";
+}
+
+    </style>
+    <link rel="stylesheet" href="./styles/link.css">
+
+<script defer         src="./scripts/head-defer.js" ></script>
+<script async         src="./scripts/head-async.js" ></script>
+<script type="module" src="./scripts/head-module.js"></script>  <!-- CSS Module Scripts -->
+<script               src="./scripts/head.js"       ></script>
+
+<script>
+  console.log(new Date().toISOString(), document.readyState, !!document.getElementById('test'), 'head 要素内の <script> 要素');
+  document.addEventListener('DOMContentLoaded', () => {
+    console.log(new Date().toISOString(), document.readyState, !!document.getElementById('test'), 'DOMContentLoaded : head 要素内の <script> 要素');
+  });
+</script>
+<script type="module">  // CSS Module Scripts
+  console.log(new Date().toISOString(), document.readyState, !!document.getElementById('test'), 'head 要素内の <script type="module"> 要素');
+  document.addEventListener('DOMContentLoaded', () => {
+    console.log(new Date().toISOString(), document.readyState, !!document.getElementById('test'), 'DOMContentLoaded : head 要素内の <script type="module"> 要素');
+  });
+  
+  import styles from './styles/head-script.css' assert { type: 'css' };
+  document.adoptedStyleSheets.push(styles);
+  console.log(new Date().toISOString(), document.readyState, !!document.getElementById('test'), 'head 要素内の <script type="module"> 要素 : ↑CSS 設定↑');
+</script>
+<script async>
+  console.log(new Date().toISOString(), document.readyState, !!document.getElementById('test'), 'head 要素内の <script async> 要素');
+  document.addEventListener('DOMContentLoaded', () => {
+    console.log(new Date().toISOString(), document.readyState, !!document.getElementById('test'), 'DOMContentLoaded : head 要素内の <script async> 要素');
+  });
+</script>
+<script defer>
+  console.log(new Date().toISOString(), document.readyState, !!document.getElementById('test'), 'head 要素内の <script defer> 要素');
+  document.addEventListener('DOMContentLoaded', () => {
+    console.log(new Date().toISOString(), document.readyState, !!document.getElementById('test'), 'DOMContentLoaded : head 要素内の <script defer> 要素');
+  });
+</script>
+
+  </head>
+  <body>
+
+<h1>Practice CSS Module Scripts</h1>
+<ul>
+  <li id="from-head-style"></li>
+  <li id="from-link"></li>
+  <li id="from-css-module-scripts-head-script"></li>
+  <li id="from-css-module-scripts-head-src"></li>
+  <li id="from-css-module-scripts-body-script"></li>
+  <li id="from-css-module-scripts-body-src"></li>
+</ul>
+
+<script type="module" src="./scripts/body-module.js"></script>  <!-- CSS Module Scripts -->
+<script defer         src="./scripts/body-defer.js" ></script>
+<script async         src="./scripts/body-async.js" ></script>
+<script               src="./scripts/body.js"       ></script>
+
+<script type="module">  // CSS Module Scripts
+  console.log(new Date().toISOString(), document.readyState, !!document.getElementById('test'), 'body 要素内の <script type="module"> 要素');
+  document.addEventListener('DOMContentLoaded', () => {
+    console.log(new Date().toISOString(), document.readyState, !!document.getElementById('test'), 'DOMContentLoaded : body 要素内の <script type="module"> 要素');
+  });
+  
+  import styles from './styles/body-script.css' assert { type: 'css' };
+  document.adoptedStyleSheets.push(styles);
+  console.log(new Date().toISOString(), document.readyState, !!document.getElementById('test'), 'body 要素内の <script type="module"> 要素 : ↑CSS 設定↑');
+</script>
+<script>
+  console.log(new Date().toISOString(), document.readyState, !!document.getElementById('test'), 'body 要素内の <script> 要素');
+  document.addEventListener('DOMContentLoaded', () => {
+    console.log(new Date().toISOString(), document.readyState, !!document.getElementById('test'), 'DOMContentLoaded : body 要素内の <script> 要素');
+  });
+</script>
+<script async>
+  console.log(new Date().toISOString(), document.readyState, !!document.getElementById('test'), 'body 要素内の <script async> 要素');
+  document.addEventListener('DOMContentLoaded', () => {
+    console.log(new Date().toISOString(), document.readyState, !!document.getElementById('test'), 'DOMContentLoaded : body 要素内の <script async> 要素');
+  });
+</script>
+<script defer>
+  console.log(new Date().toISOString(), document.readyState, !!document.getElementById('test'), 'body 要素内の <script defer> 要素');
+  document.addEventListener('DOMContentLoaded', () => {
+    console.log(new Date().toISOString(), document.readyState, !!document.getElementById('test'), 'DOMContentLoaded : body 要素内の <script defer> 要素');
+  });
+</script>
+
+<p id="test">
+  リストが6つ表示されていれば、全ての方法で CSS 読み込み・設定が成功しています。<br>
+  また、script 要素の属性値や記載位置による読み込みタイミングを確認するため、全16パターンの各種情報をコンソール出力しています。
+</p>
+
+<ul>
+  <li><code>script</code> : その場で同期的に JS が DL され、その場で同期実行される (JS の DL から実行の間まで HTML パースは中断される)</li>
+  <li><code>script async</code> : その場で非同期に JS が DL され、HTML パースを待たずに実行される。複数の <code>script async</code> がある場合は書かれた順番が保証されず非同期的に実行される</li>
+  <li><code>script defer</code> : その場で非同期に JS が DL され、HTML パースを待って実行される (DOMContentLoaded の直前)。複数の <code>script defer</code> がある場合は書かれた順番に実行される</li>
+  <li><code>script type="module"</code> : defer 相当のタイミング、つまり HTML パースを待って実行される</li>
+  <li><code>script type="module" async</code> (未検証) : HTML パースを待たずに実行できる</li>
+</ul>
+
+<ul>
+  <li><a href="https://qiita.com/phanect/items/82c85ea4b8f9c373d684">script タグに async / defer を付けた場合のタイミング - Qiita</a></li>
+  <li><a href="https://qiita.com/irico/items/bd97e1afc737f83b395d">Scriptタグの属性についてまとめ - Qiita</a></li>
+  <li><a href="https://gist.github.com/jakub-g/385ee6b41085303a53ad92c7c8afd7a6">async scripts, defer scripts, module scripts: explainer, comparison, and gotchas</a></li>
+  <li><a href="https://developer.mozilla.org/ja/docs/Web/JavaScript/Guide/Modules">JavaScript モジュール - JavaScript | MDN</a></li>
+  <li><a href="https://zenn.dev/bugbearr/scraps/6bd58eadd60bd6">クライアントサイド JavaScript の呼び出し方の変遷</a></li>
+  <li><a href="https://zenn.dev/akfm/articles/e7615e8e826df8">似て非なるCSS Module Scripts</a></li>
+  <li><a href="https://blog.kazu69.net/2017/06/09/es6-modules-in-browser/">ブラウザに実装されている ECMAScript modules について | 69log</a></li>
+  <li><a href="https://blogs.windows.com/msedgedev/2021/08/17/css-module-scripts-import-stylesheets-like-javascript-modules/">CSS module scripts: `import` stylesheets like JavaScript modules - Microsoft Edge Blog</a></li>
+</ul>
+
+  </body>
+</html>
