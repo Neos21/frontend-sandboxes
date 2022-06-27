@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Practice CSS Has Pseudo</title>
+    <style>
+
+*, ::before, ::after { box-sizing: border-box; }
+html { font-family: sans-serif; }
+
+    </style>
+    <style>
+
+h1:has(span):hover {
+  color: red;
+}
+
+/* 予め以下のような変換をしておく */
+h1[\:has\(span\)]:hover {
+  color: red;
+}
+
+    </style>
+    <script>
+
+// https://github.com/csstools/postcss-plugins/tree/main/plugins/css-has-pseudo
+function cssHasPseudo(document) {
+  const observedItems = [];
+  // document.createAttribute() doesn't support `:` in the name. innerHTML does
+  const attributeElement = document.createElement('x');
+  // walk all stylesheets to collect observed css rules
+  Array.from(document.styleSheets).forEach(walkStyleSheet);
+  transformObservedItems();
+  
+  // observe DOM modifications that affect selectors
+  const mutationObserver = new MutationObserver(mutationsList => {
+    console.log('MutationObserver', mutationsList);
+    mutationsList.forEach(mutation => {
+      Array.from(mutation.addedNodes || []).forEach(node => {
+        // walk stylesheets to collect observed css rules
+        if(node.nodeType === 1 && node.sheet) {
+          console.log('MutationObserver : sheet', node);
+          walkStyleSheet(node.sheet);
+        }
+      });
+      // transform observed css rules
+      cleanupObservedCssRules();
+      transformObservedItems();
+    });
+  });
+  
+  mutationObserver.observe(document, { childList: true, subtree: true });
+  // observe DOM events that affect pseudo-selectors
+  document.addEventListener('focus', transformObservedItems, true);
+  document.addEventListener('blur', transformObservedItems, true);
+  document.addEventListener('input', transformObservedItems);
+  
+  // transform observed css rules
+  function transformObservedItems() {
+    console.log('transformObservedItems');
+    requestAnimationFrame(() => {
+      observedItems.forEach(item => {
+        const nodes = [];
+        document.querySelectorAll(item.scopeSelector).forEach(element => {
+          const nthChild = [].indexOf.call(element.parentNode.children, element) + 1;
+          const relativeSelectors = item.relativeSelectors.map(relativeSelector => item.scopeSelector + ':nth-child(' + nthChild + ') ' + relativeSelector).join();
+          console.log('transformObservedItems : 1', relativeSelectors);
+          // find any relative :has element from the :scope element
+          const relativeElement = element.parentNode.querySelector(relativeSelectors);
+          const shouldElementMatch = item.isNot ? !relativeElement : relativeElement;
+          if(shouldElementMatch) {
+            // memorize the node
+            nodes.push(element);
+            // set an attribute with an irregular attribute name
+            // document.createAttribute() doesn't support special characters
+            attributeElement.innerHTML = '<x ' + item.attributeName + '>';
+            console.log('transformObservedItems : 2', attributeElement.innerHTML, element.outerHTML);
+            element.setAttributeNode(attributeElement.children[0].attributes[0].cloneNode());
+            console.log('transformObservedItems : 3', element.outerHTML);
+            document.documentElement.style.zoom = 1; document.documentElement.style.zoom = null;  // trigger a style refresh in IE and Edge
+          }
+        });
+        
+        // remove the encoded attribute from all nodes that no longer match them
+        item.nodes.forEach(node => {
+          if(nodes.indexOf(node) === -1) {
+            node.removeAttribute(item.attributeName);
+            document.documentElement.style.zoom = 1; document.documentElement.style.zoom = null;  // trigger a style refresh in IE and Edge
+          }
+        });
+        // update the
+        item.nodes = nodes;
+      });
+    });
+  }
+  
+  // remove any observed cssrules that no longer apply
+  function cleanupObservedCssRules() {
+    console.log('cleanupObservedCssRules : 1', JSON.stringify(observedItems));
+    [].push.apply(observedItems, observedItems.splice(0).filter(item => item.rule.parentStyleSheet && item.rule.parentStyleSheet.ownerNode && document.documentElement.contains(item.rule.parentStyleSheet.ownerNode)));
+    console.log('cleanupObservedCssRules : 2', JSON.stringify(observedItems));
+  }
+  
+  // walk a stylesheet to collect observed css rules
+  function walkStyleSheet(styleSheet) {
+    try {
+      console.log('walkStyleSheet', styleSheet);
+      // walk a css rule to collect observed css rules
+      Array.from(styleSheet.cssRules || []).forEach(rule => {
+        if(rule.selectorText) {
+          // decode the selector text in all browsers to: [1] = :scope, [2] = :not(:has), [3] = :has relative, [4] = :scope relative
+          const selectors = decodeURIComponent(rule.selectorText.replace(/\\(.)/g, '$1')).match(/^(.*?)\[:(not-)?has\((.+?)\)\](.*?)$/);
+          if(selectors) {
+            console.log('walkStyleSheet : selectors あった 1', selectors);
+            // encode a :has() pseudo selector as an attribute name
+            const attributeName = ':' + (selectors[2] ? 'not-' : '') + 'has(' + encodeURIComponent(selectors[3]).replace(/%3A/g, ':').replace(/%5B/g, '[').replace(/%5D/g, ']').replace(/%2C/g, ',') + ')';
+            console.log('walkStyleSheet : selectors あった 2', attributeName);
+            observedItems.push({
+              rule,
+              scopeSelector: selectors[1],
+              isNot: selectors[2],
+              relativeSelectors: selectors[3].split(/\s*,\s*/),
+              attributeName,
+              nodes: [],
+            });
+            console.log('walkStyleSheet : selectors あった 3', observedItems);
+          }
+        }
+        else {
+          console.log('walkStyleSheet ... 入れ子', rule);
+          walkStyleSheet(rule);
+        }
+      });
+    }
+    catch(error) {  /* do nothing and continue */
+      console.warn('walkStyleSheet ERROR', error, styleSheet);
+    }
+  }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  cssHasPseudo(document);
+});
+
+function add() {
+  document.documentElement.insertAdjacentHTML('beforeend', '<h1><span>Add</span></h1>');
+}
+
+    </script>
+  </head>
+  <body>
+
+<h1>Practice CSS Has Pseudo</h1>
+<p>CSS Has Pseudo の Polyfill の動作を確認する</p>
+
+<h1><span>Hoge</span></h1>
+<button type="button" onclick="add()">Add</button>
+
+  </body>
+</html>
