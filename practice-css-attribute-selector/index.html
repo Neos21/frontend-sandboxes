@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Practice CSS Attribute Selector</title>
+    <style>
+
+*, ::before, ::after { box-sizing: border-box; }
+html { font-family: sans-serif; }
+
+[data-example] { color: #09f; }
+
+[title="AAA1"] { color: #f00; }
+[title^="AAA2"] { color: #0f0; }
+[title$="AAA3"] { color: #00f; }
+
+/* 改行を表現するにはこんな感じで可能ではある */
+[title="AA4\a
+example"] { color: #900; }
+
+/* チルダ：属性値のスペースや改行を無視したい場合はコレ */
+[title~="BBB"] { color: #f0f; }
+
+/* ↓ チルダはスペース入りの属性値にはマッチしなくなる */
+[title~="Aexample Bexample"] { color: #f00; font-weight: bold; }
+/* その他の方法ならマッチする */
+[title*="Aexample Bexample"] { color: #ff0; }
+
+/* ケースインセンシティブ i or I */
+[title="ccc1" i] { color: #0ff; }
+/* ケースセンシティブの s or S は主要ブラウザで未対応 */
+
+/* en か en- にマッチする文字列を探す */
+[title|="en"i] { color: #f90; }
+
+    </style>
+  </head>
+  <body>
+
+<h1>Practice CSS Attribute Selector</h1>
+
+<div data-example>data-example</div>
+
+<div title="AAA1">AAA1</div>
+<div title="AAA2example">AAA2example</div>
+<div title="exampleAAA3">exampleAAA3</div>
+
+<div title="AA4
+example">AA4(\n)example</div>
+
+<div title=" BBB">_BBB</div>
+<div title="BBB ">BBB_</div>
+<div title=" BBB ">_BBB_</div>
+<div title="aaaa BBB cccc">aaa_BBB_cccc</div>
+<div title="
+BBB">(\n)BBB</div>
+<div title="BBB
+">BBB(\n)</div>
+<div title="
+BBB
+">(\n)BBB(\n)</div>
+
+<div title="Aexample Bexample">Aexample Bexample</div>
+
+<div title="CCC1">CCC1</div>
+
+<div title="enus">enus (Not Match)</div>
+<div title="en">en</div>
+<div title="en-us">en-us</div>
+<div title="en--uk">en--uk</div>
+
+  </body>
+</html>

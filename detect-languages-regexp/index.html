@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Detect Languages RegExp</title>
+    <style>
+
+*, ::before, ::after { box-sizing: border-box; }
+html { font-family: sans-serif; }
+
+    </style>
+    <script>
+
+// 韓国語 : ハングル
+// https://stabucky.com/wp/archives/5058
+// https://codechacha.com/ja/javascript-input-alphabet-number-hangul/
+// https://www.asahi-net.or.jp/~ax2s-KMTN/ref/unicode/uac00.html
+const hangul = (text) => text.match(/[ㄱ-ㅎ|가-힣]/);  // 가-힣 : [\uAC00-\uD7A3] : Hangul Syllables
+console.log('ハングル : ', hangul('한글 조선글'));
+
+// ロシア語 : キリル文字
+// https://tagsqa.com/detail/11310
+// https://www.web-dev-qa-db-ja.com/ja/regex/%E3%82%AD%E3%83%AA%E3%83%AB%E6%96%87%E5%AD%97%E3%82%92%E6%AD%A3%E8%A6%8F%E8%A1%A8%E7%8F%BE%E3%81%A8%E4%B8%80%E8%87%B4%E3%81%95%E3%81%9B%E3%82%8B%E6%96%B9%E6%B3%95/968923949/
+const cyrillic = (text) => text.match(/[\u0430-\u04FF]/);  // [\u0400-\04FF]
+console.log('キリル文字 : ', cyrillic('русский язык'));
+
+// アラビア文字
+// https://jablogs.com/detail/42124
+// https://www.web-dev-qa-db-ja.com/ja/regex/%E3%82%A2%E3%83%A9%E3%83%93%E3%82%A2%E8%AA%9E%E3%81%AE%E6%AD%A3%E8%A6%8F%E8%A1%A8%E7%8F%BE%E3%81%A8%E6%95%B0%E5%AD%97%E3%81%AE%E3%81%BF/1052336255/
+// https://www.compart.com/en/unicode/block/U+0600
+const arabic = (text) => text.match(/[\u0621-\u064A]/);  // [\u0600-\06FF]
+console.log('アラビア文字 : ', arabic('اللغة العربية'));
+
+// 中国語 … 日本語と混在しているため判別が困難
+// https://pgmemo.tokyo/data/archives/1495.html
+// https://blog.1a23.com/2020/03/16/nlp-wo-tsukawazu-kantan-ni-chugokugo-to-nihongo-wo-shiwakeru-houhou/
+// https://shinya131-note.hatenablog.jp/entry/2015/07/10/004853
+
+// 1文字を16進数の Unicode に直す。結果は '3042' のように返るので先頭に '\u' を付与し '\u3042' とすれば元の文字になる
+// https://itsakura.com/js-charcodeat
+// https://jsprimer.net/basic/string-unicode/
+const characterToHexCodeUnit = (character) => character.charCodeAt(0).toString(16);
+
+// '3042' のような16進数の Unicode を渡すと「あ」という元の文字を返す
+const hexCodeUnitToCharacter = (hexCodeUnit) => String.fromCodePoint('0x' + hexCodeUnit);
+
+
+    </script>
+  </head>
+  <body>
+
+<h1>Detect Languages RegExp</h1>
+<p>各国の外国語とマッチする正規表現を組み立ててみたい。開発者コンソールを参照。</p>
+
+  </body>
+</html>

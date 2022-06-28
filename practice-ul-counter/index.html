@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Practice UL Counter</title>
+    <style>
+
+*, ::before, ::after { box-sizing: border-box; }
+html { font-family: sans-serif; }
+
+/* 単に ol 化するだけならコレでいい */
+ul#list-style-type-decimal {
+  list-style-type: decimal;
+}
+
+/*
+ * list-item という名前は暗黙的に命名されているので
+ * ul#counter-list-item { counter-reset: list-item; } を書かなくても動く
+ */
+ul#counter-list-item > li::before {
+  content: counter(list-item) " : ";
+}
+
+    </style>
+  </head>
+  <body>
+
+<h1>Practice UL Counter</h1>
+
+<ul id="list-style-type-decimal">
+  <li>Text A</li>
+  <li>Text B</li>
+  <li>Text C</li>
+  <li>Text D</li>
+  <li>Text E</li>
+  <li>Text F</li>
+  <li>Text G</li>
+</ul>
+
+<ul id="counter-list-item">
+  <li>Text a</li>
+  <li>Text b</li>
+  <li>Text c</li>
+  <li>Text d</li>
+  <li>Text e</li>
+  <li>Text f</li>
+  <li>Text g</li>
+</ul>
+
+  </body>
+</html>
