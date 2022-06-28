@@ -251,7 +251,7 @@ function cssInnerText(selector, metaOrInnerTextRegExp, innerTextOrStyle, styleOr
     </ul>
   </li>
   <li>
-    <code>:hover</code>、<code>:focus</code> などの擬似クラス、<code>::before</code> などの疑似要素を操作したい場合に対応できない
+    <code>:hover</code>、<code>:focus</code> などの擬似クラス、<code>::before</code> などの擬似要素を操作したい場合に対応できない
     <ul>
       <li><code>style.cssText</code> を使ってスタイルを書き込むのではなく、属性セレクタをでっちあげるようなやり方じゃないと無理かな</li>
       <li>参考 : <a href="https://github.com/csstools/postcss-plugins/tree/main/plugins/css-has-pseudo">https://github.com/csstools/postcss-plugins/tree/main/plugins/css-has-pseudo</a></li>
