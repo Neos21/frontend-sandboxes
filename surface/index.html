@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Surface</title>
+    <style>
+
+*, ::before, ::after { box-sizing: border-box; }
+html { font-family: sans-serif; }
+
+table {
+  border-collapse: collapse;
+  font-family: monospace;
+}
+th, td {
+  border: 1px solid #ddd;
+  padding: .1rem .3rem;
+  text-align: center;
+  vertical-align: top;
+  white-space: nowrap;
+}
+th {
+  background: #eff;
+}
+thead th {
+  vertical-align: middle;
+}
+tbody th,
+.text-left {
+  text-align: left;
+}
+
+    </style>
+  </head>
+  <body>
+
+<h1>Surface</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th rowspan="2">Gen</th>
+      <th rowspan="2">Release<br>Date</th>
+      <th rowspan="2">OS</th>
+      <th colspan="3" title="FL : Fan Less">CPU</th>
+      <th colspan="4">RAM</th>
+      <th colspan="5">SSD</th>
+      <th colspan="2">Display</th>
+      <th rowspan="2">Weight</th>
+      <th rowspan="2">Battery</th>
+      <th colspan="5">Port</th>
+      <th rowspan="2">Type Cover</th>
+      <th rowspan="2">Surface<br>Connect</th>
+    </tr>
+    <tr>
+      <th>i3</th>
+      <th>i5</th>
+      <th>i7</th>
+      <th>4GB</th>
+      <th>8GB</th>
+      <th>16GB</th>
+      <th>32GB</th>
+      <th>64GB</th>
+      <th>128GB</th>
+      <th>256GB</th>
+      <th>512GB</th>
+      <th>1TB</th>
+      <th>Inch</th>
+      <th>Px</th>
+      <th>USB-A3.0</th>
+      <th>USB-C</th>
+      <th>microSD</th>
+      <th>MiniDP</th>
+      <th>Phone</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Pro 1</th>
+      <td>2013-02-09</td>
+      <td class="text-left">8 Pro</td>
+      <td class="text-left">-</td>
+      <td class="text-left">i5-3317U</td>
+      <td class="text-left">-</td>
+      <td>DDR3</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>64GB</td>
+      <td>128GB</td>
+      <td>256GB</td>
+      <td>-</td>
+      <td>-</td>
+      <td>10.6</td>
+      <td>1920x1080</td>
+      <td>903g</td>
+      <td>&nbsp;4.5h</td>
+      <td>○</td>
+      <td>-</td>
+      <td>○</td>
+      <td>○</td>
+      <td>○</td>
+      <td>Type Cover 1</td>
+      <td>?</td>
+    </tr>
+    <tr>
+      <th>Pro 2</th>
+      <td>2013-10-22</td>
+      <td class="text-left">8.1 Pro</td>
+      <td class="text-left">-</td>
+      <td class="text-left">i5-4200U<br>i5-4300U</td>
+      <td class="text-left">-</td>
+      <td>DDR3</td>
+      <td>DDR3</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>128GB</td>
+      <td>256GB</td>
+      <td>512GB</td>
+      <td>-</td>
+      <td>10.6</td>
+      <td>1920x1080</td>
+      <td>907g</td>
+      <td>&nbsp;9.0h</td>
+      <td>○</td>
+      <td>-</td>
+      <td>○</td>
+      <td>○</td>
+      <td>○</td>
+      <td>Type Cover 2</td>
+      <td>?</td>
+    </tr>
+    <tr>
+      <th>Pro 3</th>
+      <td>2014-06-20</td>
+      <td class="text-left">10 Pro</td>
+      <td class="text-left">i3-4020Y</td>
+      <td class="text-left">i5-4300U</td>
+      <td class="text-left">i7-4600U</td>
+      <td>DDR3</td>
+      <td>DDR3</td>
+      <td>-</td>
+      <td>-</td>
+      <td>64GB</td>
+      <td>128GB</td>
+      <td>256GB</td>
+      <td>512GB</td>
+      <td>-</td>
+      <td>12.0</td>
+      <td>2160x1440</td>
+      <td>800g</td>
+      <td>&nbsp;9.0h</td>
+      <td>○</td>
+      <td>-</td>
+      <td>○</td>
+      <td>○</td>
+      <td>○</td>
+      <td>Pro Type</td>
+      <td>1625 36W</td>
+    </tr>
+    <tr>
+      <th>Pro 4</th>
+      <td>2015-10-26</td>
+      <td class="text-left">10 Pro</td>
+      <td class="text-left">m3-6Y30 FL</td>
+      <td class="text-left">i5-6300U</td>
+      <td class="text-left">i7-6650U</td>
+      <td>4GB</td>
+      <td>8GB</td>
+      <td>16GB</td>
+      <td>-</td>
+      <td>-</td>
+      <td>128GB</td>
+      <td>256GB</td>
+      <td>512GB</td>
+      <td>1TB</td>
+      <td>12.3</td>
+      <td>2736x1824</td>
+      <td>766g<br>786g</td>
+      <td>&nbsp;9.0h</td>
+      <td>○</td>
+      <td>-</td>
+      <td>○</td>
+      <td>○</td>
+      <td>○</td>
+      <td>Pro Type</td>
+      <td>1735 24W<br>1625 36W</td>
+    </tr>
+    <tr>
+      <th>Pro 5</th>
+      <td>2017-06-15</td>
+      <td class="text-left">10 Pro</td>
+      <td class="text-left">m3-7Y30 FL</td>
+      <td class="text-left">i5-7300U FL</td>
+      <td class="text-left">i7-7660U</td>
+      <td>4GB</td>
+      <td>8GB</td>
+      <td>16GB</td>
+      <td>-</td>
+      <td>-</td>
+      <td>128GB</td>
+      <td>256GB</td>
+      <td>512GB</td>
+      <td>1TB</td>
+      <td>12.3</td>
+      <td>2736x1824</td>
+      <td>768g<br>770g<br>784g</td>
+      <td>&nbsp;9.0h</td>
+      <td>○</td>
+      <td>-</td>
+      <td>○</td>
+      <td>○</td>
+      <td>○</td>
+      <td>Pro Type</td>
+      <td>1735 24W<br>1800 44W</td>
+    </tr>
+    <tr>
+      <th>Pro 5 LTE</th>
+      <td>2018-05-01</td>
+      <td class="text-left">10 Pro</td>
+      <td class="text-left">-</td>
+      <td class="text-left">i5-7300U FL</td>
+      <td class="text-left">-</td>
+      <td>4GB</td>
+      <td>8GB</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>128GB</td>
+      <td>256GB</td>
+      <td>-</td>
+      <td>-</td>
+      <td>12.3</td>
+      <td>2736x1824</td>
+      <td>812g</td>
+      <td>13.5h</td>
+      <td>○</td>
+      <td>-</td>
+      <td>○</td>
+      <td>○</td>
+      <td>○</td>
+      <td>Pro Type</td>
+      <td>1800 44W</td>
+    </tr>
+    <tr>
+      <th>Pro 6</th>
+      <td>2018-10-16</td>
+      <td class="text-left">10 Home<br>10 Pro</td>
+      <td class="text-left">-</td>
+      <td class="text-left">i5-8250U FL<br>i5-8350U</td>
+      <td class="text-left">i7-8650U</td>
+      <td>-</td>
+      <td>8GB</td>
+      <td>16GB</td>
+      <td>-</td>
+      <td>-</td>
+      <td>128GB</td>
+      <td>256GB</td>
+      <td>512GB</td>
+      <td>1TB</td>
+      <td>12.3</td>
+      <td>2736x1824</td>
+      <td>775g<br>792g</td>
+      <td>13.5h</td>
+      <td>○</td>
+      <td>-</td>
+      <td>○</td>
+      <td>○</td>
+      <td>○</td>
+      <td>Pro Type</td>
+      <td>1800 44W</td>
+    </tr>
+    <tr>
+      <th>Pro 7</th>
+      <td>2019-10-22</td>
+      <td class="text-left">10 Home<br>10 Pro</td>
+      <td class="text-left">i3-1005G1 FL</td>
+      <td class="text-left">i5-1035G4 FL</td>
+      <td class="text-left">i7-1065G7</td>
+      <td>4GB</td>
+      <td>8GB</td>
+      <td>16GB</td>
+      <td>-</td>
+      <td>-</td>
+      <td>128GB</td>
+      <td>256GB</td>
+      <td>512GB</td>
+      <td>1TB</td>
+      <td>12.3</td>
+      <td>2736x1824</td>
+      <td>775g<br>790g</td>
+      <td>10.5h</td>
+      <td>○</td>
+      <td>○</td>
+      <td>○</td>
+      <td>-</td>
+      <td>○</td>
+      <td>Pro Type</td>
+      <td>1706 65W</td>
+    </tr>
+    <tr>
+      <th>Pro 7+</th>
+      <td>2021-01-01<br>2022-02-08</td>
+      <td class="text-left">10 Home<br>10 Pro</td>
+      <td class="text-left">i3-1115G4 FL</td>
+      <td class="text-left">i5-1135G7 FL</td>
+      <td class="text-left">i7-1165G7</td>
+      <td>-</td>
+      <td>8GB</td>
+      <td>16GB</td>
+      <td>32GB</td>
+      <td>-</td>
+      <td>128GB</td>
+      <td>256GB</td>
+      <td>512GB</td>
+      <td>1TB</td>
+      <td>12.3</td>
+      <td>2736x1824</td>
+      <td>770g<br>784g<br>796g</td>
+      <td>13.5h<br>15.0h</td>
+      <td>○</td>
+      <td>○</td>
+      <td>○</td>
+      <td>-</td>
+      <td>○</td>
+      <td>Pro Type</td>
+      <td>1706 65W</td>
+    </tr>
+    <tr>
+      <th>Pro 8</th>
+      <td>2021-10-05</td>
+      <td class="text-left">11 Home<br>10/11 Pro</td>
+      <td class="text-left">i3-1115G4</td>
+      <td class="text-left">i5-1135G7<br>i5-1145G4</td>
+      <td class="text-left">i7-1185G7</td>
+      <td>-</td>
+      <td>8GB</td>
+      <td>16GB</td>
+      <td>32GB</td>
+      <td>-</td>
+      <td>128GB</td>
+      <td>256GB</td>
+      <td>512GB</td>
+      <td>1TB</td>
+      <td>13.0</td>
+      <td>2880x1920</td>
+      <td>889g</td>
+      <td>16.0h</td>
+      <td>-</td>
+      <td>○<br>T4x2</th>
+      <td>-</td>
+      <td>-</td>
+      <td>○</td>
+      <td>Pro Signature</td>
+      <td>1706 65W</td>
+    </tr>
+    <tr>
+      <th>Go 1</th>
+      <td>2018-08-02</td>
+      <td class="text-left">10 HomeS<br>10 Pro</td>
+      <td class="text-left">Gold-4415Y FL</td>
+      <td class="text-left">-</td>
+      <td class="text-left">-</td>
+      <td>4GB</td>
+      <td>8GB</td>
+      <td>-</td>
+      <td>-</td>
+      <td>64GB</td>
+      <td>128GB</td>
+      <td>256GB</td>
+      <td>-</td>
+      <td>-</td>
+      <td>10.0</td>
+      <td>1800x1200</td>
+      <td>522g<br>532g</td>
+      <td>9.0h</td>
+      <td>-</td>
+      <td>○</td>
+      <td>○</td>
+      <td>-</td>
+      <td>○</td>
+      <td>Go Type</td>
+      <td>1735 24W</td>
+    </tr>
+    <tr>
+      <th>Go 2</th>
+      <td>2020-05-12</td>
+      <td class="text-left">10 HomeS<br>10 Pro</td>
+      <td class="text-left">Gold-4425Y FL<br>m3-8100Y</td>
+      <td class="text-left">-</td>
+      <td class="text-left">-</td>
+      <td>4GB</td>
+      <td>8GB</td>
+      <td>-</td>
+      <td>-</td>
+      <td>64GB</td>
+      <td>128GB</td>
+      <td>256GB</td>
+      <td>-</td>
+      <td>-</td>
+      <td>10.5</td>
+      <td>1920x1280</td>
+      <td>544g<br>553g</td>
+      <td>10.0h</td>
+      <td>-</td>
+      <td>○</td>
+      <td>○</td>
+      <td>-</td>
+      <td>○</td>
+      <td>Go Type</td>
+      <td>1735 24W</td>
+    </tr>
+    <tr>
+      <th>Go 3</th>
+      <td>2021-10-05</td>
+      <td class="text-left">11 HomeS<br>10/11 Pro</td>
+      <td class="text-left">Gold-6500Y FL<br>i3-10100Y</td>
+      <td class="text-left">-</td>
+      <td class="text-left">-</td>
+      <td>4GB</td>
+      <td>8GB</td>
+      <td>-</td>
+      <td>-</td>
+      <td>64GB</td>
+      <td>128GB</td>
+      <td>256GB</td>
+      <td>-</td>
+      <td>-</td>
+      <td>10.5</td>
+      <td>1920x1280</td>
+      <td>544g<br>553g</td>
+      <td>11.0h</td>
+      <td>-</td>
+      <td>○</td>
+      <td>○</td>
+      <td>-</td>
+      <td>○</td>
+      <td>Go Type</td>
+      <td>1735 24W</td>
+    </tr>
+  </tbody>
+</table>
+
+  </body>
+</html>
