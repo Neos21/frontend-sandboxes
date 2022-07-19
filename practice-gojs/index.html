@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Practice GoJS</title>
+    <style>
+
+*, ::before, ::after { box-sizing: border-box; }
+html { font-family: sans-serif; }
+
+#my-diagram {
+  width: 400px;
+  height: 400px;
+  border: 1px solid #000;
+}
+
+    </style>
+    <script src="https://unpkg.com/gojs@2.2.12/release/go.js"></script>
+    <script>
+
+document.addEventListener('DOMContentLoaded', () => {
+  // create a Diagram for the HTML Div element
+  const myDiagram = new go.Diagram('my-diagram', {
+    'undoManager.isEnabled': true  // enable undo & redo
+  });
+  
+  // define a simple Node template
+  myDiagram.nodeTemplate = new go.Node('Auto')  // the Shape will automatically surround the TextBlock
+    // add a Shape and a TextBlock to this 'Auto' Panel
+    // no border; default fill is white
+    // Shape.fill is bound to Node.data.color
+    .add(new go.Shape('RoundedRectangle', { strokeWidth: 0, fill: '#f0f' }).bind('fill', 'color'))
+    // some room around the text
+    // TextBlock.text is bound to Node.data.key
+    .add(new go.TextBlock({ margin: 10, font: 'bold 16px sans-serif', stroke: '#222' }).bind('text', 'key'));
+  // but use the default Link template, by not setting Diagram.linkTemplate
+  
+  // create the model data that will be represented by Nodes and Links
+  myDiagram.model = new go.GraphLinksModel(
+    [
+      { key: 'Alpha'                  },
+      { key: 'Beta' , color: 'orange' },
+      { key: 'Gamma', color: 'green'  },
+      { key: 'Delta', color: 'pink'   }
+    ],
+    [
+      { from: 'Alpha', to: 'Beta'  },
+      { from: 'Alpha', to: 'Gamma' },
+      { from: 'Beta' , to: 'Beta'  },
+      { from: 'Gamma', to: 'Beta'  },
+      { from: 'Beta' , to: 'Gamma' },
+      { from: 'Delta', to: 'Alpha' }
+    ]);
+});
+
+    </script>
+  </head>
+  <body>
+
+<h1>Practice GoJS</h1>
+
+<div id="my-diagram"></div>
+
+  </body>
+</html>
