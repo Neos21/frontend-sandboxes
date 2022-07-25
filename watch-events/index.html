@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Watch Events</title>
+    <style>
+
+*, ::before, ::after {
+  box-sizing: border-box;
+}
+
+html {
+  height: 100%;
+  font-family: sans-serif;
+}
+
+body {
+  height: 100%;
+  margin: 0 .5rem;
+  font-family: monospace;
+  white-space: nowrap;
+}
+
+.wrapper {
+  margin: 0 .5rem;
+  height: 100%;
+  display: grid;
+  grid-template: "title         title           title         title          title          " auto
+                 "header-window header-document header-button header-textbox header-checkbox" auto
+                 "events-window events-document events-button events-textbox events-checkbox" 1fr
+               / 1fr            1fr             1fr           1fr            1fr;
+  gap: .25rem .5rem;
+}
+
+.title           { grid-area: title          ; }
+.header-window   { grid-area: header-window  ; }
+.header-document { grid-area: header-document; }
+.header-button   { grid-area: header-button  ; }
+.header-textbox  { grid-area: header-textbox ; }
+.header-checkbox { grid-area: header-checkbox; }
+#events-window   { grid-area: events-window  ; }
+#events-document { grid-area: events-document; }
+#events-button   { grid-area: events-button  ; }
+#events-textbox  { grid-area: events-textbox ; }
+#events-checkbox { grid-area: events-checkbox; }
+
+h1 {
+  margin: .5rem 0;
+  font-size: 1rem;
+  text-align: center;
+}
+
+label {
+  font-weight: normal;
+}
+
+h2 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.wrapper > div {
+  margin-bottom: .5rem;
+  padding: .5rem;
+  border: 1px solid #ccc;
+  overflow: auto scroll;
+}
+
+.active {
+  color: #f00;
+  font-weight: bold;
+}
+
+    </style>
+    <script>
+
+document.addEventListener('DOMContentLoaded', () =>{
+  const isOutputConsoleElement = document.getElementById('is-output-console');
+  
+  const generateEvents = (targetObject, objectName) => {
+    const propertyNames = [];
+    for(const propertyName in targetObject) propertyNames.push(propertyName);
+    
+    const eventNames = propertyNames
+      .filter((propertyName) => propertyName.startsWith('on'))
+      .map((propertyName) => propertyName.replace((/^on/), ''))
+      .sort();
+    
+    const eventsHtml = eventNames.map((eventName) => `<div id="event-${objectName}-${eventName}">${eventName}</div>`).join('');
+    document.getElementById(`events-${objectName}`).insertAdjacentHTML('afterbegin', eventsHtml);
+    
+    eventNames.forEach((eventName) => {
+      targetObject.addEventListener(eventName, (event) => {
+        if(isOutputConsoleElement.checked) console.log(new Date().toISOString(), `${objectName} : ${eventName}`, event);
+        document.getElementById(`event-${objectName}-${eventName}`).classList.add('active');
+        setTimeout(() => document.getElementById(`event-${objectName}-${eventName}`).classList.remove('active'), 1000);
+      });
+    });
+  };
+  
+  generateEvents(window                             , 'window'  );
+  generateEvents(document                           , 'document');
+  generateEvents(document.getElementById('button'  ), 'button'  );
+  generateEvents(document.getElementById('textbox' ), 'textbox' );
+  generateEvents(document.getElementById('checkbox'), 'checkbox');
+});
+
+    </script>
+  </head>
+  <body>
+
+<div class="wrapper">
+  <h1 class="title">Watch Events : <label><input type="checkbox" id="is-output-console" accesskey="z"> Output Console <small>(AccessKey : z)</small></h1>
+  
+  <h2 class="header-window"  >Window</h2>
+  <h2 class="header-document">Document</h2>
+  <h2 class="header-button"  >Button <button type="button" id="button">Button</button></h2>
+  <h2 class="header-textbox" >Textbox <input type="text" id="textbox" value="" placeholder="Textbox"></h2>
+  <h2 class="header-checkbox">Checkbox <input type="checkbox" id="checkbox"></h2>
+  
+  <div id="events-window"  ></div>
+  <div id="events-document"></div>
+  <div id="events-button"  ></div>
+  <div id="events-textbox" ></div>
+  <div id="events-checkbox"></div>
+</div>
+
+  </body>
+</html>
