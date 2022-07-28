@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Huge Initial Load</title>
+    <style>
+
+html { font-family: monospace; }
+div, li { white-space: pre; }
+div { font-weight: bold; }
+span { font-weight: normal; }
+h1, ul, pre, table { margin-top: .25rem; }
+pre { height: 8rem; overflow-y: scroll; }
+
+input[type="number"] {
+  width: 10rem;
+  font-size: 16px;
+  text-align: right;
+}
+
+table { border-collapse: collapse; font-size: .86rem; }
+th, td { vertical-align: top; border: 1px solid #ccc; padding: .2rem .4rem; }
+th, tr td:not(:last-of-type) { white-space: nowrap; }
+th { background: #f0f0f0; }
+tr td:last-of-type { font-size: .8rem; }
+ul.memo li { white-space: normal; }
+strong { color: #f00; }
+
+    </style>
+    <script>
+
+let logText = '';
+
+document.addEventListener('DOMContentLoaded', async () => {
+  const params = [...new URLSearchParams(location.search)].reduce((acc, pair) => ({...acc, [pair[0]]: pair[1]}), {});
+  // 全体
+  const operation      = ['s' , 'p' ].includes(params.p)          ? params.p           : 's' ;  // s (直列実行・デフォルト)、p (並列実行)
+  const order          = ['sa', 'as'].includes(params.o)          ? params.o           : 'sa';  // 処理の実行順・Promise.all の配列の順序 … sa (同期 → 非同期・デフォルト)、as (非同期 → 同期)
+  // 同期処理
+  const syncType       = ['s', 'p', 't', 'pt'].includes(params.s) ? params.s           : 's' ;  // s (通常の直列・デフォルト)、p (Promise でのラップ)、t (setTimeout でのラップ)、pt (Promise 内で setTimeout ラップ)
+  const syncLoop       = Number.isInteger(Number(params.l))       ? Number(params.l)   : 2_000_000_000;  // 同期処理のループ処理回数
+  const syncTimeoutMs  = Number.isInteger(Number(params.sms))     ? Number(params.sms) : 0;     // setTimeout ラップの際の遅延
+  // 非同期処理
+  const asyncTimeoutMs = Number.isInteger(Number(params.ams))     ? Number(params.ams) : 3000;  // 非同期処理の遅延
+  
+  // Settings 出力
+  const htmlOperation      = `<li>処理方式         (p)   : ${operation} (${operation === 's' ? '直列実行' : '並列実行'})</li>`;
+  const htmlOrder          = `<li>実行順序         (o)   : ${order} (${order === 'sa' ? '同期処理 → 非同期処理' : '非同期処理 → 同期処理'})</li>`;
+  const htmlSyncType       = `<li>同期処理のタイプ (s)   : ${syncType} (${syncType === 's' ? '通常の同期処理' : syncType === 'p' ? 'Promise でラップした同期処理' : syncType === 't' ? 'setTimeout でラップした同期処理' : 'Promise と setTimeout でラップした同期処理'})</li>`;
+  const htmlSyncLoop       = `<li>同期処理のループ (l)   : ${syncLoop}</li>`;
+  const htmlSyncTimeoutMs  = `<li>同期処理の遅延   (sms) : ${syncTimeoutMs}${syncType === 's' ? ' (通常の同期処理のため無効)' : syncType === 'p' ? ' (Promise ラップの同期処理のため無効)' : ''}</li>`;
+  const htmlAsyncTimeoutMs = `<li>非同期処理の遅延 (ams) : ${asyncTimeoutMs}`;
+  document.getElementById('settings').innerHTML = htmlOperation + htmlOrder + htmlSyncType + htmlSyncLoop + htmlSyncTimeoutMs + htmlAsyncTimeoutMs;
+  
+  // Reload 設定
+  document.querySelector(`input[type="radio"][name="operation"][value="${operation}"]`).checked = true;
+  document.querySelector(`input[type="radio"][name="order"][value="${order}"]`        ).checked = true;
+  document.querySelector(`input[type="radio"][name="sync-type"][value="${syncType}"]` ).checked = true;
+  document.getElementById('sync-loop'       ).value = syncLoop;
+  document.getElementById('sync-timeout-ms' ).value = syncTimeoutMs;
+  document.getElementById('async-timeout-ms').value = asyncTimeoutMs;
+  // Reload ボタン
+  document.getElementById('reload-button').addEventListener('click', () => {
+    const selectedOperation   = document.querySelector('input[type="radio"][name="operation"]:checked').value;
+    const selectedOrder       = document.querySelector('input[type="radio"][name="order"]:checked'    ).value;
+    const selectedSyncType    = document.querySelector('input[type="radio"][name="sync-type"]:checked').value;
+    const inputSyncLoop       = document.getElementById('sync-loop'       ).value;
+    const inputSyncTimeoutMs  = document.getElementById('sync-timeout-ms' ).value;
+    const inputAsyncTimeoutMs = document.getElementById('async-timeout-ms').value;
+    if(inputSyncLoop === '' || inputSyncTimeoutMs === '' || inputAsyncTimeoutMs === '') return alert('Please Input A Number');
+    if(!Number.isInteger(Number(inputSyncLoop)) || !Number.isInteger(Number(inputSyncTimeoutMs)) || !Number.isInteger(Number(inputAsyncTimeoutMs))) return alert('Please Input A Valid Number');
+    location.href = location.pathname + `?p=${selectedOperation}&o=${selectedOrder}&s=${selectedSyncType}&l=${inputSyncLoop}&sms=${inputSyncTimeoutMs}&ams=${inputAsyncTimeoutMs}`;
+  });
+  
+  // F5 更新時に画面描画の状態が変わることを分かりやすくするため
+  window.addEventListener('beforeunload', () => {
+    document.body.innerHTML = '';
+  });
+  
+  // 処理開始
+  if(operation === 's') {     // 直列実行
+    if(order === 'sa') {      // 同期 → 非同期
+      if(syncType === 's') {  // 通常同期
+        const syncResult  = syncFunction(syncLoop);
+        const asyncResult = await asyncFunction(asyncTimeoutMs);
+        outputAllResult(syncResult, asyncResult);
+      } else if(syncType === 'p') {  // Promise ラップ
+        const syncResult  = await syncFunctionToPromise(syncLoop);
+        const asyncResult = await asyncFunction(asyncTimeoutMs);
+        outputAllResult(syncResult, asyncResult);
+      } else if(syncType === 't') {  // setTimeout ラップ
+        const syncResult  = syncFunctionToSetTimeout(syncLoop, syncTimeoutMs);
+        const asyncResult = await asyncFunction(asyncTimeoutMs);
+        outputAllResult(syncResult, asyncResult);
+      } else if(syncType === 'pt') { // Promise・setTimeout ラップ
+        const syncResult  = await syncFunctionToPromiseSetTimeout(syncLoop, syncTimeoutMs);
+        const asyncResult = await asyncFunction(asyncTimeoutMs);
+        outputAllResult(syncResult, asyncResult);
+      } else { throw new Error('Invalid Sync Type In Operation:Serial Order:Sync-Async'); }
+    }
+    else if(order === 'as') {  // 非同期 → 同期
+      if(syncType === 's') {     // 通常同期
+        const asyncResult = await asyncFunction(asyncTimeoutMs);
+        const syncResult  = syncFunction(syncLoop);
+        outputAllResult(syncResult, asyncResult);
+      } else if(syncType === 'p') {  // Promise ラップ
+        const asyncResult = await asyncFunction(asyncTimeoutMs);
+        const syncResult  = await syncFunctionToPromise(syncLoop);
+        outputAllResult(syncResult, asyncResult);
+      } else if(syncType === 't') {  // setTimeout ラップ
+        const asyncResult = await asyncFunction(asyncTimeoutMs);
+        const syncResult  = syncFunctionToSetTimeout(syncLoop, syncTimeoutMs);
+        outputAllResult(syncResult, asyncResult);
+      } else if(syncType === 'pt') { // Promise・setTimeout ラップ
+        const asyncResult = await asyncFunction(asyncTimeoutMs);
+        const syncResult  = await syncFunctionToPromiseSetTimeout(syncLoop, syncTimeoutMs);
+        outputAllResult(syncResult, asyncResult);
+      } else { throw new Error('Invalid Sync Type In Operation:Serial Order:Async-Sync'); }
+    } else { throw new Error('Invalid Order In Operation:s'); }
+  }
+  else if(operation === 'p') {  // 並列実行
+    if(order === 'sa') {        // 同期 → 非同期
+      if(syncType === 's') {    // 通常同期
+        const [syncResult, asyncResult] = await Promise.all([syncFunction(syncLoop)                                  , asyncFunction(asyncTimeoutMs)]);
+        outputAllResult(syncResult, asyncResult);
+      } else if(syncType === 'p') {  // Promise ラップ
+        const [syncResult, asyncResult] = await Promise.all([syncFunctionToPromise(syncLoop)                         , asyncFunction(asyncTimeoutMs)]);
+        outputAllResult(syncResult, asyncResult);
+      } else if(syncType === 't') {  // setTimeout ラップ
+        const [syncResult, asyncResult] = await Promise.all([syncFunctionToSetTimeout(syncLoop, syncTimeoutMs)       , asyncFunction(asyncTimeoutMs)]);
+        outputAllResult(syncResult, asyncResult);
+      } else if(syncType === 'pt') { // Promise・setTimeout ラップ
+        const [syncResult, asyncResult] = await Promise.all([syncFunctionToPromiseSetTimeout(syncLoop, syncTimeoutMs), asyncFunction(asyncTimeoutMs)]);
+        outputAllResult(syncResult, asyncResult);
+      } else { throw new Error('Invalid Sync Type In Operation:Serial Order:Sync-Async'); }
+    }
+    else if(order === 'as') {  // 非同期 → 同期
+      if(syncType === 's') {     // 通常同期
+        const [asyncResult, syncResult] = await Promise.all([asyncFunction(asyncTimeoutMs), syncFunction(syncLoop)                                  ]);
+        outputAllResult(syncResult, asyncResult);
+      } else if(syncType === 'p') {  // Promise ラップ
+        const [asyncResult, syncResult] = await Promise.all([asyncFunction(asyncTimeoutMs), syncFunctionToPromise(syncLoop)                         ]);
+        outputAllResult(syncResult, asyncResult);
+      } else if(syncType === 't') {  // setTimeout ラップ
+        const [asyncResult, syncResult] = await Promise.all([asyncFunction(asyncTimeoutMs), syncFunctionToSetTimeout(syncLoop, syncTimeoutMs)       ]);
+        outputAllResult(syncResult, asyncResult);
+      } else if(syncType === 'pt') { // Promise・setTimeout ラップ
+        const [asyncResult, syncResult] = await Promise.all([asyncFunction(asyncTimeoutMs), syncFunctionToPromiseSetTimeout(syncLoop, syncTimeoutMs)]);
+        outputAllResult(syncResult, asyncResult);
+      } else { throw new Error('Invalid Sync Type In Operation:Serial Order:Async-Sync'); }
+    } else { throw new Error('Invalid Order In Operation:s'); }
+  } else { throw new Error('Invalid Operation'); }
+});
+
+function log(...values) {
+  logText += values.join('  ') + '\n';
+  console.log(...values);
+}
+
+function syncFunction(loop) {
+  log(new Date().toISOString(), 'Sync Start', window.performance.now());
+  let syncResult = 0;
+  for(let i = 0; i < loop; i++) {  // 10億 (1_000_000_000) 回ループで1秒程度かかる
+    syncResult = i * 1000;
+  }
+  log(new Date().toISOString(), 'Sync End!!', window.performance.now());
+  document.getElementById('sync-result').innerText = syncResult;
+  return syncResult;
+}
+
+function syncFunctionToPromise(loop) {
+  log(new Date().toISOString(), 'Sync Function To Promise', window.performance.now());
+  return new Promise((resolve) => {
+    const syncResult = syncFunction(loop);
+    resolve(syncResult);
+  });
+}
+
+function syncFunctionToSetTimeout(loop, ms) {
+  log(new Date().toISOString(), 'Sync Function To SetTimeout', window.performance.now());
+  setTimeout(() => {
+    log(new Date().toISOString(), 'Sync Function To SetTimeout Start', window.performance.now());
+    const syncResult = syncFunction(loop);
+    log(new Date().toISOString(), 'Sync Function To SetTimeout End!!', window.performance.now(), syncResult);
+  }, ms);
+  return '(See Console)';
+}
+
+function syncFunctionToPromiseSetTimeout(loop, ms) {
+  log(new Date().toISOString(), 'Sync Function To Promise SetTimeout', window.performance.now());
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      log(new Date().toISOString(), 'Sync Function To Promise SetTimeout Start', window.performance.now());
+      const syncResult = syncFunction(loop);
+      log(new Date().toISOString(), 'Sync Function To Promise SetTimeout End!!', window.performance.now());
+      resolve(syncResult);
+    }, ms);
+  });
+}
+
+async function asyncFunction(ms) {
+  log(new Date().toISOString(), 'Async Start', window.performance.now());
+  const wait = waitMs => new Promise(resolve => setTimeout(() => resolve(waitMs), waitMs));
+  const asyncResult = await wait(ms);
+  log(new Date().toISOString(), 'Async End!!', window.performance.now());
+  document.getElementById('async-result').innerText = asyncResult;
+  return asyncResult;
+}
+
+function outputAllResult(syncResult, asyncResult) {
+  document.getElementById('all-result').innerText = `[${syncResult}] … [${asyncResult}]`;
+  document.getElementById('logs').innerText = logText;
+}
+
+    </script>
+  </head>
+  <body>
+
+<h1>Huge Initial Load : See Console Log</h1>
+
+<div>Sync  : <span id="sync-result"></span></div>
+<div>Async : <span id="async-result"></span></div>
+<div>All   : <span id="all-result"></span></div>
+<div>Settings :</div>
+<ul id="settings"></ul>
+
+<div>Logs :</div>
+<pre id="logs"></pre>
+
+<hr>
+<div>Reload :</div>
+<ul id="reload-settings">
+  <li>処理方式         (p)   : <label><input type="radio" name="operation" value="s"> s (直列実行)</label>
+                         <label><input type="radio" name="operation" value="p"> p (並列実行)</label></li>
+  <li>実行順序         (o)   : <label><input type="radio" name="order" value="sa"> sa (同期処理 → 非同期処理)</label>
+                         <label><input type="radio" name="order" value="as"> as (非同期処理 → 同期処理)</label></li>
+  <li>同期処理のタイプ (s)   : <label><input type="radio" name="sync-type" value="s"> s (通常の同期処理)</label>
+                         <label><input type="radio" name="sync-type" value="p"> p (Promise でラップした同期処理)</label>
+                         <label><input type="radio" name="sync-type" value="t"> t (setTimeout でラップした同期処理)</label>
+                         <label><input type="radio" name="sync-type" value="pt"> pt (Promise と setTimeout でラップした同期処理)</label></li>
+  <li>同期処理のループ (l)   : <input type="number" id="sync-loop"        min="0" value="" placeholder="Sync Loop"></li>
+  <li>同期処理の遅延   (sms) : <input type="number" id="sync-timeout-ms"  min="0" value="" placeholder="Sync Timeout Ms"></li>
+  <li>非同期処理の遅延 (ams) : <input type="number" id="async-timeout-ms" min="0" value="" placeholder="Async Timeout Ms"></li>
+  <li><button type="button" id="reload-button">Reload</button></li>
+</ul>
+
+<hr>
+<div>当方調べの結果 (「同期処理のループ回数 (l)」はいずれも 2000000000) :</div>
+<table>
+  <thead>
+    <tr>
+      <th>処理方式 (p)</th>
+      <th>実行順序 (o)</th>
+      <th>同期処理タイプ (s)</th>
+      <th>同期遅延</th>
+      <th>非同期遅延</th>
+      <th>見え方</th>
+      <th>メモ</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td rowspan="8">s<br>(直列実行)</td>
+      <td rowspan="4">sa<br>(同期 → 非同期)</td>
+      <td>s (通常同期)</td>
+      <td>-</td>
+      <td>3000</td>
+      <td>初期表示+同期結果 → 非同期結果</td>
+      <td>同期処理が終わるまで初期表示がされない</td>
+    </tr>
+    <tr>
+      <td>p (Promise)</td>
+      <td>-</td>
+      <td>3000</td>
+      <td>初期表示+同期結果 → 非同期結果</td>
+      <td>同期処理が終わるまで初期表示がされない (通常同期と同じ)</td>
+    </tr>
+    <tr>
+      <td>t (setTimeout)</td>
+      <td>0</td>
+      <td>3000</td>
+      <td>初期表示 → 同期結果 → 非同期結果</td>
+      <td>同期遅延を遅らせても同じ</td>
+    </tr>
+    <tr>
+      <td>pt (Promise+setTimeout)</td>
+      <td>0</td>
+      <td>3000</td>
+      <td>初期表示 → 同期結果 → 非同期結果</td>
+      <td>同期遅延を遅らせても同じ (setTimeout ラップと同じ)</td>
+    </tr>
+    <tr>
+      <td rowspan="4">as<br>(非同期 → 同期)</td>
+      <td>s (通常同期)</td>
+      <td>-</td>
+      <td>3000</td>
+      <td>初期表示 → 非同期結果+同期結果</td>
+      <td>コンソール上では非同期が終了しているのに、DOM には描画されない</td>
+    </tr>
+    <tr>
+      <td>p (Promise)</td>
+      <td>-</td>
+      <td>3000</td>
+      <td>初期表示 → 非同期結果+同期結果</td>
+      <td>コンソール上では非同期が終了しているのに、DOM には描画されない (同期処理と同じ)</td>
+    </tr>
+    <tr>
+      <td>t (setTimeout)</td>
+      <td>0</td>
+      <td>3000</td>
+      <td>初期表示 → 非同期結果 → 同期結果</td>
+      <td>同期処理が軽い場合でも、非同期処理結果表示 → 同期処理結果表示の順で動いている</td>
+    </tr>
+    <tr>
+      <td>pt (Promise+setTimeout)</td>
+      <td>0</td>
+      <td>3000</td>
+      <td>初期表示 → 非同期結果 → 同期結果</td>
+      <td>同期処理が軽い場合でも、非同期処理結果表示 → 同期処理結果表示の順で動いている (setTimeout ラップと同じ)</td>
+    </tr>
+    <tr>
+      <td rowspan="16">p<br>(並列実行)</td>
+      <td rowspan="8">sa<br>(同期 → 非同期)</td>
+      <td>s (通常同期)</td>
+      <td>-</td>
+      <td>3000</td>
+      <td>初期表示+同期結果 → 非同期結果</td>
+      <td>同期処理が終わるまで初期表示がされない (直列実行の同期 → 非同期と同じ)</td>
+    </tr>
+    <tr>
+      <td>p (Promise)</td>
+      <td>-</td>
+      <td>3000</td>
+      <td>初期表示+同期結果 → 非同期結果</td>
+      <td>同期処理が終わるまで初期表示がされない (通常同期、および、直列実行の同期 → 非同期と同じ)</td>
+    </tr>
+    <tr>
+      <td rowspan="3">t (setTimeout)</td>
+      <td>0</td>
+      <td>3000</td>
+      <td>初期表示 → 同期結果 → 非同期結果</td>
+      <td>計算が終わった方から順に表示</td>
+    </tr>
+    <tr>
+      <td>0</td>
+      <td>0 (早)</td>
+      <td>初期表示 → 同期結果 → 非同期結果<br>(ほぼ同時の場合もある)</td>
+      <td>同期処理が始まってブロックしていると、非同期処理が完了せず待たされる。結果的に同時表示とか、同期結果 → 非同期結果 の順となる</td>
+    </tr>
+    <tr>
+      <td>1000 (遅)</td>
+      <td>0 (早)</td>
+      <td>初期表示 → 非同期結果 → 同期結果</td>
+      <td>非同期処理が終わるまで、同期処理が遅延できた場合は、同期処理によるブロックが起こらないので、先に非同期結果が見える</td>
+    </tr>
+    <tr>
+      <td rowspan="3">pt (Promise+setTimeout)</td>
+      <td>0</td>
+      <td>3000</td>
+      <td>初期表示 → 同期結果 → 非同期結果</td>
+      <td>計算が終わった方から順に表示 (setTimeout ラップと同じ)</td>
+    </tr>
+    <tr>
+      <td>0</td>
+      <td>0 (早)</td>
+      <td>初期表示 → 同期結果 → 非同期結果<br>(ほぼ同時の場合もある)</td>
+      <td>同期処理が始まってブロックしていると、非同期処理が完了せず待たされる。結果的に同時表示とか、同期結果 → 非同期結果 の順となる (setTimeout ラップと同じ)</td>
+    </tr>
+    <tr>
+      <td>1000 (遅)</td>
+      <td>0 (早)</td>
+      <td>初期表示 → 非同期結果 → 同期結果</td>
+      <td>非同期処理が終わるまで、同期処理が遅延できた場合は、同期処理によるブロックが起こらないので、先に非同期結果が見える (setTimeout ラップと同じ)</td>
+    </tr>
+    <tr>
+      <td rowspan="8">as<br>(非同期 → 同期)</td>
+      <td>s (通常同期)</td>
+      <td>-</td>
+      <td>3000</td>
+      <td>初期表示+同期結果 → 非同期結果</td>
+      <td>同期処理が終わるまで初期表示がされない (直列実行・並列実行の同期 → 非同期と同じ)</td>
+    </tr>
+    <tr>
+      <td>p (Promise)</td>
+      <td>-</td>
+      <td>3000</td>
+      <td>初期表示+同期結果 → 非同期結果</td>
+      <td>同期処理が終わるまで初期表示がされない (通常同期、および、直列実行の同期 → 非同期と同じ)</td>
+    </tr>
+    <tr>
+      <td rowspan="3">t (setTimeout)</td>
+      <td>0</td>
+      <td>3000</td>
+      <td>初期表示 → 同期結果 → 非同期結果</td>
+      <td>計算が終わった方から順に表示 (並列実行の同期 → 非同期と同じ)</td>
+    </tr>
+    <tr>
+      <td>0</td>
+      <td>0 (早)</td>
+      <td>初期表示 → 同期結果 → 非同期結果<br>(ほぼ同時の場合もある)</td>
+      <td>同期処理が始まってブロックしていると、非同期処理が完了せず待たされる。結果的に同時表示とか、同期結果 → 非同期結果 の順となる (同じ)</td>
+    </tr>
+    <tr>
+      <td>1000 (遅)</td>
+      <td>0 (早)</td>
+      <td>初期表示 → 非同期結果 → 同期結果</td>
+      <td>非同期処理が終わるまで、同期処理が遅延できた場合は、同期処理によるブロックが起こらないので、先に非同期結果が見える (同じ)</td>
+    </tr>
+    <tr>
+      <td rowspan="3">pt (Promise+setTimeout)</td>
+      <td>0</td>
+      <td>3000</td>
+      <td>初期表示 → 同期結果 → 非同期結果</td>
+      <td>計算が終わった方から順に表示 (setTimeout ラップと同じ)</td>
+    </tr>
+    <tr>
+      <td>0</td>
+      <td>0 (早)</td>
+      <td>初期表示 → 同期結果 → 非同期結果<br>(ほぼ同時の場合もある)</td>
+      <td>同期処理が始まってブロックしていると、非同期処理が完了せず待たされる。結果的に同時表示とか、同期結果 → 非同期結果 の順となる (setTimeout ラップと同じ)</td>
+    </tr>
+    <tr>
+      <td>1000 (遅)</td>
+      <td>0 (早)</td>
+      <td>初期表示 → 非同期結果 → 同期結果</td>
+      <td>非同期処理が終わるまで、同期処理が遅延できた場合は、同期処理によるブロックが起こらないので、先に非同期結果が見える (setTimeout ラップと同じ)</td>
+    </tr>
+  </tbody>
+</table>
+<ul class="memo">
+  <li>重い同期処理があると、初期表示のレンダリングもブロックされてしまい、真っ白な画面がしばらく続いてしまう。重い同期処理が終わったタイミングで初期表示のレンダリングと同時に画面描画がされるような挙動になる</li>
+  <li><strong>重い同期処理をsetTimeout でラップすることで、初期表示のレンダリングを先に終わらせて、真っ白な画面の時間を短くできそう。</strong>重い同期処理を Promise のみでラップするのは効果がない。Promise 内で setTimeout を重ねるのは setTimeout でのラップだけと同じなので、Promise ラップ自体は全く影響を及ぼさない、不要</li>
+  <li>重い同期処理が始まると結局、並列動作している非同期処理もブロックされてしまう。「軽めの非同期処理」と「重い同期処理」があるなら、「重い同期処理」の開始を setTimeout で少し遅延させる方が、先に「軽めの非同期処理」の結果が表示されることが期待できるかもしれない</li>
+</ul>
+
+  </body>
+</html>
