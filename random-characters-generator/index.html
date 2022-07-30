@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Random Characters Generator</title>
+    <style>
+
+*, ::before, ::after { box-sizing: border-box; }
+html { font-family: sans-serif; }
+
+body {
+  margin: .5rem;
+  color: #000;
+  text-align: center;
+  background: #fff;
+}
+
+h1 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+form {
+  margin: 1rem 0 2rem;
+  white-space: nowrap;
+}
+
+button, input {
+  margin: 0;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: .2rem .75rem;
+  color: inherit;
+  font-family: monospace;
+  font-size: 16px;
+}
+
+button {
+  margin-right: .2rem;
+  background: #f6f6f6;
+  cursor: pointer;
+}
+
+button:hover, button:focus {
+  background: #ececec;
+}
+
+input {
+  width: 6rem;
+  text-align: right;
+  background: #fff;
+}
+
+div {
+  margin-top: 1.5rem;
+  font-size: 1.2rem;
+}
+
+strong {
+  color: #f00;
+}
+
+    </style>
+    <script>
+
+const generateArray = (min, max) => [...Array(max - min + 1)].map((_, i) => i + min);  // min ～ max (Includes Both Value)
+const codePointToString = codePoint => String.fromCodePoint(codePoint);
+
+// Ref : https://www.asahi-net.or.jp/~ax2s-KMTN/ref/unicode/u3040.html
+const arrayHiragana = [
+  ...generateArray(12353, 12438).map(codePointToString),  // \u3041 ぁ ～ // \u3096 ゖ
+  'ー'                                                    // \u30FC 12540
+];
+
+// Ref : https://www.asahi-net.or.jp/~ax2s-KMTN/ref/unicode/u30a0.html
+const arrayKatakana = [
+  ...generateArray(12449, 12538).map(codePointToString),  // \u30A1 ァ ～ \u30FA ヺ
+  'ー'                                                    // \u30FC 12540
+];
+
+// Ref : https://www.asahi-net.or.jp/~ax2s-KMTN/ref/unicode/u31f0.html
+const arrayKatakanaExtension = [
+  ...arrayKatakana,
+  ...generateArray(12784, 12799).map(codePointToString)  // \u31F0 ㇰ ～ \u31FF ㇿ
+];
+
+// Ref : https://www.asahi-net.or.jp/~ax2s-KMTN/ref/unicode/uff00.html#hkv
+const arrayHalfWidthKatakana = (() => {
+  const arrayForVSMAndSVSM = generateArray(65418, 65422).map(codePointToString);  // \uFF8A ﾊ ～ \uFF8E ﾎ
+  return [
+    ...generateArray(65382, 65437).map(codePointToString),    // \uFF66 ｦ ～ \uFF9D ﾝ
+    ...[
+      ...generateArray(65398, 65412).map(codePointToString),  // \uFF76 ｶ ～ \uFF84 ﾄ
+      ...arrayForVSMAndSVSM,
+      'ﾜ',  // \uFF9C 65436
+      'ｦ',  // \uFF66 65382
+      'ｳ'   // \uFF73 65395
+    ]                    .map(character => character + 'ﾞ'),  // \uFF9E 65438 Voiced Sound Mark
+    ...arrayForVSMAndSVSM.map(character => character + 'ﾟ')   // \uFF9F 65439 Semi Voiced Sound Mark
+  ];
+})();
+
+const arrayHalfWidthKatakanaWidthWeirds = (() => {
+  const prolongedSoundMark     = 'ｰ';                         // \uFF70 65392
+  const arrayHalfWidthKatakana = generateArray(65382, 65437)  // \uFF66 ｦ ～ \uFF9D ﾝ
+    .map(codePointToString)
+    .filter(character => character !== prolongedSoundMark);
+  return [
+    ...arrayHalfWidthKatakana,
+    ...arrayHalfWidthKatakana.map(character => character + 'ﾞ'),  // \uFF9E 65438 Voiced Sound Mark
+    ...arrayHalfWidthKatakana.map(character => character + 'ﾟ'),  // \uFF9F 65439 Semi Voiced Sound Mark
+    prolongedSoundMark
+  ];
+})();
+
+const getRandomItem = array => array[Math.floor(Math.random() * array.length)];
+
+const getRandomText = (array, length) => {
+  if(!Array.isArray(array)     || array.length < 1) throw new Error('Invalid Array' );
+  if(!Number.isInteger(length) || length       < 1) throw new Error('Invalid Length');
+  return [...Array(length)].map(() => getRandomItem(array)).join('');
+};
+
+document.addEventListener('DOMContentLoaded', () => {
+  const exec = () => {
+    const lengthElement = document.getElementById('length');
+    if(!lengthElement.value.trim()           ) lengthElement.value = 3;
+    if(!Number.isInteger(lengthElement.value)) lengthElement.value = Math.round(lengthElement.value);
+    if(Number(lengthElement.value) < 1       ) lengthElement.value = 1;
+    const length = Number(lengthElement.value);
+    try {
+      document.getElementById('result').innerHTML = '<div>' + getRandomText(arrayHiragana                    , length) + '</div>'
+                                                  + '<div>' + getRandomText(arrayKatakana                    , length) + '</div>'
+                                                  + '<div>' + getRandomText(arrayKatakanaExtension           , length) + '</div>'
+                                                  + '<div>' + getRandomText(arrayHalfWidthKatakana           , length) + '</div>'
+                                                  + '<div>' + getRandomText(arrayHalfWidthKatakanaWidthWeirds, length) + '</div>';
+    }
+    catch(error) {
+      console.error('Error', error);
+      document.getElementById('result').innerHTML = `<strong>Error ... ${error}</strong>`;
+    }
+  };
+  
+  exec();
+  
+  const execElement = document.getElementById('exec');
+  execElement.addEventListener('click', event => {
+    event.preventDefault();
+    exec();
+  });
+  execElement.focus();
+});
+
+    </script>
+  </head>
+  <body>
+
+<h1>Random Characters Generator</h1>
+
+<form>
+  <button id="exec"   type="submit" accesskey="e"><u>E</u>xec</button>
+  <input  id="length" type="number" accesskey="l" value="3" min="1" step="1" placeholder="Length">
+</form>
+
+<div id="result"></div>
+
+  </body>
+</html>
