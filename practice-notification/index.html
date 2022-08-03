@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Practice Notification</title>
+    <style>
+
+*, ::before, ::after { box-sizing: border-box; }
+html { font-family: sans-serif; }
+
+.denied  { color: #f00; }
+.granted { color: #00f; }
+
+    </style>
+    <script>
+
+document.addEventListener('DOMContentLoaded', async () => {
+  console.log('Notification : Start');
+  
+  const permission = await Notification.requestPermission();  // ローカルファイルでは発火せず先に進まない・`localhost` で開発サーバを起動する必要がある
+  console.log('Permission : ', permission);
+  
+  if(permission !== 'granted') {
+    document.getElementById('message').textContent = '通知 API は許可されていません';
+    document.getElementById('message').classList.add('denied');
+    return;
+  }
+  else {
+    document.getElementById('message').textContent = '通知 API は許可されています';
+    document.getElementById('message').classList.add('granted');
+  }
+  
+  // https://developer.mozilla.org/ja/docs/Web/API/Notification/Notification
+  const notification = new Notification('Hello World', {  // タイトルを改行すると Mac Chrome では「…」で2行目が省略表示された
+    body: 'Hello Body\nほげほげ',  // タイトル下の本文・Mac Chrome では `\n` で改行できた
+    requireInteraction: true,  // ユーザが操作するまで閉じなくなる
+    data: 'My Data',  // テキトーに値を付与できる
+    //icon: './icon.png',  // Mac Chrome の場合、通知バナーの右側に表示される
+    //badge: './badge.png',  // Mac Chrome の場合、表示されず。表示領域が足りない場合に表示されるアイコンらしい
+    
+    renotify: true,  // 同じ通知を許可するかどうか
+    tag: 'my-notification',  // `renotify: true` の場合は必須。同一のタグ名を使用すると同じ通知としてグループ化される
+    
+    vibrate: [200],  // バイブレーション : https://developer.mozilla.org/ja/docs/Web/API/Vibration_API#vibration_patterns
+    //silent: true,  // `silent: true` と `vibrate` は併用不可
+    
+    //timestamp: 1600000000000,  // 指定のタイムスタンプが送れる
+    //dir: 'auto',  // テキストの方向
+    //lang: 'ja',  // 言語指定
+    
+    //actions: [  // `ServiceWorkerRegistration.showNotification()` でないと利用できない
+    //  { action: 'Action 1', title: 'Action Title 1', icon: './icon.png'  },
+    //  { action: 'Action 2', title: 'Action Title 2', icon: './badge.png' }
+    //],
+    //title: 'Hello World Title',  // 書いても無視される
+    //onclick: (event) => { console.log('On Click : ', event); },  // プロパティが見えたので試してみたが動作せず
+    //onclose: (event) => { console.log('On Close : ', event); },  // プロパティが見えたので試してみたが動作せず
+    //onerror: (event) => { console.log('On Error : ', event); },  // プロパティが見えたので試してみたが動作せず
+    //onshow : (event) => { console.log('On Show  : ', event); },  // プロパティが見えたので試してみたが動作せず
+  });
+  console.log('Notification : ', notification);
+  
+  document.getElementById('exec').addEventListener('click', () => {
+    console.log('Exec : Start');
+    const execNotification = new Notification('Hello World From Exec', {
+      body: 'Hello Hello!',
+      requireInteraction: true,
+      renotify: true,
+      tag: 'my-exec-notification',
+      vibrate: [200]
+    });
+    console.log('Exec : ', execNotification);
+  });
+});
+
+    </script>
+  </head>
+  <body>
+
+<h1>Practice Notification</h1>
+
+<p>通知許可設定 : <strong id="message">-</strong></p>
+<p><button type="button" id="exec">通知バナーを表示する</button></p>
+
+  </body>
+</html>
