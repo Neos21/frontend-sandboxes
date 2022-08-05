@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Practice Web Worker Inline</title>
+    <style>
+
+*, ::before, ::after { box-sizing: border-box; }
+html { font-family: sans-serif; }
+
+dt { font-weight: bold; }
+strong { color: #f00; }
+button { cursor: pointer; }
+
+    </style>
+    <script>
+
+document.addEventListener('DOMContentLoaded', () => {
+  const webWorkerCode = `
+    self.addEventListener('message', event => {
+      console.log('【Web Worker】メインスレッドからメッセージを受信', event, event.data);
+      self.postMessage(\`【\${new Date().toISOString()}】Web Worker はこのメッセージを受け取りました → [\${event.data}]\`);
+    });
+  `;
+  const webWorkerBlob = new Blob([webWorkerCode]);
+  const webWorkerBlobUrl = URL.createObjectURL(webWorkerBlob);
+  const webWorker = new Worker(webWorkerBlobUrl);
+  
+  webWorker.addEventListener('message', event => {
+    console.log('[Main] Web Worker からメッセージを受信', event, event.data);
+    document.getElementById('message').innerHTML = event.data;
+  });
+  
+  document.getElementById('post').addEventListener('click', () => {
+    const text = document.getElementById('text').value || '(No Text)';
+    webWorker.postMessage(text);
+  });
+});
+
+    </script>
+  </head>
+  <body>
+
+<h1>Practice Web Worker Inline</h1>
+
+<p>Web Worker の JS ファイルを別途用意することなく、本 HTML 内からインラインに Web Worker を生成しています。</p>
+<dl>
+  <dt>Web Worker にメッセージを送信</dt>
+  <dd>
+    <input type="text" id="text" value="Hello From Main!" placeholder="メッセージ">
+    <button type="button" id="post">Post</button>
+  </dd>
+  <dt>Web Worker からの返信</dt>
+  <dd id="message">-</dd>
+</dl>
+
+  </body>
+</html>

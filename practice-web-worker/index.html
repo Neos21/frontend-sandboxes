@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Practice Web Worker</title>
+    <style>
+
+*, ::before, ::after { box-sizing: border-box; }
+html { font-family: sans-serif; }
+
+dt { font-weight: bold; }
+strong { color: #f00; }
+button { cursor: pointer; }
+
+    </style>
+    <script>
+
+document.addEventListener('DOMContentLoaded', () => {
+  const webWorker = new Worker('./web-worker.js');
+  webWorker.addEventListener('message', event => {
+    console.log('[Main] Web Worker からメッセージを受信', event, event.data);
+    document.getElementById('message').innerHTML = event.data;
+  });
+  webWorker.addEventListener('error', error => {
+    console.warn('[Main] Web Worker でエラーが発生', error);
+    document.getElementById('message').innerHTML = `<strong>Web Worker でエラーが発生したようです → [${error.message}]</strong>`;
+  });
+  // 終了させるには `webWorker.terminate();`
+  
+  document.getElementById('post').addEventListener('click', () => {
+    const text = document.getElementById('text').value || '(No Text)';
+    webWorker.postMessage(text);
+  });
+});
+
+    </script>
+  </head>
+  <body>
+
+<h1>Practice Web Worker</h1>
+
+<dl>
+  <dt>Web Worker にメッセージを送信 (「ERROR」と送るとエラーイベントを確認できます)</dt>
+  <dd>
+    <input type="text" id="text" value="Hello From Main!" placeholder="メッセージ">
+    <button type="button" id="post">Post</button>
+  </dd>
+  <dt>Web Worker からの返信</dt>
+  <dd id="message">-</dd>
+</dl>
+
+<ul>
+  <li><a href="./inline.html">インラインで Web Worker を生成する</a></li>
+</ul>
+
+  </body>
+</html>
