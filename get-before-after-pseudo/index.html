@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Get Before After Pseudo</title>
+    <style>
+
+*, ::before, ::after { box-sizing: border-box; }
+html { font-family: sans-serif; }
+
+strong::before { content: "Before"; margin-right: 1em; }
+strong::after  { content: "After" ; margin-left : 1em; }
+
+    </style>
+    <script>
+
+document.addEventListener('DOMContentLoaded', () => {
+  const beforePseudo = window.getComputedStyle(document.querySelector('strong'), '::before');
+  const  afterPseudo = window.getComputedStyle(document.querySelector('strong'), '::after' );
+  const beforeContent = beforePseudo.getPropertyValue('content');
+  const  afterContent =  afterPseudo.getPropertyValue('content');
+  console.log({ beforePseudo, afterPseudo, beforeContent, afterContent });
+  document.getElementById('before').textContent = beforeContent.replace((/^"(.*)"$/), '$1');
+  document.getElementById('after' ).textContent =  afterContent.replace((/^"(.*)"$/), '$1');
+});
+
+    </script>
+  </head>
+  <body>
+
+<h1>Get Before After Pseudo</h1>
+
+<p><strong>Strong</strong></p>
+<p>Before : [<span id="before"></span>]</p>
+<p>After  : [<span id="after" ></span>]</p>
+
+  </body>
+</html>

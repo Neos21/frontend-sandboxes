@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Empty</title>
+    <link rel="icon" href="data:image/x-icon;base64,AAABAAEAEBAQAAEABAAoAQAAFgAAACgAAAAQAAAAIAAAAAEABAAAAAAAgAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAIiIiAP+IAAD///8AREREAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAABQQAAFEREEBQ0EAFDMzNBAUNBABRERBAAFDQQARERAAABQ0EAAAAAAAAUNBAAAAAAAAFDQQAAAAAAFDQQAAAAAAFDQQAAAAAAFDQQAAAAAAFDQQAAAAAAFDQQAAAAAAABQQAAAAAAACIiIiIiIiIiIiIiIiIiIiIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA">
+    <style>
+
+*, ::before, ::after { display: block; font-size: 3.5rem; user-select: none; }
+::before, ::after { position: absolute; }
+html, body { overflow: hidden; }
+html { font-size: 10px; }
+@media (min-width: 600px) { html { font-size: 16px; } }
+style { font-size: 0; }
+body { margin: 0; background: #000; }
+
+html::before                  { content: "💖"; top: 2.5em; left: calc(50% - 4em); }
+html::after                   { content: "🧡"; top: 2.5em; left: calc(50% - 3em); }
+head::before                  { content: "💛"; top: 2.5em; left: calc(50% - 2em); }
+head::after                   { content: "💚"; top: 2.5em; left: calc(50% - 1em); }
+meta[charset="UTF-8"]::before { content: "💙"; top: 2.5em; left: calc(50% + 0em); }
+meta[charset="UTF-8"]::after  { content: "💜"; top: 2.5em; left: calc(50% + 1em); }
+meta[name="viewport"]::before { content: "🖤"; top: 2.5em; left: calc(50% + 2em); }
+meta[name="viewport"]::after  { content: "🤍"; top: 2.5em; left: calc(50% + 3em); }
+
+link::before  { content: "🍎"; top: 4em; left: calc(50% - 1em); animation: rainbow-left  1s alternate infinite; }
+link::after   { content: "🍏"; top: 4em; left: calc(50% + 0em); animation: rainbow-right 1s alternate infinite; transform: scaleX(-1); }
+@keyframes rainbow-left {
+    0% { left: calc(50% - 1em); }
+  100% { left: calc(50% - 2em); }
+}
+@keyframes rainbow-right {
+    0% { left: calc(50% + 0em); }
+  100% { left: calc(50% + 1em); }
+}
+
+style::before { content: "🔴"; top: 5.75em; left: calc(50% -  2em); }
+style::after  { content: "🟡"; top: 5.75em; left: calc(50% - .5em); }
+body::before  { content: "🟢"; top: 5.75em; left: calc(50% +  1em); }
+
+:not(link)::before          { animation: rotate-right 1s linear infinite; }
+:not(link):not(body)::after { animation: rotate-left  1s linear infinite; }
+@keyframes rotate-right {
+    0% { transform: rotate(  0deg); }
+  100% { transform: rotate(360deg); }
+}
+@keyframes rotate-left {
+    0% { transform: rotate(   0deg); }
+  100% { transform: rotate(-360deg); }
+}
+
+title::before { content: "🌈"; top: .25em; left: calc(50% - 4em); }
+title::after  { content: "🌈"; top: .25em; left: calc(50% + 3em); }
+title         { display: block; margin-top: .5em; color: #fff; font-family: "Comic Sans MS", sans-serif; text-align: center; animation: skew-text 2s linear infinite; }
+body::after   { content: "🟫"; z-index: -1; top: .55em; left: calc(50% - .5em); transform: scaleX(5) scaleY(1.5); animation: skew-board 2s linear infinite; }
+@keyframes skew-text {
+    0% { transform: skewX(  0deg); }
+   25% { transform: skewX( 15deg); }
+   50% { transform: skewX(  0deg); }
+   75% { transform: skewX(-15deg); }
+  100% { transform: skewX(  0deg); }
+}
+@keyframes skew-board {
+    0% { transform: skewX(  0deg) scaleX(5) scaleY(1.5); }
+   25% { transform: skewX( 15deg) scaleX(5) scaleY(1.5); }
+   50% { transform: skewX(  0deg) scaleX(5) scaleY(1.5); }
+   75% { transform: skewX(-15deg) scaleX(5) scaleY(1.5); }
+  100% { transform: skewX(  0deg) scaleX(5) scaleY(1.5); }
+}
+
+    </style>
+  </head>
+  <body></body>
+</html>
