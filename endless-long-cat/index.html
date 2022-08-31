@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Endless Long Cat</title>
+    <style>
+
+body {
+  margin: 0;
+  color: #000;
+  font-family: "Noto Sans Mono CJK JP", monospace;
+  text-align: center;
+  background: #fff;
+  cursor: default;
+  user-select: none;
+  overflow-x: hidden;
+}
+
+#long-cat {
+  white-space: pre;
+}
+
+    </style>
+    <script>
+
+document.addEventListener('DOMContentLoaded', () => {
+  // Element References
+  const html = document.documentElement;
+  const cat  = document.getElementById('long-cat');
+  // Multi Lines
+  const catBodyLines = '\n                  |;               .,|   '.repeat(50);
+  
+  const isShortHeight = () => {
+    const clientHeight = html.clientHeight;
+    const remainingBottom = html.scrollHeight - clientHeight - html.scrollTop;  // Remaining Scrollable Amount
+    const requiredBottom  = Math.max(clientHeight, 2160) * 2;  // At Least 2x [4K or Browser Window] Height
+    const isShort = remainingBottom < requiredBottom;
+    //console.log(`isShortHeight : remaining[${remainingBottom}] ${isShort ? '<' : '>='} required[${requiredBottom}]`);
+    return isShort;
+  };
+  const addCatBody = () => {
+    while(isShortHeight()) cat.insertAdjacentHTML('beforeend', catBodyLines);
+  };
+  
+  addCatBody();  // Init
+  window.addEventListener('resize', addCatBody);
+  window.addEventListener('scroll', addCatBody);
+});
+
+    </script>
+  </head>
+  <body>
+    <!-- Add whitespaces at the end of each line to center the text -->
+    <div id="long-cat">
+               ,,_         ,'`,          
+               \, '``-._,./ ,, \         
+               |,-;`   ,.,  ,.,`-,      
+  ,_,          / :o;  .;o; ['     `',    
+['   `'`*-,.,._\    -;-     `-,_    `',  
+ ''*-,._        \  ,-,-,     ,. `,     \,
+        `'`*--., `'`-----'`'`    `-    \`
+               `'-.                  .,| 
+                  |;                .,|  
+                  |;               .,|   
+                  |;               .,|   </div>  <!-- Do Not Break The End of Line -->
+  </body>
+</html>
+
+<!--
+
+# MEMO
+
+- 参考
+  - [hooooooooooooooooooooooooooooooooooooooooooooooooooooooooorse](http://endless.horse/)
+  - [cjosephson/endless.horse: neigh](https://github.com/cjosephson/endless.horse)
+
+| window      | document.documentElement | 検証結果                                                                                         |
+|-------------|--------------------------|--------------------------------------------------------------------------------------------------|
+|             | offsetHeight             | html 要素の高さ。1画面に収まる場合は clientHeight と、スクロールバーが出ると scrollHeight と同値 |
+| innerHeight | clientHeight             | ブラウザ上の表示領域。ウィンドウリサイズで変化する。innerHeight と clientHeight は常に同値       |
+|             | scrollHeight             | html 要素の全体の高さ。コンテンツが1画面に収まる場合は clientHeight と同値                       |
+| outerHeight |                          | アドレスバーなどを含んだブラウザウィンドウ全体の高さ                                             |
+| screenTop   |                          | screenTop・screenY は同値。デスクトップ上におけるウィンドウの位置を示す                          |
+| screenY     |                          | 〃 (↑同上)                                                                                      |
+| pageYOffset | scrollTop                | pageYOffset・scrollY、および scrollTop は同値。スクロールした量                                  |
+| scrollY     |                          | 〃 (↑同上)                                                                                      |
+
+- html 要素に height: 100% 指定がない場合
+  - 1画面に収まる場合  : offsetHeight < scrollHeight = clientHeight
+  - スクロールする場合 : clientHeight < offsetHeight = scrollHeight
+- html 要素に height: 100% 指定がある場合 (body 要素の height: 100% 指定の有無は無関係)
+  - 1画面に収まる場合  : offsetHeight = scrollHeight = clientHeight
+  - スクロールする場合 : offsetHeight = clientHeight < scrollHeight
+- → 常に offsetHeight <= clientHeight <= scrollHeight な関係
+- ⇒ offsetHeight >= scrollHeight な値になるようにコンテンツを増やし続ければ Endless 化できる
+
+-->
