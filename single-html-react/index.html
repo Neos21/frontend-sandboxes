@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Single HTML React</title>
+    <link rel="icon" type="image/vnd.microsoft.icon" href="data:image/x-icon;base64,AAABAAEAEBAAAAEAIABoBAAAFgAAACgAAAAQAAAAIAAAAAEAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A//8AAP//AAD//wAA//8AAP//AAD//wAA//8AAP//AAD//wAA//8AAP//AAD//wAA//8AAP//AAD//wAA//8AAA==">
+    <script src="https://unpkg.com/react@16.3.1/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@16.3.1/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/react-router-dom@5.0.0/umd/react-router-dom.min.js"></script>
+    <script src="https://unpkg.com/babel-standalone@6.26.0/babel.min.js"></script>
+    <style>
+
+*, ::before, ::after { box-sizing: border-box; }
+html { font-family: sans-serif; }
+
+    </style>
+  </head>
+  <body>
+
+<div id="container">Loading...</div>
+<script type="text/babel">
+
+const { Route, Link } = window.ReactRouterDOM;
+
+class Index extends React.Component {
+  render() {
+    return (
+      <div>
+        Index
+        <ul>
+          <li><Link to='/about'>About</Link></li>
+          <li><Link to='/article'>Article</Link></li>
+        </ul>
+        {this.props.children}
+      </div>
+    );
+  }
+}
+
+class About extends React.Component {
+  render() {
+    return ( <div>About</div> );
+  }
+}
+
+class Article extends React.Component {
+  render() {
+    return (<div>Article</div>);
+  }
+}
+
+class App extends React.Component {
+  render() {
+    return (
+      <ReactRouterDOM.HashRouter>
+      { /*<ReactRouterDOM.BrowserRouter> */ }
+        <ul>
+          <li><Link to="/">Index</Link></li>
+          <li><Link to="/about">About</Link></li>
+          <li><Link to="/article">Article</Link></li>
+        </ul> 
+        <Route path="/" exact component={Index} />
+        <Route path="/about" component={About} />
+        <Route path="/article" component={Article} />
+      { /* </ReactRouterDOM.BrowserRouter> */ }
+      </ReactRouterDOM.HashRouter>
+    );
+  }
+}
+
+ReactDOM.render(<App />, document.getElementById('container'));
+</script>
+
+  </body>
+</html>

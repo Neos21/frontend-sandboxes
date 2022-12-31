@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Reversed Nested List</title>
+    <style>
+
+*, ::before, ::after { box-sizing: border-box; }
+html { font-family: sans-serif; }
+
+body {
+  color: #222;
+  background: #f6f6f6;
+  cursor: default;
+}
+
+body > ol > li {
+  color: #08f;
+}
+  body > ol > li:hover {
+    color: #f08;
+  }
+
+body > ol > li > details > ol > li {
+  color: initial;
+}
+
+summary {
+  display: inline-block;
+  list-style: none;
+  cursor: pointer;
+}
+  summary:hover {
+    color: #0f8;
+  }
+
+    </style>
+  </head>
+  <body>
+
+<h1>Reversed Nested List</h1>
+
+<ol start="3" reversed>
+  <li>
+    <details open>
+      <summary>Part 3</summary>
+      <ol start="30" reversed>
+        <li>10</li><li>09</li><li>08</li><li>07</li><li>06</li><li>05</li><li>04</li><li>03</li><li>02</li><li>01</li>
+      </ol>
+    </details>
+  </li>
+  <li>
+    <details open>
+      <summary>Part 2</summary>
+      <ol start="20" reversed>
+        <li>10</li><li>09</li><li>08</li><li>07</li><li>06</li><li>05</li><li>04</li><li>03</li><li>02</li><li>01</li>
+      </ol>
+    </details>
+  </li>
+  <li>
+    <details open>
+      <summary>Part 1</summary>
+      <ol start="10" reversed>
+        <li>10</li><li>09</li><li>08</li><li>07</li><li>06</li><li>05</li><li>04</li><li>03</li><li>02</li><li>01</li>
+      </ol>
+    </details>
+  </li>
+</ol>
+
+  </body>
+</html>

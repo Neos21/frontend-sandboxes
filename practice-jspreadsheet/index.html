@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Practice Jspreadsheet</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Material+Icons">
+    <link rel="stylesheet" href="https://bossanova.uk/jspreadsheet/v4/jexcel.css">
+    <link rel="stylesheet" href="https://jsuites.net/v4/jsuites.css">
+    <script src="https://bossanova.uk/jspreadsheet/v4/jexcel.js"></script>
+    <script src="https://jsuites.net/v4/jsuites.js"></script>
+    <style>
+
+*, ::before, ::after { box-sizing: border-box; }
+
+html {
+  width: 100%;
+  height: 100%;
+  overflow: auto scroll;
+  font-family: sans-serif;
+}
+
+body {
+  width: 100%;
+  height: 100%;
+  margin: 0
+}
+
+.jexcel_container {  /* ID Element */
+  padding-right: 0;
+}
+.jexcel_container > .jexcel_toolbar {
+  margin: 0;
+}
+.jexcel_container > .jexcel_content {
+  padding-right : 0;
+  padding-bottom: 0;
+}
+.jexcel_container > .jexcel_content > table.jexcel {
+  margin-left: -1px;
+}
+
+table.jexcel thead td[data-x] {
+  text-align: center !important;
+}
+table.jexcel tbody td {
+  vertical-align: top;  /* Align Top */
+  word-break: break-all;  /* Force Word Wrap */
+}
+
+    </style>
+    <script>
+
+document.addEventListener('DOMContentLoaded', () => {
+  const sheetElm = document.getElementById('spreadsheet');
+  const sheetObj = jspreadsheet(sheetElm, {
+    // https://github.com/jspreadsheet/ce/blob/master/src/index.js#L101
+    minDimensions: [10, 40],  // 20列・50行
+      //columns: [...Array(26)].map((_, index) => { title: (10 + index).toString(36) }),  // A-Z 列
+      //data: Array(100).fill([]),  // 10行
+    defaultColWidth: 100,
+    defaultColAlign: 'left',
+    columnDrag   : true,
+    columnResize : true,
+    columnSorting: false,
+    rowDrag      : true,
+    rowResize    : true,
+    wordWrap: true,  // Allow Multi Lines
+    //tableOverflow: true,
+    //tableWidth: '100%',
+    about: false,  // Disable About Context Menu
+    toolbar: [
+      {
+        type: 'i',
+        content: 'undo',
+        tooltip: 'Undo',
+        onclick(jSheetElm, jSheetObj, clickedElement) {
+          console.log('UNDO', jSheetElm === sheetElm, jSheetObj === sheetObj);
+          sheetObj.undo();
+        }
+      },
+      {
+        type: 'i',
+        content: 'redo',
+        tooltip: 'Redo',
+        onclick() {
+          sheetObj.redo();
+        }
+      },
+      {
+        type: 'i',
+        content: 'save',
+        tooltip: 'Save',
+        onclick() {
+          sheetObj.download();
+        }
+      },
+      {
+        type: 'select',
+        tooltip: 'Font Family',
+        k: 'font-family',
+        v: ['Arial','Verdana']
+      },
+      {
+        type: 'select',
+        tooltip: 'Font Size',
+        k: 'font-size',
+        v: ['9px','10px','11px','12px','13px','14px','15px','16px','17px','18px','19px','20px']
+      },
+      {
+        type: 'i',
+        content: 'format_align_left',
+        tooltip: 'Align Left',
+        k: 'text-align',
+        v: 'left'
+      },
+      {
+        type:'i',
+        content:'format_align_center',
+        tooltip: 'Align Center',
+        k:'text-align',
+        v:'center'
+      },
+      {
+        type: 'i',
+        content: 'format_align_right',
+        tooltip: 'Align Right',
+        k: 'text-align',
+        v: 'right'
+      },
+      {
+        type: 'i',
+        content: 'format_bold',
+        tooltip: 'Bold',
+        k: 'font-weight',
+        v: 'bold'
+      },
+      {
+        type: 'color',
+        content: 'format_color_text',
+        tooltip: 'Text Color',
+        k: 'color'
+      },
+      {
+        type: 'color',
+        content: 'format_color_fill',
+        tooltip: 'Background Color',
+        k: 'background-color'
+      }
+    ]
+  });
+});
+
+    </script>
+  </head>
+  <body>
+
+<div id="spreadsheet"></div>
+
+  </body>
+</html>
