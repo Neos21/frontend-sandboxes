@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>My First Mistake</title>
+    <style>
+
+*, ::before, ::after { box-sizing: border-box; }
+html { font-family: sans-serif; }
+
+table, table td {
+  border: 1px solid #999;
+}
+table td {
+  padding: 1rem;
+  cursor: pointer;
+  background: #fff;
+}
+table td:hover {
+  background: #fee;
+}
+
+    </style>
+    <script>
+
+document.addEventListener('DOMContentLoaded', () => {
+  const items = [
+    { title: 'File 1', fileName: 'file-1.txt' },
+    { title: 'File 2', fileName: 'file-2.txt' },
+    { title: 'File 3', fileName: 'file-3.txt' },
+    { title: 'File 4', fileName: 'file-4.txt' },
+    { title: 'File 5', fileName: 'file-5.txt' },
+    { title: 'File 6', fileName: 'file-6.txt' },
+    { title: 'File 7', fileName: 'file-7.txt' },
+    { title: 'File 8', fileName: 'file-8.txt' },
+    { title: 'File 9', fileName: 'file-9.txt' }
+  ];
+  
+  // セルに触れた時の処理
+  window.onSelect = (item) => {
+    document.getElementById('selected-item').innerText = item;
+  };
+  
+  // テーブル HTML を組み立てる
+  let tableHtml = '<table>';
+  for(let row = 0; row < 3; row++) {
+    tableHtml += '<tr>';
+    for(let col = 0; col < 3; col++) {
+      tableHtml += `<td onmouseover="onSelect('${items[3 * col + row].fileName}')" onmouseleave="onSelect('')">${items[3 * row + col].title}</td>`;  // この行にバグがあります
+    }
+    tableHtml += '</tr>';
+  }
+  tableHtml += '</table>';
+  document.getElementById('container').innerHTML = tableHtml;
+});
+
+    </script>
+  </head>
+  <body>
+
+<h1>My First Mistake</h1>
+
+<p>Selected : [<span id="selected-item"></span>]</p>
+<div id="container"></div>
+
+  </body>
+</html>

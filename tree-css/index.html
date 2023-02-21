@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Tree CSS</title>
+    <style>
+
+*, ::before, ::after { box-sizing: border-box; }
+html { font-family: sans-serif; }
+
+#l ul {
+  padding-left: 0;
+  list-style: none;
+}
+#l li::before {
+  display: inline;
+  white-space: pre;
+  font-family: monospace;
+}
+
+#l > ul > li::before            { content: "├ "; }
+#l > ul > li:last-child::before { content: "└ "; }
+
+#l > ul > li            > ul > li::before            { content: "│ ├ "; }
+#l > ul > li            > ul > li:last-child::before { content: "│ └ "; }
+#l > ul > li:last-child > ul > li::before            { content: "　 ├ "; }
+#l > ul > li:last-child > ul > li:last-child::before { content: "　 └ "; }
+
+#l > ul > li            > ul > li            > ul > li::before            { content: "│ │ ├ "; }
+#l > ul > li            > ul > li            > ul > li:last-child::before { content: "│ │ └ "; }
+#l > ul > li            > ul > li:last-child > ul > li::before            { content: "│ 　 ├ "; }
+#l > ul > li            > ul > li:last-child > ul > li:last-child::before { content: "│ 　 └ "; }
+#l > ul > li:last-child > ul > li            > ul > li::before            { content: "　 │ ├ "; }
+#l > ul > li:last-child > ul > li            > ul > li:last-child::before { content: "　 │ └ "; }
+#l > ul > li:last-child > ul > li:last-child > ul > li::before            { content: "　 　 ├ "; }
+#l > ul > li:last-child > ul > li:last-child > ul > li:last-child::before { content: "　 　 └ "; }
+
+    </style>
+  </head>
+  <body>
+
+<h1>Tree CSS</h1>
+
+<div id="l">
+  <ul>
+    <li>1 hoge</li>
+    <li>1 fuga
+      <ul>
+        <li>2 foo</li>
+        <li>2 foobar
+          <ul>
+            <li>3 foofoo</li>
+            <li>3 barbar</li>
+          </ul>
+        </li>
+        <li>2 bar
+          <ul>
+            <li>3 bar</li>
+            <li>3 foo</li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+    <li>1 piyo
+      <ul>
+        <li>2 foo
+          <ul>
+            <li>3 hoge</li>
+            <li>3 fuga</li>
+          </ul>
+        </li>
+        <li>2 hoge
+          <ul>
+            <li>3 bar</li>
+            <li>3 foo</li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>
+
+  </body>
+</html>
