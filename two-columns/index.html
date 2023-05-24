@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Two Columns</title>
+    <style>
+
+*, ::before, ::after { box-sizing: border-box; }
+html { font-family: sans-serif; }
+
+dl {
+  display: grid;
+  grid-template: auto / 1fr 1fr;
+  border: 1px solid #999;
+}
+
+.columns-title {
+  border-top: 0;
+  border-bottom: 1px solid #999;
+  font-weight: bold;
+}
+.columns-title + dt,
+.columns-title + dt + dd {
+  border-top: 0;
+}
+
+dt, dd {
+  border-top: 1px solid #999;
+  margin: 0;
+  padding: 1px .5em;
+}
+
+dt {
+  grid-column: 1;
+  border-right: 1px solid #999;
+}
+
+dd {
+  grid-column: 2;
+}
+
+dd ul {
+  margin-top: 0;
+  margin-bottom: 0;
+  padding-left: 1.5em;
+}
+
+    </style>
+    <script>
+
+const text = `
+AAA
+  - aa
+BBB
+CCC
+  - ccc-aaa
+  - ccc-bbb
+DDD
+EEE
+FFF
+  - fff-aaa
+GGG
+HHH
+III
+JJJ
+KKK
+  - kkk-aaa
+LLL
+  - lll-aaa
+`;
+
+document.addEventListener('DOMContentLoaded', () => {
+  const lines = text.trim().split('\n');
+  console.log(lines);
+  let html = `<dl id="columns"><dt class="columns-title">Script</dt><dd class="columns-title">Trivia</dd>`;
+  
+  let sideLines = null;
+  const insertSideHtml = () => {
+    const sideHtml = sideLines.map(sideLine => `<li>${sideLine.replace(/^  - /, '')}</li>`).join('');
+    html += `<dd><ul>${sideHtml}</ul></dd>`;
+    sideLines = null;
+  };
+  
+  lines.forEach(line => {
+    if(line.startsWith('  ')) {
+      if(sideLines == null) {
+        sideLines = [line];
+      }
+      else {
+        sideLines.push(line);
+      }
+    }
+    else {
+      if(sideLines != null) insertSideHtml();
+      html += `<dt>${line}</dt>`;
+    }
+  });
+  if(sideLines != null) insertSideHtml();
+  
+  html += `</dl>`;
+  document.getElementById('wrapper').innerHTML = html;
+});
+
+    </script>
+  </head>
+  <body>
+
+<h1>Two Columns</h1>
+
+<div id="wrapper"></div>
+
+  </body>
+</html>
