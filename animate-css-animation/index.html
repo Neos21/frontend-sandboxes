@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Animate CSS Animation</title>
+    <style id="style">
+
+*, ::before, ::after { box-sizing: border-box; }
+html { font-family: sans-serif; }
+
+html, body {
+  margin: 0;
+  height: 100%;
+}
+
+#wrapper {
+  height: 100%;
+  display: grid;
+  place-items: center;
+}
+
+#title {
+  display: inline-block;
+  
+  animation-name: title-anime;
+  animation-fill-mode: backwards;  /* none forwards backwards both */
+  animation-duration: 3s;
+  animation-iteration-count: infinite;  /* infinite Number */
+  animation-timing-function: linear;  /* ease ease-in ease-out ease-in-out linear など */
+  animation-delay: 0;
+  animation-direction: alternate;  /* normal reverse alternate alternate-reverse */
+}
+
+@keyframes title-anime {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+    </style>
+    <script>
+
+document.addEventListener('DOMContentLoaded', () => {
+  setTimeout(() => {
+    const style = document.getElementById('style');
+    style.innerText = style.innerText.replace('transform: rotate(360deg)', 'transform: rotate(180deg)');
+    console.log('Style Changed');
+  }, 3000);
+});
+
+    </script>
+  </head>
+  <body>
+
+<div id="wrapper">
+  <h1 id="title">Hello</h1>
+</div>
+
+  </body>
+</html>
