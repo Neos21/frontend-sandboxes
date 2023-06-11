@@ -9,7 +9,21 @@
 *, ::before, ::after { box-sizing: border-box; }
 html { font-family: sans-serif; }
 
-dl {
+/* Raw Content (Pre) */
+#content {
+  display: none;
+}
+
+/* Loading */
+#wrapper:empty::before {
+  display: block;
+  content: "Loading...";
+  color: #eb0;
+  font-weight: bold;
+}
+
+/* Parsed Wrapper (Dl) */
+#wrapper {
   display: grid;
   grid-template: auto / 1fr 1fr;
   border: 1px solid #999;
@@ -47,9 +61,58 @@ dd ul {
 }
 
     </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/5.1.0/marked.min.js"></script>
     <script>
 
-const text = `
+document.addEventListener('DOMContentLoaded', () => {
+  try {
+    const text = document.getElementById('content').textContent;
+    const lines = text.trim().split('\n');
+    
+    let html = `<dt class="columns-title">Script</dt><dd class="columns-title">Trivia</dd>`;
+    
+    let sideLines = null;
+    const insertSideHtml = () => {
+      const sideMarkdown = sideLines.map(sideLine => `${sideLine.replace((/^  /u), '')}`).join('\n');
+      const sideHtml = marked.parse(sideMarkdown, { mangle: false, headerIds: false });
+      html += `<dd>${sideHtml}</dd>`;
+      sideLines = null;
+    };
+    
+    lines.forEach(line => {
+      if(line.startsWith('  ')) {
+        if(sideLines == null) {
+          sideLines = [line];
+        }
+        else {
+          sideLines.push(line);
+        }
+      }
+      else {
+        if(sideLines != null) insertSideHtml();
+        html += `<dt>${line}</dt>`;
+      }
+    });
+    if(sideLines != null) insertSideHtml();  // Last Line
+    
+    document.getElementById('wrapper').innerHTML = html;
+  }
+  catch(error) {
+    console.error('Error :', error);
+    document.getElementById('wrapper').style.display = 'none';
+    document.getElementById('content').style.display = 'block';
+  }
+});
+
+    </script>
+  </head>
+  <body>
+
+<h1>Two Columns</h1>
+
+<dl id="wrapper"></dl>
+
+<pre id="content">
 AAA
   - aa
 BBB
@@ -68,47 +131,7 @@ KKK
   - kkk-aaa
 LLL
   - lll-aaa
-`;
-
-document.addEventListener('DOMContentLoaded', () => {
-  const lines = text.trim().split('\n');
-  console.log(lines);
-  let html = `<dl id="columns"><dt class="columns-title">Script</dt><dd class="columns-title">Trivia</dd>`;
-  
-  let sideLines = null;
-  const insertSideHtml = () => {
-    const sideHtml = sideLines.map(sideLine => `<li>${sideLine.replace(/^  - /, '')}</li>`).join('');
-    html += `<dd><ul>${sideHtml}</ul></dd>`;
-    sideLines = null;
-  };
-  
-  lines.forEach(line => {
-    if(line.startsWith('  ')) {
-      if(sideLines == null) {
-        sideLines = [line];
-      }
-      else {
-        sideLines.push(line);
-      }
-    }
-    else {
-      if(sideLines != null) insertSideHtml();
-      html += `<dt>${line}</dt>`;
-    }
-  });
-  if(sideLines != null) insertSideHtml();
-  
-  html += `</dl>`;
-  document.getElementById('wrapper').innerHTML = html;
-});
-
-    </script>
-  </head>
-  <body>
-
-<h1>Two Columns</h1>
-
-<div id="wrapper"></div>
+</pre>
 
   </body>
 </html>
