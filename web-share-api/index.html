@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Web Share API</title>
+    <style>
+
+*, ::before, ::after { box-sizing: border-box; }
+html { font-family: sans-serif; }
+
+    </style>
+    <script>
+
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('share-button').addEventListener('click', async () => {
+    try {
+      await navigator.share({
+        title: document.querySelector('title').textContent,
+        text : 'This is my example page.',
+        url  : location.href
+      });
+      console.log('Succeeded');
+    }
+    catch(error) {
+      console.error('Failed', error);
+    }
+  });
+});
+
+    </script>
+  </head>
+  <body>
+
+<h1>Web Share API</h1>
+
+<p><button type="button" id="share-button">Share</button></p>
+
+<dl>
+  <dt>参考</dt>
+  <dd>
+    <ul>
+      <li><a href="https://developer.mozilla.org/ja/docs/Web/API/Web_Share_API">ウェブ共有 API - Web API | MDN</a></li>
+      <li><a href="https://www.mitsue.co.jp/knowledge/blog/frontend/201711/17_1512.html">Web Share APIでユーザーの様々なシェア方法を可能にする | フロントエンドBlog | ミツエーリンクス</a></li>
+      <li><a href="https://qiita.com/kjugk/items/921be89431cf156bb700">Web Share API を使ったページ共有を試してみた #JavaScript - Qiita</a></li>
+    </ul>
+  </dd>
+</dl>
+
+  </body>
+</html>
