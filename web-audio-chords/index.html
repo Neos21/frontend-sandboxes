@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Web Audio Chords</title>
+    <style>
+
+*, ::before, ::after { box-sizing: border-box; }
+html { font-family: sans-serif; }
+
+body > div,
+body > div > button {
+  white-space: nowrap;
+}
+
+    </style>
+    <script>
+
+// MIDI ノート番号・音階名の変換
+// ==================================================
+
+/** 音階名 : シャープ表記 */
+const noteNamesSharp = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+
+/** 音階名 : フラット表記 */
+const noteNamesFlat  = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B'];
+
+/** コード名と構成音の配列情報 */
+const chordNames = [
+  { chordName: 'M'    , notes: [0, 4, 7]     },
+  { chordName: 'm'    , notes: [0, 3, 7]     },
+  { chordName: '7'    , notes: [0, 4, 7, 10] },
+  { chordName: 'M7'   , notes: [0, 4, 7, 11] },
+  { chordName: 'm7'   , notes: [0, 3, 7, 10] },
+  { chordName: 'm7b5' , notes: [0, 3, 6, 10] },
+  { chordName: 'mM7'  , notes: [0, 3, 7, 11] },
+  { chordName: 'sus4' , notes: [0, 5, 7]     },
+  { chordName: '7sus4', notes: [0, 5, 7, 10] },
+  { chordName: 'dim'  , notes: [0, 3, 6,  9] },
+  { chordName: 'aug'  , notes: [0, 4, 8]     },
+  { chordName: 'add9' , notes: [0, 2, 7]     },
+  { chordName: '6'    , notes: [0, 4, 7,  9] },
+  { chordName: 'm6'   , notes: [0, 3, 7,  9] }
+];
+
+/** MIDI ノート番号から周波数 Hz を求める */
+const midiNumberToFrequency = midiNoteNumber => 440 * 2 ** ((midiNoteNumber - 69) / 12);
+
+/** オクターブ数付きの音階名 ('A4' や 'C#4' や 'Gb4' など) から MIDI ノート番号を求める */
+const noteNameWithOctaveToMidiNoteNumber = noteNameWithOctave => {
+  const noteName     = noteNameWithOctave.slice(0, -1);  // 音階名
+  const octaveNumber = noteNameWithOctave.slice(-1);     // オクターブ数
+  
+  // 音階名が存在するかチェックする
+  const noteNameIndexSharp = noteNamesSharp.findIndex(noteNameSharp => noteNameSharp === noteName);
+  const noteNameIndexFlat  = noteNamesFlat .findIndex(noteNameFlat  => noteNameFlat  === noteName);
+  const noteNameIndex      = noteNameIndexSharp >= 0 ? noteNameIndexSharp : noteNameIndexFlat;
+  if(noteNameIndex === -1) throw new Error(`音階名が誤っています : [${noteNameWithOctave}]`);
+  
+  // オクターブ数をチェックする : 国際式の -1 オクターブ (MIDI ノート番号 0 ～ 11) は使用しない
+  if(octaveNumber === '') throw new Error(`オクターブ表記がありません : [${noteNameWithOctave}]`);
+  if(Number(octaveNumber) < 0 || 9 < Number(octaveNumber)) throw new Error(`オクターブ表記は 0 ～ 9 の間で記載してください : [${noteNameWithOctave}]`);
+  
+  // MIDI ノート番号を求める
+  const midiNoteNumber = noteNameIndex + (12 * (Number(octaveNumber) + 1));
+  return midiNoteNumber;
+};
+
+/** オクターブ数付きの音階名とコード構成音の配列から周波数の配列を求める */
+const chordNameToFrequencies = (rootNoteNameWithNumber, chordNotes) => {
+  const rootMidiNoteNumber = noteNameWithOctaveToMidiNoteNumber(rootNoteNameWithNumber);  // ルートの MIDI 番号が分かる
+  const notes = chordNotes.map(chordNote => rootMidiNoteNumber + chordNote);
+  const frequencies = notes.map(note => midiNumberToFrequency(note));
+  return frequencies;
+};
+
+
+// グローバル定数・変数
+// ==================================================
+
+/** Web Audio API */
+const audioContext = new window.AudioContext();
+
+/** 鳴らしている最中のオシレータを控えておく */
+let currentOscillators = [];
+
+/** オシレータを鳴らしているか否か */
+let isAttacking = false;
+
+
+// オシレータの操作
+// ==================================================
+
+/** オシレータを作る */
+const createNote = (frequency, type = 'sawtooth', gain = 0.1) => {
+  const oscillator = audioContext.createOscillator();
+  const gainNode = audioContext.createGain();
+  oscillator.connect(gainNode);
+  gainNode.connect(audioContext.destination);
+  
+  oscillator.frequency.value = frequency;  // 周波数 Hz
+  oscillator.type = type;  // 正弦波:sine・矩形波:square・ノコギリ波:sawtooth・三角波:triangle
+  gainNode.gain.value = gain;  // 音量
+  
+  return oscillator;
+};
+
+/** 音声を鳴らす */
+const startSound = (frequencies, type, gain) => {
+  if(isAttacking) return;
+  isAttacking = true;
+  
+  for(let frequency of frequencies) {
+    const oscillator = createNote(frequency, type, gain);
+    currentOscillators.push(oscillator);
+    oscillator.start();
+  }
+};
+
+/** 音声を止める */
+const stopSound = () => {
+  isAttacking = false;
+  currentOscillators.forEach(oscillator => oscillator.stop());
+  currentOscillators = [];
+};
+
+
+// DOM 操作
+// ==================================================
+
+/** 音階1つについてのコード行を作る */
+const createNoteLine = noteName => {
+  const noteNameForId = noteName.replace(/#/gu, 's');
+  const div = document.createElement('div');
+  div.id = `line-${noteNameForId}`;
+  chordNames.forEach(chordNameToNotes => {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.id   = `button-${noteNameForId}${chordNameToNotes.chordName}`;
+    button.textContent = `${(noteName + ' ').slice(0, 2)}${chordNameToNotes.chordName}`;
+    button.addEventListener('mousedown' , () => startSound(chordNameToFrequencies(`${noteName}4`, chordNameToNotes.notes)));
+    button.addEventListener('touchstart', () => startSound(chordNameToFrequencies(`${noteName}4`, chordNameToNotes.notes)));
+    button.addEventListener('mouseup'   , () => stopSound());
+    button.addEventListener('mouseleave', () => stopSound());
+    button.addEventListener('touchend'  , () => stopSound());
+    div.appendChild(button);
+  });
+  document.body.appendChild(div);
+};
+
+/** 1オクターブのコード行を作る */
+const createNoteLines = (noteNames = noteNamesSharp) => {
+  noteNames.forEach(noteName => createNoteLine(noteName));
+};
+
+
+// Init
+// ==================================================
+
+document.addEventListener('DOMContentLoaded', () => {
+  createNoteLines();
+});
+
+    </script>
+  </head>
+  <body>
+
+<h1>Web Audio Chords</h1>
+
+  </body>
+</html>
