@@ -7,13 +7,17 @@
     <style>
 
 *, ::before, ::after { box-sizing: border-box; }
-html { font-family: sans-serif; }
+html {
+  font-family: sans-serif;
+  -webkit-user-select: none;
+}
 
 body > div,
 body > div > button {
   font-family: monospace;  /* For iOS Safari */
   white-space: nowrap;
-  user-select: none;  /* For iOS Safari */
+  user-select: none;
+  -webkit-user-select: none;  /* For iOS Safari */
 }
 
     </style>

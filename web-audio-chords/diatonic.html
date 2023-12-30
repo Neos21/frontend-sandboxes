@@ -1,0 +1,1970 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Web Audio Diatonic Chords</title>
+    <style>
+
+*, ::before, ::after { box-sizing: border-box; }
+html {
+  font-family: monospace;
+  -webkit-user-select: none;  /* For iOS Safari */
+}
+
+table,
+th,
+td {
+  border: 1px solid #777;
+  border-collapse: collapse;
+  padding: .2rem;
+  font-size: .8rem;
+  white-space: nowrap;
+  background: #fff;
+  table-layout: fixed;
+  user-select: none;
+}
+
+thead th { background: #9ee; }
+tbody th { background: #dff; }
+
+.not-use th,
+.not-use td {
+  background: #ccc;
+}
+
+summary {
+  font-weight: bold;
+  cursor: pointer;
+}
+
+th {
+  text-align: left;
+}
+
+table                              { width: 100%; min-width: 920px; margin-bottom: 1.2rem; }
+table thead > tr > th[rowspan="2"] { width:  19%; }
+table thead > tr > th              { width:  11%; }
+
+    </style>
+    <script>
+
+// MIDI ノート番号・音階名の変換
+// ==================================================
+
+/** 音階名 : シャープ表記 */
+const noteNamesSharp = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+
+/** 音階名 : フラット表記 */
+const noteNamesFlat  = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B'];
+
+/** コード名と構成音の配列情報 */
+const chordNameToNotes = {
+  'M'   : [0, 4, 7    ],
+  'm'   : [0, 3, 7    ],
+  'mb5' : [0, 3, 6    ],  // mb5 ≒ dim
+  'dim' : [0, 3, 6    ],
+  'M#5' : [0, 4, 8    ],  // Aug
+  'M7'  : [0, 4, 7, 11],
+  'm7'  : [0, 3, 7, 10],
+  '7'   : [0, 4, 7, 10],
+  'm7b5': [0, 3, 6, 10],
+  'dim7': [0, 3, 6,  9],
+  'M7#5': [0, 4, 8, 11]
+};
+
+/** MIDI ノート番号から周波数 Hz を求める */
+const midiNumberToFrequency = midiNoteNumber => 440 * 2 ** ((midiNoteNumber - 69) / 12);
+
+/** 音階名 ('A' や 'C#' や 'Gb' など) から MIDI ノート番号を求める・ルート音の取得用 */
+const noteNameToMidiNoteNumber = (noteName, octaveNumber) => {
+  // 音階名が存在するかチェックする
+  const noteNameIndexSharp = noteNamesSharp.findIndex(noteNameSharp => noteNameSharp === noteName);
+  const noteNameIndexFlat  = noteNamesFlat .findIndex(noteNameFlat  => noteNameFlat  === noteName);
+  const noteNameIndex      = noteNameIndexSharp >= 0 ? noteNameIndexSharp : noteNameIndexFlat;
+  if(noteNameIndex === -1) throw new Error(`音階名が誤っています : [${noteName}]`);
+  
+  // オクターブ数をチェックする : 国際式の -1 オクターブ (MIDI ノート番号 0 ～ 11) は使用しない
+  if(octaveNumber === '') throw new Error(`オクターブ表記がありません : [${noteNameWithOctave}]`);
+  if(Number(octaveNumber) < 0 || 9 < Number(octaveNumber)) throw new Error(`オクターブ表記は 0 ～ 9 の間で記載してください : [${noteNameWithOctave}]`);
+  
+  // MIDI ノート番号を求める
+  const midiNoteNumber = noteNameIndex + (12 * (Number(octaveNumber) + 1));
+  return midiNoteNumber;
+};
+
+/** ルート音階名とコード構成音の配列から周波数の配列を求める */
+const chordNameToFrequencies = (rootNoteName, chordNotes, octaveNumber) => {
+  const rootMidiNoteNumber = noteNameToMidiNoteNumber(rootNoteName, octaveNumber);  // ルートの MIDI 番号が分かる
+  const notes = chordNotes.map(chordNote => rootMidiNoteNumber + chordNote);
+  const frequencies = notes.map(note => midiNumberToFrequency(note));
+  return frequencies;
+};
+
+
+// グローバル定数・変数
+// ==================================================
+
+/** Web Audio API */
+const audioContext = new window.AudioContext();
+
+/** 鳴らしている最中のオシレータを控えておく */
+let currentOscillators = [];
+
+/** オシレータを鳴らしているか否か */
+let isAttacking = false;
+
+
+// オシレータの操作
+// ==================================================
+
+/** オシレータを作る */
+const createNote = (frequency, type = 'sawtooth', gain = 0.1) => {
+  const oscillator = audioContext.createOscillator();
+  const gainNode = audioContext.createGain();
+  oscillator.connect(gainNode);
+  gainNode.connect(audioContext.destination);
+  
+  oscillator.frequency.value = frequency;  // 周波数 Hz
+  oscillator.type = type;  // 正弦波:sine・矩形波:square・ノコギリ波:sawtooth・三角波:triangle
+  gainNode.gain.value = gain;  // 音量
+  
+  return oscillator;
+};
+
+/** 音声を鳴らす */
+const startSound = (frequencies, type, gain) => {
+  if(isAttacking) return;
+  isAttacking = true;
+  
+  for(let frequency of frequencies) {
+    const oscillator = createNote(frequency, type, gain);
+    currentOscillators.push(oscillator);
+    oscillator.start();
+  }
+};
+
+/** 音声を止める */
+const stopSound = () => {
+  isAttacking = false;
+  currentOscillators.forEach(oscillator => oscillator.stop());
+  currentOscillators = [];
+};
+
+
+// Init
+// ==================================================
+
+document.addEventListener('DOMContentLoaded', () => {
+  /** オクターブ数を判定する */
+  const isOctaveHigh = td => {
+    const prevElement = td.previousElementSibling;
+    if(prevElement == null) return false;  // 最初の列
+    if(prevElement.tagName === 'TD') {
+      // 直前の音階が既にオクターブ上のため同様に音階を上げる
+      if(prevElement.dataset.octaveNumber === '5') {
+        td.dataset.octaveNumber = '5';
+        return true;
+      }
+      const prevChord    = prevElement.textContent.split(' = ').pop();  // 特殊なコード名は後ろに書いた「 = X」部分を参照する
+      const prevNoteName = prevChord.match((/^[A-G][b#]?/u))[0];  // 「Xb」「X」「X#」部分を取得する
+      // 直前の音階が B のためオクターブ上にする
+      if(['A#', 'Bb', 'B'].includes(prevNoteName)) {
+        const chord    = td.textContent.split(' = ').pop();  // 特殊なコード名は後ろに書いた「 = X」部分を参照する
+        const noteName = chord.match((/^[A-G][b#]?/u))[0];  // 「Xb」「X」「X#」部分を取得する
+        if(noteName === 'B') return false;  // 自身も B 音なので無視する
+        
+        td.dataset.octaveNumber = '5';
+        return true;
+      }
+    }
+    return false;
+  };
+  
+  // セルに対してイベントを設定していく
+  document.querySelectorAll('table tbody td').forEach(td => {
+    const chord      = td.textContent.split(' = ').pop();  // 特殊なコード名は後ろに書いた「 = X」部分を参照する
+    const noteName   = chord.match((/^[A-G][b#]?/u))[0];  // 「Xb」「X」「X#」部分を取得する
+    const chordName  = chord.replace(noteName, '').trim() || 'M';  // 残った「m」「M7」などの部分を取得する・なければ M と判定する
+    
+    const chordNotes = chordNameToNotes[chordName];  // コードの構成音情報を取得する
+    const octaveNumber = isOctaveHigh(td) ? '5' : '4';  // オクターブ数
+    
+    const activeCell   = () => td.style.backgroundColor = '#fc9';
+    const deactiveCell = () => td.style.backgroundColor = '';
+    
+    td.addEventListener('mousedown' , () => { activeCell();   startSound(chordNameToFrequencies(noteName, chordNotes, octaveNumber)); });
+    td.addEventListener('touchstart', () => { activeCell();   startSound(chordNameToFrequencies(noteName, chordNotes, octaveNumber)); });
+    td.addEventListener('mouseup'   , () => { deactiveCell(); stopSound(); });
+    td.addEventListener('mouseleave', () => { deactiveCell(); stopSound(); });
+    td.addEventListener('touchend'  , () => { deactiveCell(); stopSound(); });
+  });
+  
+  // エラー表示
+  window.addEventListener('error', (error) => {
+    console.error('ERROR! : ', error);
+    alert(`ERROR!\n${error.toString()}`);
+  });
+  
+  // セルを1つずつ押下して音を聞くテスト用
+  document.getElementById('test').addEventListener('click', async () => {
+    const tdElements = document.querySelectorAll('table tbody td');
+    for(const td of tdElements) {
+      await new Promise(resolve => {
+        td.dispatchEvent(new Event('mousedown'));
+        setTimeout(() => {
+          td.dispatchEvent(new Event('mouseup'));
+          resolve();
+        }, 100);
+      });
+    }
+    console.log('Finished!');
+  });
+});
+
+    </script>
+  </head>
+  <body>
+
+<h1>Web Audio Diatonic Chords</h1>
+
+<details>
+  <summary>Major Diatonic Chords</summary>
+<table>
+  <thead>
+    <tr>
+      <th rowspan="2">Degree Name</th>
+      <th>I (T)</th>
+      <th>II (SD)</th>
+      <th>III (D or T)</th>
+      <th>IV (SD)</th>
+      <th>V (D)</th>
+      <th>VI (T)</th>
+      <th>VII (D or SD)</th>
+    </tr>
+    <tr>
+      <th>I</th>
+      <th>IIm</th>
+      <th>IIIm</th>
+      <th>IV</th>
+      <th>V</th>
+      <th>VIm</th>
+      <th>VIImb5 (dim)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr class="not-use">
+      <th>表記が難解なので避ける</th>
+      <td>B# = C</td>
+      <td>Cxm = D m</td>
+      <td>Dxm = E m</td>
+      <td>E# = F</td>
+      <td>Fx = G</td>
+      <td>Gxm = A m</td>
+      <td>Axmb5 = Bmb5</td>
+    </tr>
+    <tr>
+      <th>C</th>
+      <td>C</td>
+      <td>D m</td>
+      <td>E m</td>
+      <td>F</td>
+      <td>G </td>
+      <td>A m</td>
+      <td>B mb5</td>
+    </tr>
+    <tr>
+      <th rowspan="2">C# / Db</th>
+      <td>C#</td>
+      <td>D#m</td>
+      <td>E#m = Fm</td>
+      <td>F#</td>
+      <td>G#</td>
+      <td>A#m</td>
+      <td>B#mb5 = Cmb5</td>
+    </tr>
+    <tr>
+      <td>Db</td>
+      <td>Ebm</td>
+      <td>F m</td>
+      <td>Gb</td>
+      <td>Ab</td>
+      <td>Bbm</td>
+      <td>C mb5</td>
+    </tr>
+    <tr>
+      <th>D</th>
+      <td>D</td>
+      <td>E m</td>
+      <td>F#m</td>
+      <td>G</td>
+      <td>A </td>
+      <td>B m</td>
+      <td>C#mb5</td>
+    </tr>
+    <tr class="not-use">
+      <th>表記が難解なので避ける</th>
+      <td>D#</td>
+      <td>E#m = Fm</td>
+      <td>Fxm = Gm</td>
+      <td>G#</td>
+      <td>A#</td>
+      <td>B#m = Cm</td>
+      <td>Cxmb5 = Dmb5</td>
+    </tr>
+    <tr>
+      <th>Eb</th>
+      <td>Eb</td>
+      <td>F m</td>
+      <td>G m</td>
+      <td>Ab</td>
+      <td>Bb</td>
+      <td>C m</td>
+      <td>D mb5</td>
+    </tr>
+    <tr>
+      <th>E</th>
+      <td>E</td>
+      <td>F#m</td>
+      <td>G#m</td>
+      <td>A</td>
+      <td>B </td>
+      <td>C#m</td>
+      <td>D#mb5</td>
+    </tr>
+    <tr>
+      <th>F</th>
+      <td>F</td>
+      <td>G m</td>
+      <td>A m</td>
+      <td>Bb</td>
+      <td>C </td>
+      <td>D m</td>
+      <td>E mb5</td>
+    </tr>
+    <tr>
+      <th rowspan="2">F# / Gb<br>難解な表記が混じる</th>
+      <td>F#</td>
+      <td>G#m</td>
+      <td>A#m</td>
+      <td>B</td>
+      <td>C#</td>
+      <td>D#m</td>
+      <td>E#mb5 = Fmb5</td>
+    </tr>
+    <tr>
+      <td>Gb</td>
+      <td>Abm</td>
+      <td>Bbm</td>
+      <td>Cb = B</td>
+      <td>Db</td>
+      <td>Ebm</td>
+      <td>F mb5</td>
+    </tr>
+    <tr>
+      <th>G</th>
+      <td>G</td>
+      <td>A m</td>
+      <td>B m</td>
+      <td>C</td>
+      <td>D </td>
+      <td>E m</td>
+      <td>F#mb5</td>
+    </tr>
+    <tr class="not-use">
+      <th>表記が難解なので避ける</th>
+      <td>G#</td>
+      <td>A#m</td>
+      <td>B#m = Cm</td>
+      <td>C#</td>
+      <td>D#</td>
+      <td>E#m = Fm</td>
+      <td>Fxmb5 = Gmb5</td>
+    </tr>
+    <tr>
+      <th>Ab</th>
+      <td>Ab</td>
+      <td>Bbm</td>
+      <td>C m</td>
+      <td>Db</td>
+      <td>Eb</td>
+      <td>F m</td>
+      <td>G mb5</td>
+    </tr>
+    <tr>
+      <th>A</th>
+      <td>A</td>
+      <td>B m</td>
+      <td>C#m</td>
+      <td>D</td>
+      <td>E </td>
+      <td>F#m</td>
+      <td>G#mb5</td>
+    </tr>
+    <tr class="not-use">
+      <th>表記が難解なので避ける</th>
+      <td>A#</td>
+      <td>B#m = Cm</td>
+      <td>Cxm = Dm</td>
+      <td>D#</td>
+      <td>E# = F </td>
+      <td>Fxm = Gm</td>
+      <td>Gxmb5 = Amb5</td>
+    </tr>
+    <tr>
+      <th>Bb</th>
+      <td>Bb</td>
+      <td>C m</td>
+      <td>D m</td>
+      <td>Eb</td>
+      <td>F </td>
+      <td>G m</td>
+      <td>A mb5</td>
+    </tr>
+    <tr>
+      <th>B</th>
+      <td>B</td>
+      <td>C#m</td>
+      <td>D#m</td>
+      <td>E</td>
+      <td>F#</td>
+      <td>G#m</td>
+      <td>A#mb5</td>
+    </tr>
+    <tr class="not-use">
+      <th>表記が難解なので避ける</th>
+      <td>Cb = B</td>
+      <td>Dbm</td>
+      <td>Ebm</td>
+      <td>Fb = E</td>
+      <td>Gb</td>
+      <td>Abm</td>
+      <td>Bbmb5</td>
+    </tr>
+  </tbody>
+</table>
+</details>
+
+<details open>
+  <summary>Major 7th Diatonic Chords</summary>
+<table>
+  <thead>
+    <tr>
+      <th rowspan="2">Degree Name</th>
+      <th>I (T)</th>
+      <th>II (SD)</th>
+      <th>III (D or T)</th>
+      <th>IV (SD)</th>
+      <th>V (D)</th>
+      <th>VI (T)</th>
+      <th>VII (D or SD)</th>
+    </tr>
+    <tr>
+      <th>IM7</th>
+      <th>IIm7</th>
+      <th>IIIm7</th>
+      <th>IVM7</th>
+      <th>V7</th>
+      <th>VIm7</th>
+      <th>VIIm7b5</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr class="not-use">
+      <th>難解な表記なので避ける</th>
+      <td>B#M7 = CM7</td>
+      <td>Cxm7 = D m7</td>
+      <td>Dxm7 = E m7</td>
+      <td>E#M7 = F M7</td>
+      <td>Fx7 = G 7</td>
+      <td>Gxm7 = A m7</td>
+      <td>Axm7b5 = Bm7b5</td>
+    </tr>
+    <tr>
+      <th>C</th>
+      <td>C M7</td>
+      <td>D m7</td>
+      <td>E m7</td>
+      <td>F M7</td>
+      <td>G 7</td>
+      <td>A m7</td>
+      <td>B m7b5</td>
+    </tr>
+    <tr>
+      <th rowspan="2">C# / Db</th>
+      <td>C#M7</td>
+      <td>D#m7</td>
+      <td>E#m7 = F m7</td>
+      <td>F#M7</td>
+      <td>G#7</td>
+      <td>A#m7</td>
+      <td>B#m7b5 = Cm7b5</td>
+    </tr>
+    <tr>
+      <td>DbM7</td>
+      <td>Ebm7</td>
+      <td>F m7</td>
+      <td>GbM7</td>
+      <td>Ab7</td>
+      <td>Bbm7</td>
+      <td>C m7b5</td>
+    </tr>
+    <tr>
+      <th>D</th>
+      <td>D M7</td>
+      <td>E m7</td>
+      <td>F#m7</td>
+      <td>G M7</td>
+      <td>A 7</td>
+      <td>B m7</td>
+      <td>C#m7b5</td>
+    </tr>
+    <tr class="not-use">
+      <th>難解な表記なので避ける</th>
+      <td>D#M7</td>
+      <td>E#m7 = Fm7</td>
+      <td>Fxm7 = Gm7</td>
+      <td>G#M7</td>
+      <td>A#7</td>
+      <td>B#m7 = Cm7</td>
+      <td>Cxm7b5 = Dm7b5</td>
+    </tr>
+    <tr>
+      <th>Eb</th>
+      <td>EbM7</td>
+      <td>F m7</td>
+      <td>G m7</td>
+      <td>AbM7</td>
+      <td>Bb7</td>
+      <td>C m7</td>
+      <td>D m7b5</td>
+    </tr>
+    <tr>
+      <th>E</th>
+      <td>E M7</td>
+      <td>F#m7</td>
+      <td>G#m7</td>
+      <td>A M7</td>
+      <td>B 7</td>
+      <td>C#m7</td>
+      <td>D#m7b5</td>
+    </tr>
+    <tr>
+      <th>F</th>
+      <td>F M7</td>
+      <td>G m7</td>
+      <td>A m7</td>
+      <td>BbM7</td>
+      <td>C 7</td>
+      <td>D m7</td>
+      <td>E m7b5</td>
+    </tr>
+    <tr>
+      <th rowspan="2">F# / Gb<br>難解な表記が表記が混じる</th>
+      <td>F#M7</td>
+      <td>G#m7</td>
+      <td>A#m7</td>
+      <td>B M7</td>
+      <td>C#7</td>
+      <td>D#m7</td>
+      <td>E#m7b5 = Fm7b5</td>
+    </tr>
+    <tr>
+      <td>GbM7</td>
+      <td>Abm7</td>
+      <td>Bbm7</td>
+      <td>CbM7 = B M7</td>
+      <td>Db7</td>
+      <td>Ebm7</td>
+      <td>F m7b5</td>
+    </tr>
+    <tr>
+      <th>G</th>
+      <td>G M7</td>
+      <td>A m7</td>
+      <td>B m7</td>
+      <td>C M7</td>
+      <td>D 7</td>
+      <td>E m7</td>
+      <td>F#m7b5</td>
+    </tr>
+    <tr class="not-use">
+      <th>難解な表記なので避ける</th>
+      <td>G#M7</td>
+      <td>A#m7</td>
+      <td>B#m7 = Cm7</td>
+      <td>C#M7</td>
+      <td>D#7</td>
+      <td>E#m7 = Fm7</td>
+      <td>Fxm7b5 = Gm7b5</td>
+    </tr>
+    <tr>
+      <th>Ab</th>
+      <td>AbM7</td>
+      <td>Bbm7</td>
+      <td>C m7</td>
+      <td>DbM7</td>
+      <td>Eb7</td>
+      <td>F m7</td>
+      <td>G m7b5</td>
+    </tr>
+    <tr>
+      <th>A</th>
+      <td>A M7</td>
+      <td>B m7</td>
+      <td>C#m7</td>
+      <td>D M7</td>
+      <td>E 7</td>
+      <td>F#m7</td>
+      <td>G#m7b5</td>
+    </tr>
+    <tr class="not-use">
+      <th>難解な表記なので避ける</th>
+      <td>A#M7</td>
+      <td>B#m7 = Cm7</td>
+      <td>Cxm7 = Dm7</td>
+      <td>D#M7</td>
+      <td>E#7 = F 7</td>
+      <td>Fxm7 = Gm7</td>
+      <td>Gxm7b5 = Am7b5</td>
+    </tr>
+    <tr>
+      <th>Bb</th>
+      <td>BbM7</td>
+      <td>C m7</td>
+      <td>D m7</td>
+      <td>EbM7</td>
+      <td>F 7</td>
+      <td>G m7</td>
+      <td>A m7b5</td>
+    </tr>
+    <tr>
+      <th>B</th>
+      <td>B M7</td>
+      <td>C#m7</td>
+      <td>D#m7</td>
+      <td>E M7</td>
+      <td>F#7</td>
+      <td>G#m7</td>
+      <td>A#m7b5</td>
+    </tr>
+    <tr class="not-use">
+      <th>難解な表記なので避ける</th>
+      <td>CbM7 = BM7</td>
+      <td>Dbm7</td>
+      <td>Ebm7</td>
+      <td>FbM7 = E M7</td>
+      <td>Gb7</td>
+      <td>Abm7</td>
+      <td>Bbm7b5</td>
+    </tr>
+  </tbody>
+</table>
+</details>
+
+<details>
+  <summary>Natural Minor Diatonic Chords</summary>
+<table>
+  <thead>
+    <tr>
+      <th rowspan="2">Degree Name</th>
+      <th>I (T)</th>
+      <th>II (SD)</th>
+      <th>III (D or T)</th>
+      <th>IV (SD)</th>
+      <th>V (D)</th>
+      <th>VI (T)</th>
+      <th>VII (D or SD)</th>
+    </tr>
+    <tr>
+      <th>Im</th>
+      <th>IImb5</th>
+      <th>III</th>
+      <th>IVm</th>
+      <th>Vm</th>
+      <th>VI</th>
+      <th>VII</th>
+    </tr>
+	</thead>
+	<tbody>
+    <tr class="not-use">
+      <th>難解な表記なので避ける</th>
+      <td>B#m = Cm</td>
+      <td>Cxmb5 = Dmb5</td>
+      <td>D#</td>
+      <td>E#m = Fm</td>
+      <td>Fxm = Gm</td>
+      <td>G#</td>
+      <td>A#</td>
+    </tr>
+    <tr>
+      <th>C m</th>
+      <td>C m</td>
+      <td>D mb5</td>
+      <td>Eb</td>
+      <td>F m</td>
+      <td>G m</td>
+      <td>Ab</td>
+      <td>Bb</td>
+    </tr>
+    <tr>
+      <th>C#m</th>
+      <td>C#m</td>
+      <td>D#mb5</td>
+      <td>E</td>
+      <td>F#m</td>
+      <td>G#m</td>
+      <td>A</td>
+      <td>B</td>
+    </tr>
+    <tr class="not-use">
+      <th>難解な表記なので避ける</th>
+      <td>Dbm</td>
+      <td>Ebmb5</td>
+      <td>Fbb = E</td>
+      <td>Gbm</td>
+      <td>Abm</td>
+      <td>Bbb = A</td>
+      <td>Cb = B</td>
+    </tr>
+    <tr>
+      <th>D m</th>
+      <td>D m</td>
+      <td>E mb5</td>
+      <td>F</td>
+      <td>G m</td>
+      <td>A m</td>
+      <td>Bb</td>
+      <td>C</td>
+    </tr>
+    <tr>
+      <th rowspan="2">D#m / Ebm<br>難解な表記が混じる</th>
+      <td>D#m</td>
+      <td>E#mb5 = Fmb5</td>
+      <td>F#</td>
+      <td>G#m</td>
+      <td>A#m</td>
+      <td>B</td>
+      <td>C#</td>
+    </tr>
+    <tr>
+      <td>Ebm</td>
+      <td>F mb5</td>
+      <td>Gb</td>
+      <td>Abm</td>
+      <td>Bbm</td>
+      <td>Cb = B</td>
+      <td>Db</td>
+    </tr>
+    <tr>
+      <th>E m</th>
+      <td>E m</td>
+      <td>F#mb5</td>
+      <td>G</td>
+      <td>A m</td>
+      <td>B m</td>
+      <td>C</td>
+      <td>D</td>
+    </tr>
+    <tr>
+      <th>F m</th>
+      <td>F m</td>
+      <td>G mb5</td>
+      <td>Ab</td>
+      <td>Bbm</td>
+      <td>C m</td>
+      <td>Db</td>
+      <td>Eb</td>
+    </tr>
+    <tr>
+      <th>F#m</th>
+      <td>F#m</td>
+      <td>G#mb5</td>
+      <td>A</td>
+      <td>B m</td>
+      <td>C#m</td>
+      <td>D</td>
+      <td>E</td>
+    </tr>
+    <tr class="not-use">
+      <th>難解な表記なので避ける</th>
+      <td>Gbm</td>
+      <td>Abmb5</td>
+      <td>Bbb = A</td>
+      <td>Cbm = Bm</td>
+      <td>Dbm</td>
+      <td>Ebb = D</td>
+      <td>Fb = E</td>
+    </tr>
+    <tr>
+      <th>G m</th>
+      <td>G m</td>
+      <td>A mb5</td>
+      <td>Bb</td>
+      <td>C m</td>
+      <td>D m</td>
+      <td>Eb</td>
+      <td>F</td>
+    </tr>
+    <tr>
+      <th>G#m</th>
+      <td>G#m</td>
+      <td>A#mb5</td>
+      <td>B</td>
+      <td>C#m</td>
+      <td>D#m</td>
+      <td>E</td>
+      <td>F#</td>
+    </tr>
+    <tr class="not-use">
+      <th>難解な表記なので避ける</th>
+      <td>Abm</td>
+      <td>Bbmb5</td>
+      <td>Cb = B</td>
+      <td>Dbm</td>
+      <td>Ebm</td>
+      <td>Fb = E</td>
+      <td>Gb</td>
+    </tr>
+    <tr>
+      <th>A m</th>
+      <td>A m</td>
+      <td>B mb5</td>
+      <td>C</td>
+      <td>D m</td>
+      <td>E m</td>
+      <td>F</td>
+      <td>G</td>
+    </tr>
+    <tr>
+      <th rowspan="2">A#m / Bbm</th>
+      <td>A#m</td>
+      <td>B#mb5 = Cmb5</td>
+      <td>C#</td>
+      <td>D#m</td>
+      <td>E#m = Fm</td>
+      <td>F#</td>
+      <td>G#</td>
+    </tr>
+    <tr>
+      <td>Bbm</td>
+      <td>C mb5</td>
+      <td>Db</td>
+      <td>Ebm</td>
+      <td>F m</td>
+      <td>Gb</td>
+      <td>Ab</td>
+    </tr>
+    <tr>
+      <th>B m</th>
+      <td>B m</td>
+      <td>C#mb5</td>
+      <td>D</td>
+      <td>E m</td>
+      <td>F#m</td>
+      <td>G</td>
+      <td>A</td>
+    </tr>
+    <tr class="not-use">
+      <th>難解な表記なので避ける</th>
+      <td>Cbm = Bm</td>
+      <td>Dbmb5</td>
+      <td>Ebb = D</td>
+      <td>Fbm = Em</td>
+      <td>Gbm</td>
+      <td>Abb = G</td>
+      <td>Bx = A</td>
+    </tr>
+  </tbody>
+</table>
+</details>
+
+<details open>
+  <summary>Natural Minor 7th Diatonic Chords</summary>
+<table>
+	<thead>
+    <tr>
+      <th rowspan="2">Degree Name</th>
+      <th>I (T)</th>
+      <th>II (SD)</th>
+      <th>III (D or T)</th>
+      <th>IV (SD)</th>
+      <th>V (D)</th>
+      <th>VI (T)</th>
+      <th>VII (D or SD)</th>
+    </tr>
+    <tr>
+      <th>Im7</th>
+      <th>IIm7b5</th>
+      <th>IIIM7</th>
+      <th>IVm7</th>
+      <th>Vm7</th>
+      <th>VIM7</th>
+      <th>VII7</th>
+    </tr>
+	</thead>
+	<tbody>
+    <tr class="not-use">
+      <th>難解な表記なので避ける</th>
+      <td>B#m7 = Cm7</td>
+      <td>Cxm7b5 = Dm7b5</td>
+      <td>D#M7</td>
+      <td>E#m7 = Fm7</td>
+      <td>Fxm7 = Gm7</td>
+      <td>G#M7</td>
+      <td>A#7</td>
+    </tr>
+    <tr>
+      <th>C m</th>
+      <td>C m7</td>
+      <td>D m7b5</td>
+      <td>EbM7</td>
+      <td>F m7</td>
+      <td>G m7</td>
+      <td>AbM7</td>
+      <td>Bb7</td>
+    </tr>
+    <tr>
+      <th>C#m</th>
+      <td>C#m7</td>
+      <td>D#m7b5</td>
+      <td>E M7</td>
+      <td>F#m7</td>
+      <td>G#m7</td>
+      <td>A M7</td>
+      <td>B 7</td>
+    </tr>
+    <tr class="not-use">
+      <th>難解な表記なので避ける</th>
+      <td>Dbm7</td>
+      <td>Ebm7b5</td>
+      <td>FbbM7 = EM7</td>
+      <td>Gbm7</td>
+      <td>Abm7</td>
+      <td>BbbM7 = A M7</td>
+      <td>Cb7 = B 7</td>
+    </tr>
+    <tr>
+      <th>D m</th>
+      <td>D m7</td>
+      <td>E m7b5</td>
+      <td>F M7</td>
+      <td>G m7</td>
+      <td>A m7</td>
+      <td>BbM7</td>
+      <td>C 7</td>
+    </tr>
+    <tr>
+      <th rowspan="2">D#m / Ebm<br>難解な表記が混じる</th>
+      <td>D#m7</td>
+      <td>E#m7b5 = Fm7b5</td>
+      <td>F#M7</td>
+      <td>G#m7</td>
+      <td>A#m7</td>
+      <td>B M7</td>
+      <td>C#7</td>
+    </tr>
+    <tr>
+      <td>Ebm7</td>
+      <td>F m7b5</td>
+      <td>GbM7</td>
+      <td>Abm7</td>
+      <td>Bbm7</td>
+      <td>CbM7 = B M7</td>
+      <td>Db7</td>
+    </tr>
+    <tr>
+      <th>E m</th>
+      <td>E m7</td>
+      <td>F#m7b5</td>
+      <td>G M7</td>
+      <td>A m7</td>
+      <td>B m7</td>
+      <td>C M7</td>
+      <td>D 7</td>
+    </tr>
+    <tr>
+      <th>F m</th>
+      <td>F m7</td>
+      <td>G m7b5</td>
+      <td>AbM7</td>
+      <td>Bbm7</td>
+      <td>C m7</td>
+      <td>DbM7</td>
+      <td>Eb7</td>
+    </tr>
+    <tr>
+      <th>F#m</th>
+      <td>F#m7</td>
+      <td>G#m7b5</td>
+      <td>A M7</td>
+      <td>B m7</td>
+      <td>C#m7</td>
+      <td>D M7</td>
+      <td>E 7</td>
+    </tr>
+    <tr class="not-use">
+      <th>難解な表記なので避ける</th>
+      <td>Gbm7</td>
+      <td>Abm7b5</td>
+      <td>BbbM7 = AM7</td>
+      <td>Cbm7 = Bm7</td>
+      <td>Dbm7</td>
+      <td>EbbM7 = D M7</td>
+      <td>Fb7 = E 7</td>
+    </tr>
+    <tr>
+      <th>G m</th>
+      <td>G m7</td>
+      <td>A m7b5</td>
+      <td>BbM7</td>
+      <td>C m7</td>
+      <td>D m7</td>
+      <td>EbM7</td>
+      <td>F 7</td>
+    </tr>
+    <tr>
+      <th>G#m</th>
+      <td>G#m7</td>
+      <td>A#m7b5</td>
+      <td>B M7</td>
+      <td>C#m7</td>
+      <td>D#m7</td>
+      <td>E M7</td>
+      <td>F#7</td>
+    </tr>
+    <tr class="not-use">
+      <th>難解な表記なので避ける</th>
+      <td>Abm7</td>
+      <td>Bbm7b5</td>
+      <td>CbM7 = BM7</td>
+      <td>Dbm7</td>
+      <td>Ebm7</td>
+      <td>FbM7 = E M7</td>
+      <td>Gb7</td>
+    </tr>
+    <tr>
+      <th>A m</th>
+      <td>A m7</td>
+      <td>B m7b5</td>
+      <td>C M7</td>
+      <td>D m7</td>
+      <td>E m7</td>
+      <td>F M7</td>
+      <td>G 7</td>
+    </tr>
+    <tr>
+      <th rowspan="2">A#m / Bbm</th>
+      <td>A#m7</td>
+      <td>B#m7b5 = Cm7b5</td>
+      <td>C#M7</td>
+      <td>D#m7</td>
+      <td>E#m7 = Fm7</td>
+      <td>F#M7</td>
+      <td>G#7</td>
+    </tr>
+    <tr>
+      <td>Bbm7</td>
+      <td>C m7b5</td>
+      <td>DbM7</td>
+      <td>Ebm7</td>
+      <td>F m7</td>
+      <td>GbM7</td>
+      <td>Ab7</td>
+    </tr>
+    <tr>
+      <th>B m</th>
+      <td>B m7</td>
+      <td>C#m7b5</td>
+      <td>D M7</td>
+      <td>E m7</td>
+      <td>F#m7</td>
+      <td>G M7</td>
+      <td>A 7</td>
+    </tr>
+    <tr class="not-use">
+      <th>難解な表記なので避ける</th>
+      <td>Cbm7 = Bm7</td>
+      <td>Dbm7b5</td>
+      <td>EbbM7 = D M7</td>
+      <td>Fbm7 = Em7</td>
+      <td>Gbm7</td>
+      <td>AbbM7 = G M7</td>
+      <td>Bx7 = A 7</td>
+    </tr>
+  </tbody>
+</table>
+</details>
+
+<details>
+  <summary>Harmonic Minor Diatonic Chords</summary>
+<table>
+	<thead>
+    <tr>
+      <th rowspan="2">Degree Name</th>
+      <th>I (T)</th>
+      <th>II (SD)</th>
+      <th>III (D or T)</th>
+      <th>IV (SD)</th>
+      <th>V (D)</th>
+      <th>VI (T)</th>
+      <th>VII (D or SD)</th>
+    </tr>
+    <tr>
+      <th>Im</th>
+      <th>IImb5</th>
+      <th>IIIM#5</th>
+      <th>IVm</th>
+      <th>V</th>
+      <th>VI</th>
+      <th>VIIdim</th>
+    </tr>
+	</thead>
+	<tbody>
+    <tr class="not-use">
+      <th>難解な表記なので避ける</th>
+      <td>B#m = Cm</td>
+      <td>Cxmb5 = Dmb5</td>
+      <td>D#M#5</td>
+      <td>E#m = Fm</td>
+      <td>Fx = G</td>
+      <td>G#</td>
+      <td>A#dim</td>
+    </tr>
+    <tr>
+      <th>C m</th>
+      <td>C m</td>
+      <td>D mb5</td>
+      <td>EbM#5</td>
+      <td>F m</td>
+      <td>G</td>
+      <td>Ab</td>
+      <td>Bbdim</td>
+    </tr>
+    <tr>
+      <th>C#m</th>
+      <td>C#m</td>
+      <td>D#mb5</td>
+      <td>E M#5</td>
+      <td>F#m</td>
+      <td>G#</td>
+      <td>A</td>
+      <td>B dim</td>
+    </tr>
+    <tr class="not-use">
+      <th>難解な表記なので避ける</th>
+      <td>Dbm</td>
+      <td>Ebmb5</td>
+      <td>FbbM#5 = EM#5</td>
+      <td>Gbm</td>
+      <td>Ab</td>
+      <td>Bbb = A</td>
+      <td>Cbdim = B dim</td>
+    </tr>
+    <tr>
+      <th>D m</th>
+      <td>D m</td>
+      <td>E mb5</td>
+      <td>F M#5</td>
+      <td>G m</td>
+      <td>A</td>
+      <td>Bb</td>
+      <td>C dim</td>
+    </tr>
+    <tr>
+      <th rowspan="2">D#m / Ebm<br>難解な表記が混じる</th>
+      <td>D#m</td>
+      <td>E#mb5 = Fmb5</td>
+      <td>F#M#5</td>
+      <td>G#m</td>
+      <td>A#</td>
+      <td>B</td>
+      <td>C#dim</td>
+    </tr>
+    <tr>
+      <td>Ebm</td>
+      <td>F mb5</td>
+      <td>GbM#5</td>
+      <td>Abm</td>
+      <td>Bb</td>
+      <td>Cb = B</td>
+      <td>Dbdim</td>
+    </tr>
+    <tr>
+      <th>E m</th>
+      <td>E m</td>
+      <td>F#mb5</td>
+      <td>G M#5</td>
+      <td>A m</td>
+      <td>B</td>
+      <td>C</td>
+      <td>D dim</td>
+    </tr>
+    <tr>
+      <th>F m</th>
+      <td>F m</td>
+      <td>G mb5</td>
+      <td>AbM#5</td>
+      <td>Bbm</td>
+      <td>C</td>
+      <td>Db</td>
+      <td>Ebdim</td>
+    </tr>
+    <tr>
+      <th>F#m</th>
+      <td>F#m</td>
+      <td>G#mb5</td>
+      <td>A M#5</td>
+      <td>B m</td>
+      <td>C#</td>
+      <td>D</td>
+      <td>E dim</td>
+    </tr>
+    <tr class="not-use">
+      <th>難解な表記なので避ける</th>
+      <td>Gbm</td>
+      <td>Abmb5</td>
+      <td>BbbM#5 = AM#5</td>
+      <td>Cbm = Bm</td>
+      <td>Db</td>
+      <td>Ebb = D</td>
+      <td>Fbdim = E dim</td>
+    </tr>
+    <tr>
+      <th>G m</th>
+      <td>G m</td>
+      <td>A mb5</td>
+      <td>BbM#5</td>
+      <td>C m</td>
+      <td>D</td>
+      <td>Eb</td>
+      <td>F dim</td>
+    </tr>
+    <tr>
+      <th>G#m</th>
+      <td>G#m</td>
+      <td>A#mb5</td>
+      <td>B M#5</td>
+      <td>C#m</td>
+      <td>D#</td>
+      <td>E</td>
+      <td>F#dim</td>
+    </tr>
+    <tr class="not-use">
+      <th>難解な表記なので避ける</th>
+      <td>Abm</td>
+      <td>Bbmb5</td>
+      <td>CbM#5 = BM#5</td>
+      <td>Dbm</td>
+      <td>Eb</td>
+      <td>Fb = E</td>
+      <td>Gbdim</td>
+    </tr>
+    <tr>
+      <th>A m</th>
+      <td>A m</td>
+      <td>B mb5</td>
+      <td>C M#5</td>
+      <td>D m</td>
+      <td>E</td>
+      <td>F</td>
+      <td>G dim</td>
+    </tr>
+    <tr class="not-use">
+      <th rowspan="2">A#m / Bbm</th>
+      <td>A#m</td>
+      <td>B#mb5 = Cmb5</td>
+      <td>C#M#5</td>
+      <td>D#m</td>
+      <td>E# = F</td>
+      <td>F#</td>
+      <td>G#dim</td>
+    </tr>
+    <tr>
+      <td>Bbm</td>
+      <td>C mb5</td>
+      <td>DbM#5</td>
+      <td>Ebm</td>
+      <td>F</td>
+      <td>Gb</td>
+      <td>Abdim</td>
+    </tr>
+    <tr>
+      <th>B m</th>
+      <td>B m</td>
+      <td>C#mb5</td>
+      <td>D M#5</td>
+      <td>E m</td>
+      <td>F#</td>
+      <td>G</td>
+      <td>A dim</td>
+    </tr>
+    <tr class="not-use">
+      <th>難解な表記なので避ける</th>
+      <td>Cbm = Bm</td>
+      <td>Dbmb5</td>
+      <td>EbbM#5 = D M#5</td>
+      <td>Fbm = Em</td>
+      <td>Gb</td>
+      <td>Abb = G</td>
+      <td>Bxdim = A dim</td>
+    </tr>
+  </tbody>
+</table>
+</details>
+
+<details open>
+  <summary>Harmonic Minor 7th Diatonic Chords</summary>
+<table>
+	<thead>
+    <tr>
+      <th rowspan="2">Degree Name</th>
+      <th>I (T)</th>
+      <th>II (SD)</th>
+      <th>III (D or T)</th>
+      <th>IV (SD)</th>
+      <th>V (D)</th>
+      <th>VI (T)</th>
+      <th>VII (D or SD)</th>
+    </tr>
+    <tr>
+      <th>Im7</th>
+      <th>IIm7b5</th>
+      <th>IIIM7#5</th>
+      <th>IVm7</th>
+      <th>V7</th>
+      <th>VIM7</th>
+      <th>VIIdim7</th>
+    </tr>
+	</thead>
+	<tbody>
+    <tr class="not-use">
+      <th>難解な表記なので避ける</th>
+      <td>B#m7 = Cm7</td>
+      <td>Cxm7b5 = Dm7b5</td>
+      <td>D#M7#5</td>
+      <td>E#m7 = Fm7</td>
+      <td>Fx7 = G7</td>
+      <td>G#M7</td>
+      <td>A#dim7</td>
+    </tr>
+    <tr>
+      <th>C m</th>
+      <td>C m7</td>
+      <td>D m7b5</td>
+      <td>EbM7#5</td>
+      <td>F m7</td>
+      <td>G 7</td>
+      <td>AbM7</td>
+      <td>Bbdim7</td>
+    </tr>
+    <tr>
+      <th>C#m</th>
+      <td>C#m7</td>
+      <td>D#m7b5</td>
+      <td>E M7#5</td>
+      <td>F#m7</td>
+      <td>G#7</td>
+      <td>A M7</td>
+      <td>B dim7</td>
+    </tr>
+    <tr class="not-use">
+      <th>難解な表記なので避ける</th>
+      <td>Dbm7</td>
+      <td>Ebm7b5</td>
+      <td>FbbM7#5 = EM7#5</td>
+      <td>Gbm7</td>
+      <td>Ab7</td>
+      <td>BbbM7 = A M7</td>
+      <td>Cbdim7 = B dim7</td>
+    </tr>
+    <tr>
+      <th>D m</th>
+      <td>D m7</td>
+      <td>E m7b5</td>
+      <td>F M7#5</td>
+      <td>G m7</td>
+      <td>A 7</td>
+      <td>BbM7</td>
+      <td>C dim7</td>
+    </tr>
+    <tr>
+      <th rowspan="2">D#m / Ebm<br>難解な表記が混じる</th>
+      <td>D#m7</td>
+      <td>E#m7b5 = Fm7b5</td>
+      <td>F#M7#5</td>
+      <td>G#m7</td>
+      <td>A#7</td>
+      <td>B M7</td>
+      <td>C#dim7</td>
+    </tr>
+    <tr>
+      <td>Ebm7</td>
+      <td>F m7b5</td>
+      <td>GbM7#5</td>
+      <td>Abm7</td>
+      <td>Bb7</td>
+      <td>CbM7 = B M7</td>
+      <td>Dbdim7</td>
+    </tr>
+    <tr>
+      <th>E m</th>
+      <td>E m7</td>
+      <td>F#m7b5</td>
+      <td>G M7#5</td>
+      <td>A m7</td>
+      <td>B 7</td>
+      <td>C M7</td>
+      <td>D dim7</td>
+    </tr>
+    <tr>
+      <th>F m</th>
+      <td>F m7</td>
+      <td>G m7b5</td>
+      <td>AbM7#5</td>
+      <td>Bbm7</td>
+      <td>C 7</td>
+      <td>DbM7</td>
+      <td>Ebdim7</td>
+    </tr>
+    <tr>
+      <th>F#m</th>
+      <td>F#m7</td>
+      <td>G#m7b5</td>
+      <td>A M7#5</td>
+      <td>B m7</td>
+      <td>C#7</td>
+      <td>D M7</td>
+      <td>E dim7</td>
+    </tr>
+    <tr class="not-use">
+      <th>難解な表記なので避ける</th>
+      <td>Gbm7</td>
+      <td>Abm7b5</td>
+      <td>BbbM7#5 = AM7#5</td>
+      <td>Cbm7 = Bm7</td>
+      <td>Db7</td>
+      <td>EbbM7 = D M7</td>
+      <td>Fbdim7 = E dim7</td>
+    </tr>
+    <tr>
+      <th>G m</th>
+      <td>G m7</td>
+      <td>A m7b5</td>
+      <td>BbM7#5</td>
+      <td>C m7</td>
+      <td>D 7</td>
+      <td>EbM7</td>
+      <td>F dim7</td>
+    </tr>
+    <tr>
+      <th>G#m</th>
+      <td>G#m7</td>
+      <td>A#m7b5</td>
+      <td>B M7#5</td>
+      <td>C#m7</td>
+      <td>D#7</td>
+      <td>E M7</td>
+      <td>F#dim7</td>
+    </tr>
+    <tr class="not-use">
+      <th>難解な表記なので避ける</th>
+      <td>Abm7</td>
+      <td>Bbm7b5</td>
+      <td>CbM7#5 = BM7#5</td>
+      <td>Dbm7</td>
+      <td>Eb7</td>
+      <td>FbM7 = E M7</td>
+      <td>Gbdim7</td>
+    </tr>
+    <tr>
+      <th>A m</th>
+      <td>A m7</td>
+      <td>B m7b5</td>
+      <td>C M7#5</td>
+      <td>D m7</td>
+      <td>E 7</td>
+      <td>F M7</td>
+      <td>G dim7</td>
+    </tr>
+    <tr>
+      <th rowspan="2">A#m / Bbm</th>
+      <td>A#m7</td>
+      <td>B#m7b5 = Cm7b5</td>
+      <td>C#M7#5</td>
+      <td>D#m7</td>
+      <td>E#7 = F7</td>
+      <td>F#M7</td>
+      <td>G#dim7</td>
+    </tr>
+    <tr>
+      <td>Bbm7</td>
+      <td>C m7b5</td>
+      <td>DbM7#5</td>
+      <td>Ebm7</td>
+      <td>F 7</td>
+      <td>GbM7</td>
+      <td>Abdim7</td>
+    </tr>
+    <tr>
+      <th>B m</th>
+      <td>B m7</td>
+      <td>C#m7b5</td>
+      <td>D M7#5</td>
+      <td>E m7</td>
+      <td>F#7</td>
+      <td>G M7</td>
+      <td>A dim7</td>
+    </tr>
+    <tr class="not-use">
+      <th>難解な表記なので避ける</th>
+      <td>Cbm7 = Bm7</td>
+      <td>Dbm7b5</td>
+      <td>EbbM7#5 = D M7#5</td>
+      <td>Fbm7 = Em7</td>
+      <td>Gb7</td>
+      <td>AbbM7 = G M7</td>
+      <td>Bxdim7 = A dim7</td>
+    </tr>
+  </tbody>
+</table>
+</details>
+
+<details>
+  <summary>Melodic Minor Diatonic Chords</summary>
+<table>
+	<thead>
+    <tr>
+      <th rowspan="2">Degree Name</th>
+      <th>I (T)</th>
+      <th>II (SD)</th>
+      <th>III (D or T)</th>
+      <th>IV (SD)</th>
+      <th>V (D)</th>
+      <th>VI (T)</th>
+      <th>VII (D or SD)</th>
+    </tr>
+    <tr>
+      <th>Im</th>
+      <th>IIm</th>
+      <th>IIIM#5</th>
+      <th>IV</th>
+      <th>V</th>
+      <th>VImb5</th>
+      <th>VIImb5</th>
+    </tr>
+	</thead>
+	<tbody>
+    <tr class="not-use">
+      <th>難解な表記なので避ける</th>
+      <td>B#m = Cm</td>
+      <td>Cxm = Dm</td>
+      <td>D#M#5</td>
+      <td>E# = F</td>
+      <td>Fx = G</td>
+      <td>G#mb5</td>
+      <td>A#mb5</td>
+    </tr>
+    <tr>
+      <th>C m</th>
+      <td>C m</td>
+      <td>D m</td>
+      <td>EbM#5</td>
+      <td>F</td>
+      <td>G</td>
+      <td>Abmb5</td>
+      <td>Bbmb5</td>
+    </tr>
+    <tr>
+      <th>C#m</th>
+      <td>C#m</td>
+      <td>D#m</td>
+      <td>E M#5</td>
+      <td>F#</td>
+      <td>G#</td>
+      <td>A mb5</td>
+      <td>B mb5</td>
+    </tr>
+    <tr class="not-use">
+      <th>難解な表記なので避ける</th>
+      <td>Dbm</td>
+      <td>Ebm</td>
+      <td>FbbM#5 = EM#5</td>
+      <td>Gb</td>
+      <td>Ab</td>
+      <td>Bbbmb5 = A mb5</td>
+      <td>Cbmb5 = B mb5</td>
+    </tr>
+    <tr>
+      <th>D m</th>
+      <td>D m</td>
+      <td>E m</td>
+      <td>F M#5</td>
+      <td>G</td>
+      <td>A</td>
+      <td>Bbmb5</td>
+      <td>C mb5</td>
+    </tr>
+    <tr>
+      <th rowspan="2">D#m / Ebm<br>難解な表記が混じる</th>
+      <td>D#m</td>
+      <td>E#m = Fm</td>
+      <td>F#M#5</td>
+      <td>G#</td>
+      <td>A#</td>
+      <td>B mb5</td>
+      <td>C#mb5</td>
+    </tr>
+    <tr>
+      <td>Ebm</td>
+      <td>F m</td>
+      <td>GbM#5</td>
+      <td>Ab</td>
+      <td>Bb</td>
+      <td>Cbmb5 = B mb5</td>
+      <td>Dbmb5</td>
+    </tr>
+    <tr>
+      <th>E m</th>
+      <td>E m</td>
+      <td>F#m</td>
+      <td>G M#5</td>
+      <td>A</td>
+      <td>B</td>
+      <td>C mb5</td>
+      <td>D mb5</td>
+    </tr>
+    <tr>
+      <th>F m</th>
+      <td>F m</td>
+      <td>G m</td>
+      <td>AbM#5</td>
+      <td>Bb</td>
+      <td>C</td>
+      <td>Dbmb5</td>
+      <td>Ebmb5</td>
+    </tr>
+    <tr>
+      <th>F#m</th>
+      <td>F#m</td>
+      <td>G#m</td>
+      <td>A M#5</td>
+      <td>B</td>
+      <td>C#</td>
+      <td>D mb5</td>
+      <td>E mb5</td>
+    </tr>
+    <tr class="not-use">
+      <th>難解な表記なので避ける</th>
+      <td>Gbm</td>
+      <td>Abm</td>
+      <td>BbbM#5 = AM#5</td>
+      <td>Cb = B</td>
+      <td>Db</td>
+      <td>Ebbmb5 = D mb5</td>
+      <td>Fbmb5 = E mb5</td>
+    </tr>
+    <tr>
+      <th>G m</th>
+      <td>G m</td>
+      <td>A m</td>
+      <td>BbM#5</td>
+      <td>C</td>
+      <td>D</td>
+      <td>Ebmb5</td>
+      <td>F mb5</td>
+    </tr>
+    <tr>
+      <th>G#m</th>
+      <td>G#m</td>
+      <td>A#m</td>
+      <td>B M#5</td>
+      <td>C#</td>
+      <td>D#</td>
+      <td>E mb5</td>
+      <td>F#mb5</td>
+    </tr>
+    <tr class="not-use">
+      <th>難解な表記なので避ける</th>
+      <td>Abm</td>
+      <td>Bbm</td>
+      <td>CbM#5 = BM#5</td>
+      <td>Db</td>
+      <td>Eb</td>
+      <td>Fbmb5 = E mb5</td>
+      <td>Gbmb5</td>
+    </tr>
+    <tr>
+      <th>A m</th>
+      <td>A m</td>
+      <td>B m</td>
+      <td>C M#5</td>
+      <td>D</td>
+      <td>E</td>
+      <td>F mb5</td>
+      <td>G mb5</td>
+    </tr>
+    <tr>
+      <th rowspan="2">A#m / Bbm</th>
+      <td>A#m</td>
+      <td>B#m = Cm</td>
+      <td>C#M#5</td>
+      <td>D#</td>
+      <td>E# = F</td>
+      <td>F#mb5</td>
+      <td>G#mb5</td>
+    </tr>
+    <tr>
+      <td>Bbm</td>
+      <td>C m</td>
+      <td>DbM#5</td>
+      <td>Eb</td>
+      <td>F</td>
+      <td>Gbmb5</td>
+      <td>Abmb5</td>
+    </tr>
+    <tr>
+      <th>B m</th>
+      <td>B m</td>
+      <td>C#m</td>
+      <td>D M#5</td>
+      <td>E</td>
+      <td>F#</td>
+      <td>G mb5</td>
+      <td>A mb5</td>
+    </tr>
+    <tr class="not-use">
+      <th>難解な表記なので避ける</th>
+      <td>Cbm = Bm</td>
+      <td>Dbm</td>
+      <td>EbbM#5 = D M#5</td>
+      <td>Fb = E</td>
+      <td>Gb</td>
+      <td>Abbmb5 = G mb5</td>
+      <td>Bxmb5 = A mb5</td>
+    </tr>
+  </tbody>
+</table>
+</details>
+
+<details open>
+  <summary>Melodic Minor 7th Diatonic Chords</summary>
+<table>
+	<thead>
+    <tr>
+      <th rowspan="2">Degree Name</th>
+      <th>I (T)</th>
+      <th>II (SD)</th>
+      <th>III (D or T)</th>
+      <th>IV (SD)</th>
+      <th>V (D)</th>
+      <th>VI (T)</th>
+      <th>VII (D or SD)</th>
+    </tr>
+    <tr>
+      <th>Im7</th>
+      <th>IIm7</th>
+      <th>IIIM7#5</th>
+      <th>IV7</th>
+      <th>V7</th>
+      <th>VIm7b5</th>
+      <th>VIIm7b5</th>
+    </tr>
+	</thead>
+	<tbody>
+    <tr class="not-use">
+      <th>難解な表記なので避ける</th>
+      <td>B#m7 = Cm7</td>
+      <td>Cxm7 = Dm7</td>
+      <td>D#M7#5</td>
+      <td>E#7 = F7</td>
+      <td>Fx7 = G7</td>
+      <td>G#m7b5</td>
+      <td>A#m7b5</td>
+    </tr>
+    <tr>
+      <th>C m</th>
+      <td>C m7</td>
+      <td>D m7</td>
+      <td>EbM7#5</td>
+      <td>F 7</td>
+      <td>G 7</td>
+      <td>Abm7b5</td>
+      <td>Bbm7b5</td>
+    </tr>
+    <tr>
+      <th>C#m</th>
+      <td>C#m7</td>
+      <td>D#m7</td>
+      <td>E M7#5</td>
+      <td>F#7</td>
+      <td>G#7</td>
+      <td>A m7b5</td>
+      <td>B m7b5</td>
+    </tr>
+    <tr class="not-use">
+      <th>難解な表記なので避ける</th>
+      <td>Dbm7</td>
+      <td>Ebm7</td>
+      <td>FbbM7#5 = EM7#5</td>
+      <td>Gb7</td>
+      <td>Ab7</td>
+      <td>Bbbm7b5 = A m7b5</td>
+      <td>Cbm7b5 = B m7b5</td>
+    </tr>
+    <tr>
+      <th>D m</th>
+      <td>D m7</td>
+      <td>E m7</td>
+      <td>F M7#5</td>
+      <td>G 7</td>
+      <td>A 7</td>
+      <td>Bbm7b5</td>
+      <td>C m7b5</td>
+    </tr>
+    <tr>
+      <th rowspan="2">D#m / Ebm<br>難解な表記が混じる</th>
+      <td>D#m7</td>
+      <td>E#m7 = Fm7</td>
+      <td>F#M7#5</td>
+      <td>G#7</td>
+      <td>A#7</td>
+      <td>B m7b5</td>
+      <td>C#m7b5</td>
+    </tr>
+    <tr>
+      <td>Ebm7</td>
+      <td>F m7</td>
+      <td>GbM7#5</td>
+      <td>Ab7</td>
+      <td>Bb7</td>
+      <td>Cbm7b5 = B m7b5</td>
+      <td>Dbm7b5</td>
+    </tr>
+    <tr>
+      <th>E m</th>
+      <td>E m7</td>
+      <td>F#m7</td>
+      <td>G M7#5</td>
+      <td>A 7</td>
+      <td>B 7</td>
+      <td>C m7b5</td>
+      <td>D m7b5</td>
+    </tr>
+    <tr>
+      <th>F m</th>
+      <td>F m7</td>
+      <td>G m7</td>
+      <td>AbM7#5</td>
+      <td>Bb7</td>
+      <td>C 7</td>
+      <td>Dbm7b5</td>
+      <td>Ebm7b5</td>
+    </tr>
+    <tr>
+      <th>F#m</th>
+      <td>F#m7</td>
+      <td>G#m7</td>
+      <td>A M7#5</td>
+      <td>B 7</td>
+      <td>C#7</td>
+      <td>D m7b5</td>
+      <td>E m7b5</td>
+    </tr>
+    <tr class="not-use">
+      <th>難解な表記なので避ける</th>
+      <td>Gbm7</td>
+      <td>Abm7</td>
+      <td>BbbM7#5 = AM7#5</td>
+      <td>Cb7 = B7</td>
+      <td>Db7</td>
+      <td>Ebbm7b5 = D m7b5</td>
+      <td>Fbm7b5 = E m7b5</td>
+    </tr>
+    <tr>
+      <th>G m</th>
+      <td>G m7</td>
+      <td>A m7</td>
+      <td>BbM7#5</td>
+      <td>C 7</td>
+      <td>D 7</td>
+      <td>Ebm7b5</td>
+      <td>F m7b5</td>
+    </tr>
+    <tr>
+      <th>G#m</th>
+      <td>G#m7</td>
+      <td>A#m7</td>
+      <td>B M7#5</td>
+      <td>C#7</td>
+      <td>D#7</td>
+      <td>E m7b5</td>
+      <td>F#m7b5</td>
+    </tr>
+    <tr class="not-use">
+      <th>難解な表記なので避ける</th>
+      <td>Abm7</td>
+      <td>Bbm7</td>
+      <td>CbM7#5 = BM7#5</td>
+      <td>Db7</td>
+      <td>Eb7</td>
+      <td>Fbm7b5 = E m7b5</td>
+      <td>Gbm7b5</td>
+    </tr>
+    <tr>
+      <th>A m</th>
+      <td>A m7</td>
+      <td>B m7</td>
+      <td>C M7#5</td>
+      <td>D 7</td>
+      <td>E 7</td>
+      <td>F m7b5</td>
+      <td>G m7b5</td>
+    </tr>
+    <tr>
+      <th rowspan="2">A#m / Bbm</th>
+      <td>A#m7</td>
+      <td>B#m7 = Cm7b5</td>
+      <td>C#M7#5</td>
+      <td>D#7</td>
+      <td>E#7 = F7</td>
+      <td>F#m7b5</td>
+      <td>G#m7b5</td>
+    </tr>
+    <tr>
+      <td>Bbm7</td>
+      <td>C m7</td>
+      <td>DbM7#5</td>
+      <td>Eb7</td>
+      <td>F 7</td>
+      <td>Gbm7b5</td>
+      <td>Abm7b5</td>
+    </tr>
+    <tr>
+      <th>B m</th>
+      <td>B m7</td>
+      <td>C#m7</td>
+      <td>D M7#5</td>
+      <td>E 7</td>
+      <td>F#7</td>
+      <td>G m7b5</td>
+      <td>A m7b5</td>
+    </tr>
+    <tr class="not-use">
+      <th>難解な表記なので避ける</th>
+      <td>Cbm7 = Bm7</td>
+      <td>Dbm7</td>
+      <td>EbbM7#5 = D M7#5</td>
+      <td>Fb7 = E7</td>
+      <td>Gb7</td>
+      <td>Abbm7b5 = G m7b5</td>
+      <td>Bxm7b5 = A m7b5</td>
+    </tr>
+  </tbody>
+</table>
+</details>
+
+<p><button type="button" id="test">Test</button></p>
+
+  </body>
+</html>
