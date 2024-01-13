@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Convert Image By Canvas</title>
+    <style>
+
+*, ::before, ::after { box-sizing: border-box; }
+html { font-family: sans-serif; }
+
+#quality { width: 10rem; }
+.canvas-wrapper { overflow: auto; max-height: 15rem; }
+
+    </style>
+    <script>
+
+document.addEventListener('DOMContentLoaded', () => {
+  const defaultQuality = 0.9;
+  
+  // Submit 防止
+  document.getElementById('form').addEventListener('submit', event => event.preventDefault());
+  
+  // リセット時は発火しないが、その後に同ファイルを選択し直しても OnChange が発火する
+  document.getElementById('input-file').addEventListener('change', event => {
+    const inputFile = event.srcElement.files?.[0];
+    if(inputFile == null) return console.error('File Not Found');
+    const image = new Image();
+    const url = URL.createObjectURL(inputFile);
+    image.src = url;
+    image.onload = () => {
+      const canvas = document.getElementById('canvas');
+      canvas.width  = image.width;
+      canvas.height = image.height;
+      const context = canvas.getContext('2d');
+      context.drawImage(image, 0, 0);
+      URL.revokeObjectURL(url);
+      document.getElementById('download-png').disabled = document.getElementById('download-jpg').disabled = document.getElementById('download-webp').disabled = false;
+    };
+  });
+  
+  document.getElementById('quality').value = defaultQuality;
+  document.getElementById('quality').addEventListener('blur', event => {
+    const inputValue = event.srcElement.value;
+    if(inputValue === '') return event.srcElement.value = defaultQuality;
+    let inputValueNumber = Number(inputValue);
+    if(inputValueNumber < 0) inputValueNumber = 0;
+    if(inputValueNumber > 1) inputValueNumber = 1;
+    if(Number.isNaN(inputValueNumber)) inputValueNumber = defaultQuality;
+    event.srcElement.value = inputValueNumber;  // 不正値は直す
+  });
+  
+  document.getElementById('download-png').addEventListener('click', event => {
+    event.srcElement.disabled = true;
+    document.getElementById('canvas').toBlob(blob => {
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement('a');
+      anchor.href = url;
+      anchor.download = (document.getElementById('input-file').files?.[0]?.name ?? 'File') + '.png';
+      anchor.click();
+      URL.revokeObjectURL(url);
+      event.srcElement.disabled = false;
+    }, 'image/png');
+  });
+  
+  document.getElementById('download-jpg').addEventListener('click', event => {
+    event.srcElement.disabled = true;
+    document.getElementById('canvas').toBlob(blob => {
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement('a');
+      anchor.href = url;
+      anchor.download = (document.getElementById('input-file').files?.[0]?.name ?? 'File') + '.jpg';
+      anchor.click();
+      URL.revokeObjectURL(url);
+      event.srcElement.disabled = false;
+    }, 'image/jpeg', Number(document.getElementById('quality').value));
+  });
+  
+  document.getElementById('download-webp').addEventListener('click', event => {
+    event.srcElement.disabled = true;
+    document.getElementById('canvas').toBlob(blob => {
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement('a');
+      anchor.href = url;
+      anchor.download = (document.getElementById('input-file').files?.[0]?.name ?? 'File') + '.webp';
+      anchor.click();
+      URL.revokeObjectURL(url);
+      event.srcElement.disabled = false;
+    }, 'image/webp', Number(document.getElementById('quality').value));
+  });
+  
+  document.getElementById('reset-button').addEventListener('click', () => {
+    document.getElementById('download-png').disabled = document.getElementById('download-jpg').disabled = document.getElementById('download-webp').disabled = true;
+  })
+});
+
+    </script>
+  </head>
+  <body>
+
+<h1>Convert Image By Canvas</h1>
+
+<form id="form">
+  <p><label>File : <input type="file" id="input-file" accept="image/*"></label></p>
+  <p><label>Quality : <input type="number" id="quality" placeholder="Quality (0-1)" min="0" max="1" step="0.05" value="0.9"></label></p>
+  <ul>
+    <li><input type="button" id="download-png"  value="PNG で保存 (Quality 無効)" disabled></li>
+    <li><input type="button" id="download-jpg"  value="JPG で保存"                disabled></li>
+    <li><input type="button" id="download-webp" value="WebP で保存"               disabled></li>
+  </ul>
+  <p><input type="reset" id="reset-button" value="Reset"></p>
+</form>
+<div class="canvas-wrapper">
+  <canvas id="canvas"></canvas>
+</div>
+
+  </body>
+</html>
