@@ -19,6 +19,7 @@ textarea {
   width: 100%;
   height: 4rem;
   min-height: 4rem;
+  font-size: 17px;
   background: #fff;
   resize: vertical;
 }
@@ -135,6 +136,14 @@ document.addEventListener('DOMContentLoaded', () => {
         const index = item.searchesArray.findIndex(character => character === match);
         return item.replaces[index] ?? match;
       });
+    });
+  });
+  
+  // On Select
+  dictionary.forEach(item => {
+    document.getElementById(item.id).addEventListener('click', event => {
+      event.srcElement.select();
+      document.execCommand('copy');
     });
   });
   
