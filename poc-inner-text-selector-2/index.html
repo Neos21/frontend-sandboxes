@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>PoC InnerText Selector 2</title>
+    <style>
+
+*, ::before, ::after { box-sizing: border-box; }
+html { font-family: sans-serif; }
+
+body[data-text-content*="フガフガ"] > h1::after {
+  content: "body 内に「フガフガ」があるよ";
+  color: #f00;
+}
+
+code[data-text-content] {
+  border: 1px solid #ccc;
+  background: #eee;
+}
+
+/* `"HOGE"]` で終わる */
+code[data-text-content$="\"HOGE\"]"] {
+  color: #090;
+}
+
+/* `i` で大文字小文字の区別をしない */
+code[data-text-content*="InNeR" i] {
+  color: #f0f;
+}
+
+[data-text-content="リンクテスト"],
+#contents [data-text-content*="てすと"] {
+  color: #f80;
+  font-weight: bold;
+}
+
+    </style>
+    <script>
+
+/**
+ * TextContent を監視して各要素に `data-text-content` 属性を付与する
+ * 
+ * @param {HTMLElement} targetElement `document.documentElement`・`document.body`・`document.getElementById()`・`document.querySelector()` が指定可能
+ * @return {MutationObserver | undefined} MutationObserver・`targetElement` が不正な場合は `undefined`
+ */
+const observeTextContent = targetElement => {
+  /** 対象の要素が `null` でなく Element Node であるか否か */
+  const isElement = element => element?.nodeType === Node.ELEMENT_NODE;
+  /** 指定の要素に `data-text-content` 属性を付与する */
+  const setTextContent = element => {
+    if(isElement(element)) element.dataset.textContent = element.textContent.trim();  // 空要素など空文字の場合も設定することで `[data-text-content=""]` に対応させる
+  };
+  /** 指定の要素とその子孫要素に一括処理する */
+  const setTextContentToChild = element => {
+    setTextContent(element);
+    if(element.children != null) [...element.children].forEach((childElement) => setTextContentToChild(childElement));
+  };
+  /** 指定の要素とその先祖要素に一括処理する (`targetElement` まで遡る) */
+  const setTextContentToParent = element => {
+    setTextContent(element);
+    if(element.parentElement !== targetElement.parentElement) setTextContentToParent(element.parentElement);  // `documentElement.parentNode` = `null` に到達してどちらかが `null` になった時もコレで問題なし
+  };
+  
+  // 指定の要素がなければ何もせず `undefined` を返す
+  if(!isElement(targetElement)) return console.warn('Invalid Target Element', targetElement);
+  
+  // 初期設定
+  setTextContentToChild(targetElement);
+  
+  // 要素変更時の処理
+  const mutationObserver = new MutationObserver((mutationRecords) => {
+    mutationRecords.forEach((mutationRecord) => {
+      // 追加された要素があれば子孫を処理する
+      mutationRecord.addedNodes?.forEach((addedNode) => {
+        setTextContentToChild(addedNode);
+      });
+      // 対象の要素とその先祖を処理する
+      setTextContentToParent(mutationRecord.target);
+    });
+  });
+  mutationObserver.observe(targetElement, {
+    characterData: true,  // テキストノードの変更に対応する
+    childList    : true,  // 子ノードの追加・削除に対応する
+    subtree      : true   // 子孫ノードの変更に対応する
+  });
+  
+  // 監視を止めたい場合の時のために MutationObserver を返しておく
+  return mutationObserver;
+};
+
+document.addEventListener('DOMContentLoaded', () => {
+  // Body 配下を監視する
+  observeTextContent(document.body);
+  
+  document.getElementById('add-content').addEventListener('click', () => {
+    // #contents 内に追加
+    const count = document.getElementById('contents').childElementCount;
+    document.getElementById('contents').insertAdjacentHTML('beforeend', `<li>テスト ${count + 1}</li><li><b>テスト</b> ${count + 2}</li>`);
+    // #link の後ろに追加
+    document.getElementById('link').insertAdjacentHTML('afterend', 'テスト<span>Span</span>てすと');
+    // body 直下に追加 (このやり方で初めて `type === 'characterData'` が発火する)
+    document.body.lastChild.data += 'ほげ';
+    document.body.lastChild.data = document.body.lastChild.data.replace('ほげほげ', 'フガ');
+  });
+  
+  document.getElementById('remove-content').addEventListener('click', () => {
+    const lastChild = document.querySelector('#contents > li:last-child');
+    lastChild?.parentNode.removeChild(lastChild);
+  });
+  
+  document.getElementById('replace-content').addEventListener('click', () => {
+    const firstChild = document.querySelector('#contents > li:first-child');
+    if(firstChild) firstChild.textContent = firstChild.textContent.replace('テスト', 'てすと');
+  });
+});
+
+    </script>
+  </head>
+  <body>
+
+<h1>PoC InnerText Selector 2</h1>
+
+<p><code>[data-text-content*="HOGE"]</code> といった CSS セレクタを予め定義しておき、JS で <code>innerText</code> (= <code>textContent</code>) を <code>data-text-content</code> 属性に指定してみよう、という試み。</p>
+<ul>
+  <li>要素の動的な増減に対応できるように <code>MutationObserver</code> も設定してみる</li>
+  <li><a href="#" id="link">リンクテスト</a></li>
+</ul>
+
+<h2>テスト用</h2>
+<p>
+  <button type="button" id="add-content">Add</button>
+  <button type="button" id="remove-content">Remove</button>
+  <button type="button" id="replace-content">Replace</button>
+</p>
+<ol id="contents">
+  <li>テスト</li>
+</ol>
+<hr>
+<div>置換テスト</div>
+
+  </body>
+</html>
