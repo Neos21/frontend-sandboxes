@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>SPA Comparison</title>
+    
+    <!-- Google Search Console -->
+    <meta name="google-site-verification" content="ls7kuvIKSqVa_dcixqKvFwl393swvYMkHCkG-xtlCj0">
+    <!-- Global Site Tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-LP3ZQV2R3M"></script>
+    <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','G-LP3ZQV2R3M');gtag('config','UA-106501-6');</script>
+    <!-- Google AdSense -->
+    <script data-ad-client="ca-pub-6475907504235292" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+    
+    <style>
+
+@import url("https://cdn.jsdelivr.net/npm/@neos21/neos-normalize@2.1.2/neos-normalize.min.css");
+
+body {
+  margin: 1rem;
+}
+
+#container {
+  margin: 1rem auto;
+  max-width: 960px;
+}
+
+h1 {
+  font-size: 3rem;
+  text-align: center;
+}
+
+h2 {
+  border-bottom: 2px solid #1976d2;
+  color: #1565c0;
+  font-size: 2rem;
+}
+
+h3 {
+  border-bottom: 1px solid #616161;
+  color: #424242;
+  font-size: 1.75rem;
+}
+
+hr {
+  border-bottom-color: #424242;
+}
+
+#footer {
+  text-align: right;
+}
+
+/* Prism.js Monokai Theme : https://github.com/Swaagie/prismjs-monokai */
+:not(pre) > code[class*="language-"], pre[class*="language-"] {
+  border: 0;
+  background: #171c1d;
+}
+code[class*="language-"], pre[class*="language-"],
+.language-css .token.string,
+.style        .token.string,
+.token.entity, .token.operator, .token.punctuation, .token.url, .token.variable {
+  color: #f2f8f8;
+}
+.token.cdata, .token.comment, .token.doctype, .token.prolog {
+  color: #8890a0;
+}
+.token.constant, .token.deleted, .token.keyword, .token.property, .token.symbol, .token.tag {
+  color: #f92672;
+}
+.token.boolean, .token.number {
+  color: #ae81ff;
+}
+.token.attr-name, .token.builtin, .token.char, .token.inserted, .token.selector, .token.string {
+  color: #a6e22e;
+}
+.token.atrule, .token.attr-value, .token.function {
+  color: #e6db74;
+}
+.token.important, .token.regex {
+  color: #fd971f;
+}
+.token.bold, .token.important, .token.italic {
+  font-weight: bold;
+}
+
+    </style>
+  </head>
+  <body>
+
+<div id="container">
+
+<h1>SPA 3強を比較</h1>
+<dl>
+  <dt>初版作成</dt>
+  <dd>2024-09-12</dd>
+  <dt>目次</dt>
+  <dd>
+    <ul>
+      <li><a href="#prerequired">事前準備</a></li>
+      <li><a href="#angular">Angular</a></li>
+      <li><a href="#vue">Vue</a></li>
+      <li><a href="#react">React</a></li>
+    </ul>
+  </dd>
+</dl>
+
+<hr>
+
+<h2 id="prerequired">事前準備</h2>
+<ul>
+  <li>Angular が怒ったので偶数バージョンの最新版にしておく</li>
+</ul>
+<pre class="language-bash"><code class="language-bash">$ node -v
+v22.8.0
+
+$ <span class="token function">npm</span> -v
+<span class="token number">10.8</span>.2
+</code></pre>
+
+<hr>
+
+<h2 id="angular">Angular</h2>
+<pre class="language-bash"><code class="language-bash"><span class="token comment"># Angular 用のコマンドをインストールする</span>
+$ <span class="token function">npm</span> <span class="token function">install</span> -g @angular/cli
+$ ng version
+Angular CLI: <span class="token number">18.2</span>.4
+
+<span class="token comment"># プロジェクトを作る</span>
+$ ng new practice-angular --standalone<span class="token operator">=</span>true --style<span class="token operator">=</span>css --routing<span class="token operator">=</span>false --ssr<span class="token operator">=</span>false --minimal<span class="token operator">=</span>true --inline-style<span class="token operator">=</span>false --inline-template<span class="token operator">=</span>false
+$ tree ./practice-angular/ -I <span class="token string">'.git|node_modules'</span>
+./practice-angular/
+├── README.md
+├── angular.json
+├── package.json
+├── public
+│   └── favicon.ico
+├── src
+│   ├── app
+│   │   ├── app.component.css
+│   │   ├── app.component.html
+│   │   ├── app.component.ts
+│   │   └── app.config.ts
+│   ├── index.html
+│   ├── main.ts
+│   └── styles.css
+├── tsconfig.app.json
+└── tsconfig.json
+
+<span class="token comment"># 開発サーバをとりあえず起動する</span>
+$ <span class="token builtin class-name">cd</span> ./practice-angular/
+$ <span class="token function">npm</span> start -- --host <span class="token number">0.0</span>.0.0
+</code></pre>
+<pre class="language-bash"><code class="language-bash"><span class="token comment"># サービスクラスを作るコマンドはこんな感じ</span>
+$ <span class="token function">npm</span> run ng generate <span class="token function">service</span> app
+CREATE src/app/app.service.ts <span class="token punctuation">(</span><span class="token number">132</span> bytes<span class="token punctuation">)</span>
+</code></pre>
+<ul>
+  <li><code>./src/app/app.component.ts</code></li>
+</ul>
+<pre class="language-typescript"><code class="language-typescript"><span class="token keyword">import</span> <span class="token imports"><span class="token punctuation">{</span> <span class="token maybe-class-name">Component</span> <span class="token punctuation">}</span></span> <span class="token keyword">from</span> <span class="token string">'@angular/core'</span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token imports"><span class="token punctuation">{</span> <span class="token maybe-class-name">CommonModule</span> <span class="token punctuation">}</span></span> <span class="token keyword">from</span> <span class="token string">'@angular/common'</span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token imports"><span class="token punctuation">{</span> <span class="token maybe-class-name">AppService</span> <span class="token punctuation">}</span></span> <span class="token keyword">from</span> <span class="token string">'./app.service'</span><span class="token punctuation">;</span>
+
+@<span class="token function"><span class="token maybe-class-name">Component</span></span><span class="token punctuation">(</span><span class="token punctuation">{</span>
+  selector<span class="token operator">:</span> <span class="token string">'app-root'</span><span class="token punctuation">,</span>
+  standalone<span class="token operator">:</span> <span class="token boolean">true</span><span class="token punctuation">,</span>
+  imports<span class="token operator">:</span> <span class="token punctuation">[</span><span class="token maybe-class-name">CommonModule</span><span class="token punctuation">]</span><span class="token punctuation">,</span>  <span class="token comment">// 必要なモジュールを読み込む</span>
+  templateUrl<span class="token operator">:</span> <span class="token string">'./app.component.html'</span><span class="token punctuation">,</span>
+  styleUrl<span class="token operator">:</span> <span class="token string">'./app.component.css'</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span>
+<span class="token keyword">export</span> <span class="token keyword">class</span> <span class="token class-name"><span class="token maybe-class-name">AppComponent</span></span> <span class="token punctuation">{</span>
+  <span class="token comment">// 画面に表示されるメッセージ</span>
+  <span class="token keyword">public</span> message<span class="token operator">:</span> <span class="token known-class-name class-name">Promise</span><span class="token operator">&#x3C;</span><span class="token builtin">string</span><span class="token operator">></span> <span class="token operator">|</span> <span class="token keyword">null</span> <span class="token operator">=</span> <span class="token keyword">null</span><span class="token punctuation">;</span>
+  
+  <span class="token comment">// サービスクラスを使う宣言</span>
+  <span class="token keyword">constructor</span><span class="token punctuation">(</span><span class="token keyword">private</span> <span class="token keyword">readonly</span> appService<span class="token operator">:</span> <span class="token maybe-class-name">AppService</span><span class="token punctuation">)</span> <span class="token punctuation">{</span> <span class="token punctuation">}</span>
+  
+  <span class="token comment">// 画面初期表示時に、サービスクラスからデータを取ってくる</span>
+  <span class="token keyword">public</span> <span class="token function">ngOnInit</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">:</span> <span class="token keyword">void</span> <span class="token punctuation">{</span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token property-access">message</span> <span class="token operator">=</span> <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token property-access">appService</span><span class="token punctuation">.</span><span class="token method function property-access">generateMessage</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<ul>
+  <li><code>./src/app/app.component.html</code></li>
+</ul>
+<pre class="language-html"><code class="language-html"><span class="token tag"><span class="token tag"><span class="token punctuation">&#x3C;</span>h1</span><span class="token punctuation">></span></span>Hello : {{ message | async }}<span class="token tag"><span class="token tag"><span class="token punctuation">&#x3C;/</span>h1</span><span class="token punctuation">></span></span>
+</code></pre>
+<ul>
+  <li><code>./src/app/app.service.ts</code>
+    <ul>
+      <li>Angular の場合、ビジネスロジック (処理) を書く場所として「Service クラス」を作るコマンドが用意されており、画面 (Component) と作業担当の分離が行いやすい</li>
+    </ul>
+  </li>
+</ul>
+<pre class="language-typescript"><code class="language-typescript"><span class="token keyword">import</span> <span class="token imports"><span class="token punctuation">{</span> <span class="token maybe-class-name">Injectable</span> <span class="token punctuation">}</span></span> <span class="token keyword">from</span> <span class="token string">'@angular/core'</span><span class="token punctuation">;</span>
+
+@<span class="token function"><span class="token maybe-class-name">Injectable</span></span><span class="token punctuation">(</span><span class="token punctuation">{</span> providedIn<span class="token operator">:</span> <span class="token string">'root'</span> <span class="token punctuation">}</span><span class="token punctuation">)</span>
+<span class="token keyword">export</span> <span class="token keyword">class</span> <span class="token class-name"><span class="token maybe-class-name">AppService</span></span> <span class="token punctuation">{</span>
+  <span class="token comment">// 3秒待ってから「Test Text」という文字列を返す関数</span>
+  <span class="token keyword">public</span> <span class="token keyword">async</span> <span class="token function">generateMessage</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">:</span> <span class="token known-class-name class-name">Promise</span><span class="token operator">&#x3C;</span><span class="token builtin">string</span><span class="token operator">></span> <span class="token punctuation">{</span>
+    <span class="token keyword">await</span> <span class="token keyword">new</span> <span class="token class-name"><span class="token known-class-name class-name">Promise</span></span><span class="token punctuation">(</span><span class="token punctuation">(</span>resolve<span class="token punctuation">)</span> <span class="token arrow operator">=></span> <span class="token function">setTimeout</span><span class="token punctuation">(</span>resolve<span class="token punctuation">,</span> <span class="token number">3000</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span> <span class="token string">'Test Text'</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>→ コレで、画面を開くと3秒後に「Test Text」と表示されるサンプルページが作れた。</p>
+
+<hr>
+
+<h2 id="vue">Vue</h2>
+<pre class="language-bash"><code class="language-bash"><span class="token comment"># プロジェクトを作る</span>
+$ <span class="token function">npm</span> create vue@latest
+✔ Project name: … practice-vue
+✔ Add TypeScript? … No / <span class="token punctuation">[</span>Yes<span class="token punctuation">]</span>
+✔ Add JSX Support? … <span class="token punctuation">[</span>No<span class="token punctuation">]</span> / Yes
+✔ Add Vue Router <span class="token keyword">for</span> Single Page Application development? … <span class="token punctuation">[</span>No<span class="token punctuation">]</span> / Yes
+✔ Add Pinia <span class="token keyword">for</span> state management? … <span class="token punctuation">[</span>No<span class="token punctuation">]</span> / Yes
+✔ Add Vitest <span class="token keyword">for</span> Unit Testing? … <span class="token punctuation">[</span>No<span class="token punctuation">]</span> / Yes
+✔ Add an End-to-End Testing Solution? › No
+✔ Add ESLint <span class="token keyword">for</span> code quality? … <span class="token punctuation">[</span>No<span class="token punctuation">]</span> / Yes
+✔ Add Vue DevTools <span class="token number">7</span> extension <span class="token keyword">for</span> debugging? <span class="token punctuation">(</span>experimental<span class="token punctuation">)</span> … <span class="token punctuation">[</span>No<span class="token punctuation">]</span> / Yes
+
+$ tree ./practice-vue/
+./practice-vue/
+├── README.md
+├── env.d.ts
+├── index.html
+├── package.json
+├── public
+│   └── favicon.ico
+├── src
+│   ├── App.vue
+│   ├── assets
+│   │   ├── base.css
+│   │   ├── logo.svg
+│   │   └── main.css
+│   ├── components
+│   │   ├── HelloWorld.vue
+│   │   ├── TheWelcome.vue
+│   │   ├── WelcomeItem.vue
+│   │   └── icons
+│   │       ├── IconCommunity.vue
+│   │       ├── IconDocumentation.vue
+│   │       ├── IconEcosystem.vue
+│   │       ├── IconSupport.vue
+│   │       └── IconTooling.vue
+│   └── main.ts
+├── tsconfig.app.json
+├── tsconfig.json
+├── tsconfig.node.json
+└── vite.config.ts
+
+<span class="token comment"># とりあえず開発サーバを起動する</span>
+$ <span class="token builtin class-name">cd</span> ./practice-vue/
+$ <span class="token function">npm</span> <span class="token function">install</span>
+$ <span class="token function">npm</span> run dev -- --host<span class="token operator">=</span><span class="token number">0.0</span>.0.0
+</code></pre>
+<p>「Vue Official <code>vue.volar</code>」という VSCode 拡張機能を入れることで、<code>.vue</code> ファイルにシンタックスハイライト (色) が付くようになる。</p>
+<ul>
+  <li>ただ <code>import</code> 部分の解釈に一部不具合があり、正しいコードなのにエラーが付いてしまうことがある。回避策調査中</li>
+</ul>
+<p>不要なサンプルファイルを消して、Angular 版と似たようなコードを書いてみる。</p>
+<ul>
+  <li><code>./src/App.vue</code>
+    <ul>
+      <li>SFC と呼ばれる、一つのファイルに TypeScript・HTML・CSS が登場するのが特徴</li>
+      <li>Vue v3 系からは、TypeScript 部分が Composition API という書き方に移行しているが、旧来の Options API という書き方でも問題はない
+        <ul>
+          <li>このあたり、どちらの記法で統一するか開発者の意識が問われる</li>
+          <li>Vue v2 系の時代が長かったため、Options API での書き方で紹介されている例が多く、記法がごちゃ混ぜになりやすいかもしれない</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
+<pre class="language-vue"><code class="language-vue"><span class="token tag"><span class="token tag"><span class="token punctuation">&#x3C;</span>script</span> <span class="token attr-name">setup</span> <span class="token attr-name">lang</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>ts<span class="token punctuation">"</span></span><span class="token punctuation">></span></span><span class="token script"><span class="token language-javascript">
+<span class="token keyword module">import</span> <span class="token imports"><span class="token maybe-class-name">HelloWorld</span></span> <span class="token keyword module">from</span> <span class="token string">'./components/HelloWorld.vue'</span><span class="token punctuation">;</span>
+</span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&#x3C;/</span>script</span><span class="token punctuation">></span></span>
+
+<span class="token tag"><span class="token tag"><span class="token punctuation">&#x3C;</span>template</span><span class="token punctuation">></span></span>
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&#x3C;</span>h1</span><span class="token punctuation">></span></span>Vue App<span class="token tag"><span class="token tag"><span class="token punctuation">&#x3C;/</span>h1</span><span class="token punctuation">></span></span>
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&#x3C;</span>HelloWorld</span> <span class="token punctuation">/></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&#x3C;/</span>template</span><span class="token punctuation">></span></span>
+
+<span class="token tag"><span class="token tag"><span class="token punctuation">&#x3C;</span>style</span> <span class="token attr-name">scoped</span><span class="token punctuation">></span></span><span class="token style"><span class="token language-css">
+<span class="token selector">h1</span> <span class="token punctuation">{</span>
+  <span class="token property">color</span><span class="token punctuation">:</span> <span class="token hexcode color">#f00</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+</span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&#x3C;/</span>style</span><span class="token punctuation">></span></span>
+</code></pre>
+<ul>
+  <li><code>./src/components/HelloWorld.vue</code></li>
+</ul>
+<pre class="language-vue"><code class="language-vue"><span class="token tag"><span class="token tag"><span class="token punctuation">&#x3C;</span>script</span> <span class="token attr-name">setup</span> <span class="token attr-name">lang</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>ts<span class="token punctuation">"</span></span><span class="token punctuation">></span></span><span class="token script"><span class="token language-javascript">
+<span class="token keyword module">import</span> <span class="token imports"><span class="token punctuation">{</span> onMounted<span class="token punctuation">,</span> ref <span class="token punctuation">}</span></span> <span class="token keyword module">from</span> <span class="token string">'vue'</span><span class="token punctuation">;</span>
+<span class="token keyword module">import</span> <span class="token imports"><span class="token punctuation">{</span> <span class="token maybe-class-name">HelloService</span> <span class="token punctuation">}</span></span> <span class="token keyword module">from</span> <span class="token string">'../services/HelloService'</span><span class="token punctuation">;</span>
+
+<span class="token keyword">const</span> message <span class="token operator">=</span> <span class="token function">ref</span><span class="token punctuation">(</span><span class="token string">'No Value'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">// 画面初期表示時に、サービスクラスからデータを取ってくる</span>
+<span class="token function">onMounted</span><span class="token punctuation">(</span><span class="token keyword">async</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token arrow operator">=></span> <span class="token punctuation">{</span>
+  message<span class="token punctuation">.</span><span class="token property-access">value</span> <span class="token operator">=</span> <span class="token keyword control-flow">await</span> <span class="token maybe-class-name">HelloService</span><span class="token punctuation">.</span><span class="token method function property-access">generateMessage</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&#x3C;/</span>script</span><span class="token punctuation">></span></span>
+
+<span class="token tag"><span class="token tag"><span class="token punctuation">&#x3C;</span>template</span><span class="token punctuation">></span></span>
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&#x3C;</span>h2</span><span class="token punctuation">></span></span>{{ message }}<span class="token tag"><span class="token tag"><span class="token punctuation">&#x3C;/</span>h2</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&#x3C;/</span>template</span><span class="token punctuation">></span></span>
+
+<span class="token tag"><span class="token tag"><span class="token punctuation">&#x3C;</span>style</span> <span class="token attr-name">scoped</span><span class="token punctuation">></span></span><span class="token style"><span class="token language-css">
+<span class="token selector">h2</span> <span class="token punctuation">{</span>
+  <span class="token property">color</span><span class="token punctuation">:</span> <span class="token hexcode color">#0c0</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+</span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&#x3C;/</span>style</span><span class="token punctuation">></span></span>
+</code></pre>
+<ul>
+  <li><code>./src/services/HelloService.ts</code>
+    <ul>
+      <li>Vue の中には「サービスクラス」を作るための仕組みがないため、このような実装を自前で用意する必要がある</li>
+      <li>大抵は Component の中に直接書いているサンプルが多いが、処理が多くなると <code>.vue</code> ファイルの中のコードが増えて全体が見通しにくくなる</li>
+    </ul>
+  </li>
+</ul>
+<pre class="language-typescript"><code class="language-typescript"><span class="token keyword">class</span> <span class="token class-name"><span class="token maybe-class-name">HelloServiceSingleton</span></span> <span class="token punctuation">{</span>
+  <span class="token comment">// インスタンスを控えるプロパティ</span>
+  <span class="token keyword">private</span> <span class="token keyword">static</span> instance<span class="token operator">:</span> <span class="token maybe-class-name">HelloServiceSingleton</span><span class="token punctuation">;</span>
+  <span class="token comment">// 外部からのインスタンス生成を防ぐためプライベート・コンストラクタを宣言しておく</span>
+  <span class="token keyword">private</span> <span class="token keyword">constructor</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span> <span class="token punctuation">}</span>
+  <span class="token comment">// シングルトンなインスタンスを生成する</span>
+  <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token function">getInstance</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">:</span> <span class="token maybe-class-name">HelloServiceSingleton</span> <span class="token punctuation">{</span>
+    <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token maybe-class-name">HelloServiceSingleton</span><span class="token punctuation">.</span><span class="token property-access">instance</span> <span class="token operator">==</span> <span class="token keyword">null</span><span class="token punctuation">)</span> <span class="token maybe-class-name">HelloServiceSingleton</span><span class="token punctuation">.</span><span class="token property-access">instance</span> <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name"><span class="token maybe-class-name">HelloServiceSingleton</span></span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span> <span class="token maybe-class-name">HelloServiceSingleton</span><span class="token punctuation">.</span><span class="token property-access">instance</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+  
+  <span class="token comment">// 3秒待ってから「Test Text」という文字列を返す関数</span>
+  <span class="token keyword">public</span> <span class="token keyword">async</span> <span class="token function">generateMessage</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">:</span> <span class="token known-class-name class-name">Promise</span><span class="token operator">&#x3C;</span><span class="token builtin">string</span><span class="token operator">></span> <span class="token punctuation">{</span>
+    <span class="token keyword">await</span> <span class="token keyword">new</span> <span class="token class-name"><span class="token known-class-name class-name">Promise</span></span><span class="token punctuation">(</span><span class="token punctuation">(</span>resolve<span class="token punctuation">)</span> <span class="token arrow operator">=></span> <span class="token function">setTimeout</span><span class="token punctuation">(</span>resolve<span class="token punctuation">,</span> <span class="token number">3000</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span> <span class="token string">'Test Text'</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">export</span> <span class="token keyword">const</span> <span class="token maybe-class-name">HelloService</span> <span class="token operator">=</span> <span class="token maybe-class-name">HelloServiceSingleton</span><span class="token punctuation">.</span><span class="token method function property-access">getInstance</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<p>→ コレで、画面を開くと3秒後に「Test Text」と表示されるサンプルページが作れた。</p>
+<h3>オマケ : Vite の <code>vue-ts</code> で作った場合</h3>
+<p>Vite が用意する雛形の方が、Vue 公式の雛形よりは若干簡素だが、ほぼ差はない。</p>
+<pre class="language-bash"><code class="language-bash">$ <span class="token function">npm</span> create vite@latest practice-vue-vite -- --template vue-ts
+
+$ tree ./practice-vue-vite/
+./practice-vue-vite/
+├── README.md
+├── index.html
+├── package.json
+├── public
+│   └── vite.svg
+├── src
+│   ├── App.vue
+│   ├── assets
+│   │   └── vue.svg
+│   ├── components
+│   │   └── HelloWorld.vue
+│   ├── main.ts
+│   ├── style.css
+│   └── vite-env.d.ts
+├── tsconfig.app.json
+├── tsconfig.json
+├── tsconfig.node.json
+└── vite.config.ts
+</code></pre>
+
+<hr>
+
+<h2 id="react">React</h2>
+<ul>
+  <li>参考 : <a href="https://ja.react.dev/learn/start-a-new-react-project" target="_blank">https://ja.react.dev/learn/start-a-new-react-project</a>
+    <ul>
+      <li>React 公式では、素の React プロジェクトを作る方法をもはや提供していない。以前は <code>create-react-app</code> という雛形提供の仕組みがあった</li>
+    </ul>
+  </li>
+  <li>そこで、Vite によるプロジェクト雛形生成を利用する</li>
+</ul>
+<pre class="language-bash"><code class="language-bash"><span class="token comment"># プロジェクトを作る</span>
+$ <span class="token function">npm</span> create vite@latest practice-react -- --template react-ts
+
+$ tree ./practice-react/
+./practice-react/
+├── README.md
+├── eslint.config.js
+├── index.html
+├── package.json
+├── public
+│   └── vite.svg
+├── src
+│   ├── App.css
+│   ├── App.tsx
+│   ├── assets
+│   │   └── react.svg
+│   ├── index.css
+│   ├── main.tsx
+│   └── vite-env.d.ts
+├── tsconfig.app.json
+├── tsconfig.json
+├── tsconfig.node.json
+└── vite.config.ts
+
+<span class="token comment"># とりあえず開発サーバを起動する</span>
+$ <span class="token builtin class-name">cd</span> ./practice-react/
+$ <span class="token function">npm</span> <span class="token function">install</span>
+$ <span class="token function">npm</span> run dev
+</code></pre>
+<p>「React <code>zhang-renyang.vscode-react</code>」という VSCode 拡張機能を入れることで、<code>.tsx</code> (<code>.jsx</code>) ファイルにシンタックスハイライト (色) が付くようになる。</p>
+<p>不要なサンプルファイルを消して、Angular 版、Vue 版と似たようなコードを書いてみる。</p>
+<ul>
+  <li><code>./src/main.tsx</code>
+    <ul>
+      <li>使用する CSS ファイルや画像ファイルなども、TypeScript の <code>import</code> で書くのが特徴</li>
+      <li>TypeScript の中に HTML を書く、TSX (JSX) という記法が特徴</li>
+    </ul>
+  </li>
+</ul>
+<pre class="language-tsx"><code class="language-tsx"><span class="token keyword">import</span> <span class="token imports"><span class="token punctuation">{</span> <span class="token maybe-class-name">StrictMode</span> <span class="token punctuation">}</span></span> <span class="token keyword">from</span> <span class="token string">'react'</span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token imports"><span class="token punctuation">{</span> createRoot <span class="token punctuation">}</span></span> <span class="token keyword">from</span> <span class="token string">'react-dom/client'</span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token imports"><span class="token maybe-class-name">App</span></span> <span class="token keyword">from</span> <span class="token string">'./App.tsx'</span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token string">'./index.css'</span><span class="token punctuation">;</span>
+
+<span class="token function">createRoot</span><span class="token punctuation">(</span><span class="token dom variable">document</span><span class="token punctuation">.</span><span class="token method function property-access">getElementById</span><span class="token punctuation">(</span><span class="token string">'root'</span><span class="token punctuation">)</span><span class="token operator">!</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token method function property-access">render</span><span class="token punctuation">(</span>
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&#x3C;</span><span class="token class-name">StrictMode</span></span><span class="token punctuation">></span></span><span class="token plain-text">
+    </span><span class="token tag"><span class="token tag"><span class="token punctuation">&#x3C;</span>h1</span><span class="token punctuation">></span></span><span class="token plain-text">Hello</span><span class="token tag"><span class="token tag"><span class="token punctuation">&#x3C;/</span>h1</span><span class="token punctuation">></span></span><span class="token plain-text">
+    </span><span class="token tag"><span class="token tag"><span class="token punctuation">&#x3C;</span><span class="token class-name">App</span></span> <span class="token punctuation">/></span></span><span class="token plain-text">
+  </span><span class="token tag"><span class="token tag"><span class="token punctuation">&#x3C;/</span><span class="token class-name">StrictMode</span></span><span class="token punctuation">></span></span>
+<span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<ul>
+  <li><code>./src/index.css</code></li>
+</ul>
+<pre class="language-css"><code class="language-css"><span class="token selector">h1</span> <span class="token punctuation">{</span> <span class="token property">color</span><span class="token punctuation">:</span> <span class="token hexcode color">#f00</span><span class="token punctuation">;</span> <span class="token punctuation">}</span>
+</code></pre>
+<ul>
+  <li><code>./src/App.tsx</code>
+    <ul>
+      <li>コチラも、このコンポーネント専用の CSS ファイルは <code>import</code> で取り込んでいる</li>
+      <li>コチラも TSX 記法で HTML を書いている</li>
+      <li><code>HelloService</code> は Vue プロジェクトで作ったモノと全く同じファイルを流用した</li>
+      <li><code>useEffect</code>・<code>useState</code> といった React によく出てくる Hook という概念を理解しないとコーディングを読み解きづらいかも</li>
+    </ul>
+  </li>
+</ul>
+<pre class="language-tsx"><code class="language-tsx"><span class="token keyword">import</span> <span class="token imports"><span class="token punctuation">{</span> useEffect<span class="token punctuation">,</span> useState <span class="token punctuation">}</span></span> <span class="token keyword">from</span> <span class="token string">'react'</span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token imports"><span class="token punctuation">{</span> <span class="token maybe-class-name">HelloService</span> <span class="token punctuation">}</span></span> <span class="token keyword">from</span> <span class="token string">'./HelloService'</span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token string">'./App.css'</span><span class="token punctuation">;</span>
+
+<span class="token keyword">function</span> <span class="token function"><span class="token maybe-class-name">App</span></span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token keyword">const</span> <span class="token punctuation">[</span>message<span class="token punctuation">,</span> setMessage<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token function">useState</span><span class="token punctuation">(</span><span class="token string">'No Value'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  
+  <span class="token function">useEffect</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token arrow operator">=></span> <span class="token punctuation">{</span>  <span class="token comment">// 特定の処理を1回だけ行うための `useEffect`</span>
+    <span class="token punctuation">(</span><span class="token keyword">async</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token arrow operator">=></span> <span class="token punctuation">{</span>
+      <span class="token comment">// 画面初期表示に、サービスクラスからデータを取ってくる</span>
+      <span class="token keyword">const</span> generatedMessage <span class="token operator">=</span> <span class="token keyword">await</span> <span class="token maybe-class-name">HelloService</span><span class="token punctuation">.</span><span class="token method function property-access">generateMessage</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token function">setMessage</span><span class="token punctuation">(</span>generatedMessage<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  
+  <span class="token keyword">return</span> <span class="token punctuation">(</span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&#x3C;</span></span><span class="token punctuation">></span></span><span class="token plain-text">
+      </span><span class="token tag"><span class="token tag"><span class="token punctuation">&#x3C;</span>h2</span><span class="token punctuation">></span></span><span class="token punctuation">{</span> message <span class="token punctuation">}</span><span class="token tag"><span class="token tag"><span class="token punctuation">&#x3C;/</span>h2</span><span class="token punctuation">></span></span><span class="token plain-text">
+    </span><span class="token tag"><span class="token tag"><span class="token punctuation">&#x3C;/</span></span><span class="token punctuation">></span></span>
+  <span class="token punctuation">)</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">export</span> <span class="token keyword">default</span> <span class="token maybe-class-name">App</span><span class="token punctuation">;</span>
+</code></pre>
+<p>→ コレで、画面を開くと3秒後に「Test Text」と表示されるサンプルページが作れた。</p>
+
+<hr>
+<p id="footer">以上</p>
+
+</div>
+
+  </body>
+</html>
