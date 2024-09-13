@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Unified Editor</title>
+    
+    <!-- Google Search Console -->
+    <meta name="google-site-verification" content="ls7kuvIKSqVa_dcixqKvFwl393swvYMkHCkG-xtlCj0">
+    <!-- Global Site Tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-LP3ZQV2R3M"></script>
+    <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','G-LP3ZQV2R3M');gtag('config','UA-106501-6');</script>
+    <!-- Google AdSense -->
+    <script data-ad-client="ca-pub-6475907504235292" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+    
+    <style>
+
+*,
+::before,
+::after {
+  box-sizing: border-box;
+}
+
+html {
+  height: 100%;
+  overflow: hidden;
+  color: #000;
+  background: #fff;
+  cursor: default;
+}
+
+body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+#unified-container {
+  display: grid;
+  grid-template: "controls controls" auto
+                 "markdown html    " 1fr
+               / 1fr       1fr;
+  height: 100vh;
+  opacity: 0;
+  transition: opacity .1s;
+}
+
+#unified-controls {
+  grid-area: controls;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  
+  & > div:first-child {
+    text-align: left;
+  }
+  
+  & > div {
+    text-align: center;
+  }
+  
+  & > div:last-child {
+    text-align: right;
+  }
+}
+
+#unified-reset,
+#unified-parse,
+#unified-copy {
+  appearance: none;
+  outline: 0;
+  margin: 0;
+  border: 1px solid #999;
+  border-radius: 0;
+  padding: .1rem 1rem;
+  color: inherit;
+  background: #f0f0f0;
+  vertical-align: top;
+  cursor: pointer;
+  
+  &:hover {
+    border-color: #666;
+    background: #e6e6e6;
+  }
+  
+  &:focus {
+    border-color: #333;
+    background: #e0e0e0;
+  }
+  
+  &::first-letter {
+    text-decoration: underline;
+  }
+}
+
+#unified-markdown {
+  grid-area: markdown;
+  appearance: none;
+  outline: 0;
+  border: 1px solid #999;
+  border-radius: 0;
+  padding: .75rem;
+  overflow: auto scroll;
+  color: inherit;
+  background: transparent;
+  resize: none;
+  
+  &::placeholder {
+    color: #666;
+  }
+  
+  &:hover {
+    border-color: #666;
+  }
+  
+  &:focus {
+    border-color: #333;
+  }
+}
+
+#unified-html {
+  grid-area: html;
+  overflow: auto scroll;
+  border: 1px solid #999;
+  padding: .75rem 1.25rem;
+}
+
+/* Prism.js Monokai Theme : https://github.com/Swaagie/prismjs-monokai */
+
+pre[class*="language-"], pre:has(> code[class*="language-"]) {
+  border: 0;
+  border-radius: 4px;
+  padding: 1rem;
+  background: #171c1d;
+  overflow-x: auto;
+}
+pre[class*="language-"], pre:has(> code[class*="language-"]),
+.language-css .token.string,
+.style        .token.string,
+.token.entity, .token.operator, .token.punctuation, .token.url, .token.variable {
+  color: #f2f8f8;
+}
+.token.cdata, .token.comment, .token.doctype, .token.prolog {
+  color: #8890a0;
+}
+.token.constant, .token.deleted, .token.keyword, .token.property, .token.symbol, .token.tag {
+  color: #f92672;
+}
+.token.boolean, .token.number {
+  color: #ae81ff;
+}
+.token.attr-name, .token.builtin, .token.char, .token.inserted, .token.selector, .token.string {
+  color: #a6e22e;
+}
+.token.atrule, .token.attr-value, .token.function {
+  color: #e6db74;
+}
+.token.important, .token.regex {
+  color: #fd971f;
+}
+.token.bold, .token.important, .token.italic {
+  font-weight: bold;
+}
+
+    </style>
+  </head>
+  <body>
+
+<div id="unified-container">
+  <div id="unified-controls">
+    <div><button type="button" id="unified-reset" accesskey="r">Reset</button></div>
+    <div><button type="button" id="unified-parse" accesskey="p">Parse</button></div>
+    <div><button type="button" id="unified-copy"  accesskey="c">Copy</button></div>
+  </div>
+  <textarea id="unified-markdown" accesskey="m" placeholder="Markdown Here"></textarea>
+  <div id="unified-html"></div>
+</div>
+
+    <script type="module">
+
+import { unified } from 'https://esm.sh/unified@11?bundle';  // https://github.com/unifiedjs/unified?tab=readme-ov-file#install
+import remarkParse from 'https://esm.sh/remark-parse@11?bundle';  // https://github.com/remarkjs/remark/tree/main/packages/remark-parse#install
+import remarkFrontmatter from 'https://esm.sh/remark-frontmatter@5?bundle';  // https://github.com/remarkjs/remark-frontmatter?tab=readme-ov-file#install
+import remarkGfm from 'https://esm.sh/remark-gfm@4?bundle';  // https://github.com/remarkjs/remark-gfm?tab=readme-ov-file#install
+import remarkToc from 'https://esm.sh/remark-toc@9?bundle';  // https://github.com/remarkjs/remark-toc?tab=readme-ov-file#install
+import remarkRehype from 'https://esm.sh/remark-rehype@11?bundle';  // https://github.com/remarkjs/remark-rehype?tab=readme-ov-file#install
+import rehypeSlug from 'https://esm.sh/rehype-slug@6?bundle';  // https://github.com/rehypejs/rehype-slug?tab=readme-ov-file#install : remark-slug は非推奨になった模様 https://github.com/remarkjs/remark-slug
+import rehypeAutolinkHeadings from 'https://esm.sh/rehype-autolink-headings@7?bundle';  // https://github.com/rehypejs/rehype-autolink-headings?tab=readme-ov-file#install
+import rehypePrism from 'https://esm.sh/rehype-prism@2?bundle';  // https://github.com/Val-istar-Guo/rehype-prism
+import rehypeStringify from 'https://esm.sh/rehype-stringify@10?bundle';  // https://github.com/rehypejs/rehype/tree/main/packages/rehype-stringify#install
+import rehypeFormat from 'https://esm.sh/rehype-format@5?bundle';  // https://github.com/rehypejs/rehype-format?tab=readme-ov-file#install
+
+const processor = unified()
+  .use(remarkParse)
+  .use(remarkGfm)
+  .use(remarkFrontmatter)  // パースしておかないと Front Matter の情報が HTML に出力されてしまう
+  .use(remarkToc, { heading: '目次', tight: true })  // `## 目次` と書くとその下に Table of Contents を出力してくれる
+  .use(remarkRehype, { fragment: true, allowDangerousHtml: true })  // `html`・`head`・`body` 要素を自動付与しない・`script` や `style` 要素が記述されていても流す
+  .use(rehypeSlug)  // Slug を付与する
+  .use(rehypeAutolinkHeadings, {  // 見出し要素に Slug のパーマリンク要素を追加する
+    behavior: 'prepend',  // `prepend`・`append`・`wrap`・`before`・`after` で位置を選べる
+    properties: {  // `a` 要素に付与する属性
+      className: ['header-link']
+    },
+    content: {  // hast Node として `a` 要素の子要素を定義する
+      type: 'element',
+      tagName: 'span',
+      properties: {
+        className: ['header-link-mark']
+      },
+      children: []
+    }
+  })
+  .use(rehypePrism)
+  .use(rehypeStringify, { allowDangerousHtml: true })  // `script` や `style` 要素が記述されていても流す
+  .use(rehypeFormat, { indent: 2, indentInitial: true });
+
+document.getElementById('unified-reset').addEventListener('click', () => {
+  document.getElementById('unified-markdown').value = '';
+});
+
+document.getElementById('unified-parse').addEventListener('click', () => {
+  const markdown = document.getElementById('unified-markdown').value;
+  const result = processor.processSync(markdown);
+  document.getElementById('unified-html').innerHTML = String(result);
+  localStorage.setItem('markdown', markdown);
+});
+
+document.getElementById('unified-copy').addEventListener('click', () => {
+  navigator.clipboard.writeText(document.getElementById('unified-html').innerHTML).catch((error) => { console.error('コピー失敗', error); alert('コピー失敗'); });
+});
+
+// 初期表示
+const lastMarkdown = localStorage.getItem('markdown');
+if(lastMarkdown != null) {
+  document.getElementById('unified-markdown').value = lastMarkdown;
+  document.getElementById('unified-parse').click();
+}
+document.getElementById('unified-container').style.opacity = 1;
+
+    </script>
+  </body>
+</html>
