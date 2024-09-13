@@ -191,6 +191,8 @@ import rehypePrism from 'https://esm.sh/rehype-prism@2?bundle';  // https://gith
 import rehypeStringify from 'https://esm.sh/rehype-stringify@10?bundle';  // https://github.com/rehypejs/rehype/tree/main/packages/rehype-stringify#install
 import rehypeFormat from 'https://esm.sh/rehype-format@5?bundle';  // https://github.com/rehypejs/rehype-format?tab=readme-ov-file#install
 
+import 'https://esm.sh/prismjs@1/components/prism-bash';  // https://github.com/denoland/deno_blog/issues/15#issuecomment-1181923643
+
 const processor = unified()
   .use(remarkParse)
   .use(remarkGfm)
