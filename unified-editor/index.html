@@ -191,10 +191,21 @@ import rehypePrism from 'https://esm.sh/rehype-prism@2?bundle';  // https://gith
 import rehypeStringify from 'https://esm.sh/rehype-stringify@10?bundle';  // https://github.com/rehypejs/rehype/tree/main/packages/rehype-stringify#install
 import rehypeFormat from 'https://esm.sh/rehype-format@5?bundle';  // https://github.com/rehypejs/rehype-format?tab=readme-ov-file#install
 
+// よく使う言語は予めロードしておく
 import 'https://esm.sh/prismjs@1/components/prism-bash';  // https://github.com/denoland/deno_blog/issues/15#issuecomment-1181923643
-import 'https://esm.sh/prismjs@1/components/prism-markdown';  // https://unpkg.com/browse/prismjs@1.29.0/components/
+import 'https://esm.sh/prismjs@1/components/prism-markdown';
 import 'https://esm.sh/prismjs@1/components/prism-powershell';
-//import prismComponents from 'https://esm.sh/prismjs@1.29.0/components/index'; console.log(prismComponents.languages);
+
+import prismComponents from 'https://esm.sh/prismjs@1.29.0/components/index';  // https://unpkg.com/browse/prismjs@1.29.0/components/
+if(location.search.includes('all')) {  // `?all` とクエリパラメータを付けてアクセスした場合、全ての言語を読み込む
+  console.log('Load All Prism Languages : Start');
+  await Promise.all(
+    Object.keys(prismComponents.languages)
+      .filter(languageName => !['meta', 'django'].includes(languageName))  // 読み込むとエラーになるモノを弾いておく
+      .map(languageName => import(`https://esm.sh/prismjs@1/components/prism-${languageName}`).catch(() => null))  // 気休めの `catch`
+  );
+  console.log('Load All Prism Languages : Done');
+}
 
 const processor = unified()
   .use(remarkParse)
@@ -233,16 +244,23 @@ document.getElementById('unified-parse').addEventListener('click', () => {
 });
 
 document.getElementById('unified-copy').addEventListener('click', () => {
-  navigator.clipboard.writeText(document.getElementById('unified-html').innerHTML).catch((error) => { console.error('コピー失敗', error); alert('コピー失敗'); });
+  navigator.clipboard.writeText(document.getElementById('unified-html').innerHTML)
+    .catch(error => {
+      console.error('Failed To Copy', error);
+      alert('Failed To Copy');
+    });
 });
 
 // 初期表示
 const lastMarkdown = localStorage.getItem('markdown');
 if(lastMarkdown != null) {
+  console.log('Resume Markdown : Start');
   document.getElementById('unified-markdown').value = lastMarkdown;
   document.getElementById('unified-parse').click();
+  console.log('Resume Markdown : Done');
 }
 document.getElementById('unified-container').style.opacity = 1;
+console.log('Loaded');
 
     </script>
   </body>
