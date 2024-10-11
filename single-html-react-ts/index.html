@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Single HTML React TS</title>
+    
+    <!-- Google Search Console -->
+    <meta name="google-site-verification" content="ls7kuvIKSqVa_dcixqKvFwl393swvYMkHCkG-xtlCj0">
+    <!-- Global Site Tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-LP3ZQV2R3M"></script>
+    <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','G-LP3ZQV2R3M');gtag('config','UA-106501-6');</script>
+    <!-- Google AdSense -->
+    <script data-ad-client="ca-pub-6475907504235292" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+    
+    <style>
+
+*, ::before, ::after { box-sizing: border-box; }
+html { font-family: sans-serif; }
+
+    </style>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script>
+      Babel.registerPreset('tsx', {
+        presets: [
+          [Babel.availablePresets['typescript'], { allExtensions: true, isTSX: true }]
+        ]
+      });
+    </script>
+    <script type="text/babel" data-type="module" data-presets="tsx,react">
+
+import React, { useState } from 'https://cdn.skypack.dev/react@17';
+import ReactDOM from 'https://cdn.skypack.dev/react-dom@17';
+
+const Counter: React.Component = () => {
+  const [count, setCount] = React.useState<number>(0);
+  const handleClick = () => setCount(num => num + 1);
+  return (
+    <div>
+      <p>Count: {count}</p>
+      <p><button onClick={handleClick}>Increment</button></p>
+    </div>
+  );
+};
+
+ReactDOM.render(<Counter />, document.getElementById('app'));
+
+    </script>
+  </head>
+  <body>
+
+<h1>Single HTML React TS</h1>
+
+<div id="app"></div>
+
+<ul>
+  <li>参考 : <a href="https://qiita.com/murasuke/items/e0600497a8900ca8401b">React+TypeScriptを1つのHTMLファイルのみ(プリコンパイルなし)で実行するサンプル #babel - Qiita</a></li>
+</ul>
+
+  </body>
+</html>
