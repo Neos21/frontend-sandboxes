@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Practice Logic Flow</title>
+    
+    <!-- Google Search Console -->
+    <meta name="google-site-verification" content="ls7kuvIKSqVa_dcixqKvFwl393swvYMkHCkG-xtlCj0">
+    <!-- Global Site Tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-LP3ZQV2R3M"></script>
+    <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','G-LP3ZQV2R3M');gtag('config','UA-106501-6');</script>
+    <!-- Google AdSense -->
+    <script data-ad-client="ca-pub-6475907504235292" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@logicflow/core/lib/style/index.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@logicflow/core/dist/index.min.js"></script>
+    
+    <style>
+
+*, ::before, ::after { box-sizing: border-box; }
+html { font-family: sans-serif; }
+
+#container {
+  width: 100%;
+  height: 600px;
+  border: 1px solid #ccc;
+}
+
+    </style>
+    <script>
+
+document.addEventListener('DOMContentLoaded', () => {
+  const data = {
+    nodes: [
+      {
+        id: '21',
+        type: 'rect',
+        x: 100,
+        y: 200,
+        text: 'rect node'
+      },
+      {
+        id: '50',
+        type: 'circle',
+        x: 300,
+        y: 400,
+        text: 'circle node'
+      }
+    ],
+    edges: [
+      {
+        type: 'polyline',
+        sourceNodeId: '50',
+        targetNodeId: '21'
+      }
+    ]
+  };
+  
+  const lf = new Core.default({
+    container: document.getElementById('container'),
+    width: 800,
+    height: 599
+  });
+  lf.render(data);
+  
+  // const data = lf.getGraphData();
+  // const jsonStr = JSON.stringify(data, null, 2);
+});
+
+    </script>
+  </head>
+  <body>
+
+<h1>Practice Logic Flow</h1>
+
+<div id="container"></div>
+
+  </body>
+</html>
