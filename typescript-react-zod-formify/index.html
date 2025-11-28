@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>TypeScript + React + Zod In Single HTML File + &quot;Formify&quot;</title>
+    
+    <!-- Google Search Console -->
+    <meta name="google-site-verification" content="ls7kuvIKSqVa_dcixqKvFwl393swvYMkHCkG-xtlCj0">
+    <!-- Global Site Tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-LP3ZQV2R3M"></script>
+    <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','G-LP3ZQV2R3M');gtag('config','UA-106501-6');</script>
+    <!-- Google AdSense -->
+    <script data-ad-client="ca-pub-6475907504235292" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+    
+    <style>
+
+*, ::before, ::after { box-sizing: border-box; }
+html { font-family: sans-serif; }
+
+    </style>
+    
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script>
+      Babel.registerPreset('tsx', {
+        presets: [
+          // `preset-typescript` を指定する・`allExtensions` は `isTSX` 利用時に必要なためセットで記述する
+          [Babel.availablePresets['typescript'], { allExtensions: true, isTSX: true }]
+        ]
+      });
+    </script>
+    
+    <script type="text/babel" data-type="module" data-presets="tsx,react">
+
+import React, { useMemo, useState } from 'https://cdn.skypack.dev/react@19.2.0';  // https://www.npmjs.com/package/react
+import ReactDOM from 'https://cdn.skypack.dev/react-dom@19.2.0';  // https://www.npmjs.com/package/react-dom
+import { z } from 'https://cdn.skypack.dev/zod@4.1.13';  // https://www.npmjs.com/package/zod
+
+const MyComponent: React.Component = () => {
+  /** Zod スキーマを定義する */
+  const userSchema = z.object({
+    // String 系のプロパティは `undefined`・`null` を空文字に変換する
+    stringRequired: z.preprocess(value => value == null ? '' : String(value)                              , z.string().trim().min(1)),
+    stringOptional: z.preprocess(value => value == null ? '' : String(value)                              , z.string().trim().optional()),
+    stringNullable: z.preprocess(value => value == null ? '' : String(value)                              , z.string().trim().nullable()),
+    stringNullish : z.preprocess(value => value == null ? '' : String(value)                              , z.string().trim().nullish()),
+    // Number 系のプロパティは `undefined`・`null`・空文字は一律で `undefined` に変換する (未入力を `0` と解釈されないようにするため)・`coerce` によって型変換を行う
+    numberRequired: z.preprocess(value => value == null || String(value).trim() === '' ? undefined : value, z.coerce.number()),
+    numberOptional: z.preprocess(value => value == null || String(value).trim() === '' ? undefined : value, z.coerce.number().optional()),
+    numberNullable: z.preprocess(value => value == null || String(value).trim() === '' ? undefined : value, z.coerce.number().nullable()),
+    numberNullish : z.preprocess(value => value == null || String(value).trim() === '' ? undefined : value, z.coerce.number().nullish())
+  });
+  
+  /** Zod スキーマから型を定義する */
+  type User = z.infer<typeof userSchema>;
+  
+  /** Zod スキーマから生成した型は HTML フォームと組み合わせる際に、特に `number` 型との組み合わせが面倒になるため `string` 型も許容するようにするユーティリティ型を作る */
+  type Formify<T> = {
+    [K in keyof T]:
+      // 元が Number 型なプロパティに String 型を含めて曖昧にする
+      [T[K]] extends [string | number | null | undefined] ? string | number | null | undefined :
+      // Boolean はそのままにする (チェックボックス向けの考慮)
+      [T[K]] extends [boolean] ? boolean :
+      // その他オブジェクトなどはそのままの型としてみなす
+      T[K];
+  };
+  
+  /** Zod スキーマをベースに HTML フォームで取り扱いやすくするための型 */
+  type UserForm = Formify<User>;
+  
+  /** テスト用に `User` 型の各プロパティに指定の値をセットしたオブジェクトを生成する */
+  const generateUserValues = (value: 'DEFAULT' | string | number | null | undefined): User => {
+    /** Zod スキーマからプロパティ名を取得する */
+    const keys = Object.keys(userSchema.shape);
+    return keys.reduce((accumulator, key) => {
+      if(value === 'DEFAULT') {
+        // `DEFAULT` が指定された場合はプロパティに応じてエラーにならないような値を設定する
+        if     (key.startsWith('string')) (accumulator as any)[key] = 'Value';
+        else if(key.startsWith('number')) (accumulator as any)[key] = 1;
+        else                              (accumulator as any)[key] = value;
+      }
+      else {
+        // それ以外の場合は `User` の本来の型を無視して指定の値を設定する
+        (accumulator as any)[key] = value;
+      }
+      return accumulator;
+    }, {} as User);
+  };
+  
+  // ユーティリティ型で生成した `UserForm` を `React.useState` に適用しフォーム入力用に用いる
+  const [userForm, setUserForm] = useState<UserForm>(generateUserValues('DEFAULT'));
+  
+  /** フォーム入力の値をもって Zod バリデーションを行った結果を表示する */
+  const parseResult: string = useMemo(() => {
+    const parsed = userSchema.safeParse(userForm);
+    return JSON.stringify(parsed.success ? parsed : { success: false, issues: parsed.error.issues }, null, 2);
+  }, [userForm]);
+  
+  return (
+    <div>
+      <h1>TypeScript + React + Zod In Single HTML File + &quot;Formify&quot;</h1>
+      <div style={{ display: 'grid', gridTemplateColumns: 'auto 1fr', gap: '.25em .5em' }}>
+        <code>String Required</code><input type="text" value={userForm.stringRequired ?? ''} onChange={event => setUserForm(prevUserForm => ({ ...prevUserForm, stringRequired: event.target.value }))} />
+        <code>String Optional</code><input type="text" value={userForm.stringOptional ?? ''} onChange={event => setUserForm(prevUserForm => ({ ...prevUserForm, stringOptional: event.target.value }))} />
+        <code>String Nullable</code><input type="text" value={userForm.stringNullable ?? ''} onChange={event => setUserForm(prevUserForm => ({ ...prevUserForm, stringNullable: event.target.value }))} />
+        <code>String Nullish </code><input type="text" value={userForm.stringNullish  ?? ''} onChange={event => setUserForm(prevUserForm => ({ ...prevUserForm, stringNullish : event.target.value }))} />
+        <code>Number Required</code><input type="text" value={userForm.numberRequired ?? ''} onChange={event => setUserForm(prevUserForm => ({ ...prevUserForm, numberRequired: event.target.value }))} />
+        <code>Number Optional</code><input type="text" value={userForm.numberOptional ?? ''} onChange={event => setUserForm(prevUserForm => ({ ...prevUserForm, numberOptional: event.target.value }))} />
+        <code>Number Nullable</code><input type="text" value={userForm.numberNullable ?? ''} onChange={event => setUserForm(prevUserForm => ({ ...prevUserForm, numberNullable: event.target.value }))} />
+        <code>Number Nullish </code><input type="text" value={userForm.numberNullish  ?? ''} onChange={event => setUserForm(prevUserForm => ({ ...prevUserForm, numberNullish : event.target.value }))} />
+      </div>
+      <p style={{ display: 'inline-grid', gridTemplateColumns: 'repeat(7, auto)', gap: '.5rem' }}>
+        <button type="button" onClick={() => setUserForm(generateUserValues('DEFAULT'))}>Valid Values</button>
+        <button type="button" onClick={() => setUserForm(generateUserValues('Value'  ))}>String &quot;Value&quot;</button>
+        <button type="button" onClick={() => setUserForm(generateUserValues('1'      ))}>String &quot;1&quot;</button>
+        <button type="button" onClick={() => setUserForm(generateUserValues(''       ))}>Empty String &quot;&quot;</button>
+        <button type="button" onClick={() => setUserForm(generateUserValues(1        ))}>Number (1)</button>
+        <button type="button" onClick={() => setUserForm(generateUserValues(null     ))}>Null</button>
+        <button type="button" onClick={() => setUserForm(generateUserValues(undefined))}>Undefined</button>
+      </p>
+      <hr />
+      <h2>Zod Parse Result</h2>
+      <pre>{parseResult}</pre>
+      <hr />
+      <h2>Memo</h2>
+      <h3>User : Zod スキーマから生成した元の型</h3>
+      <pre>
+        type User = &#123;<br />
+          &nbsp;&nbsp;stringRequired : string;<br />
+          &nbsp;&nbsp;stringOptional?: string | undefined;<br />
+          &nbsp;&nbsp;stringNullable : string | null;<br />
+          &nbsp;&nbsp;stringNullish? : string | null | undefined;<br />
+          &nbsp;&nbsp;numberRequired : number;<br />
+          &nbsp;&nbsp;numberOptional?: number | undefined;<br />
+          &nbsp;&nbsp;numberNullable : number | null;<br />
+          &nbsp;&nbsp;numberNullish? : number | null | undefined;<br />
+        &#125;;
+      </pre>
+      <h3>UserForm : ユーティリティ型 Formify で変換したことで String 型を受け付けるようになっており HTML フォームで扱いやすくなる</h3>
+      <pre>
+        type UserForm = &#123;<br />
+          &nbsp;&nbsp;stringRequired : string | number | null | undefined;<br />
+          &nbsp;&nbsp;stringOptional?: string | number | null | undefined;<br />
+          &nbsp;&nbsp;stringNullable : string | number | null | undefined;<br />
+          &nbsp;&nbsp;stringNullish? : string | number | null | undefined;<br />
+          &nbsp;&nbsp;numberRequired : string | number | null | undefined;<br />
+          &nbsp;&nbsp;numberOptional?: string | number | null | undefined;<br />
+          &nbsp;&nbsp;numberNullable : string | number | null | undefined;<br />
+          &nbsp;&nbsp;numberNullish? : string | number | null | undefined;<br />
+        &#125;;
+      </pre>
+      <h3>本ページはシングル HTML ファイル内に React・Zod を記述し TypeScript (TSX) をトランスパイルしています</h3>
+      <ul>
+        <li>参考 : <a href="https://qiita.com/murasuke/items/e0600497a8900ca8401b">React+TypeScriptを1つのHTMLファイルのみ(プリコンパイルなし)で実行するサンプル</a></li>
+      </ul>
+    </div>
+  );
+};
+
+z.config(z.locales.ja());  // Zod のデフォルトメッセージを日本語化する
+ReactDOM.render(<MyComponent />, document.getElementById('app'));
+
+    </script>
+  </head>
+  <body>
+
+<div id="app"></div>
+
+  </body>
+</html>
